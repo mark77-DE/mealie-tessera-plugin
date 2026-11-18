@@ -1,0 +1,6 @@
+# Data shown by the Tessera preview bench.
+tiles:
+  - tile: browser
+    name: Mealie – Rezeptsuche
+    options:
+      query: sauce
