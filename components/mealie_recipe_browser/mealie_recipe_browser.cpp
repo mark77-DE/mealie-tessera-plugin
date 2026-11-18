@@ -127,6 +127,11 @@ void MealieRecipeBrowser::on_message(JsonObjectConst message) {
   JsonObjectConst result = message["result"].as<JsonObjectConst>();
   JsonArrayConst items = result["recipes"]["items"].as<JsonArrayConst>();
   if (items.isNull()) items = result["items"].as<JsonArrayConst>();
+  if (items.isNull()) {
+    recipes_.clear();
+    status_ = "unexpected_response";
+    return;
+  }
 
   recipes_.clear();
   for (JsonObjectConst item : items) {
