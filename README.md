@@ -1,58 +1,44 @@
-# Mealie Recipe Browser
+# Mealie Recipe Browser für Tessera
 
-Ein gemeinsamer Rezeptbrowser für Home Assistant und das große Tessera-Küchendisplay. Beide Oberflächen greifen auf dieselbe Mealie-Datenbasis und dieselben fachlichen Datenmodelle zurück.
+Ein Tessera-Plugin zum Suchen, Anzeigen und Kochen von Rezepten aus einer Mealie-Instanz.
 
-> Entwicklungsstand: Grundlagen und Bedienkonzepte dokumentiert; es gibt noch keine installierbare Lovelace-Karte oder Tessera-Plugin-Version.
+> Entwicklungsstand: technische Grundlagen und Bedienkonzept dokumentiert; das Plugin ist noch nicht installierbar.
 
 ## Ziel
 
-Rezepte aus einer Mealie-Instanz sollen sowohl im Home-Assistant-Dashboard als auch auf einem großen Tessera-Touchdisplay gesucht, angezeigt und beim Kochen genutzt werden können.
+Der Rezeptbrowser ergänzt ein bestehendes Tessera-Dashboard um eine eigenständige Rezeptoberfläche. Die normale Tessera-Oberfläche bleibt erhalten.
 
-Die beiden Oberflächen werden eigenständig entwickelt:
-
-- **Home Assistant:** Lovelace-Custom-Card für bestehende HA-Dashboards.
-- **Tessera:** zusätzliche Rezeptoberfläche für ein großes Touchdisplay, insbesondere das Guition JC8012P4A1C-I-W-Y (1280 × 800). Kleine Tessera-Displays sind vorerst kein Ziel.
-
-## Gemeinsame Grundlage
-
-- Mealie als Quelle für Rezepte, Kategorien und Rezeptdetails
-- Home Assistant als zentrale Integrations- und Vermittlungsschicht
-- ein gemeinsames, frontend-neutrales Rezeptdatenmodell
-- gemeinsame fachliche Logik, z. B. Zeitformatierung und spätere Portionsberechnung
-
-Die Oberflächen, Navigation und Darstellung bleiben frontend-spezifisch. Tessera wird nicht zur Voraussetzung für die Home-Assistant-Karte und umgekehrt.
+Zielgerät ist das große 10,1-Zoll-Touchdisplay Guition JC8012P4A1C-I-W-Y / JC8012P4A1, Hardware V3, mit 1280 × 800 Pixeln. Kleine Tessera-Displays sind ausdrücklich nicht Teil des aktuellen Projektziels.
 
 ## Geplante Funktionen
 
-- Rezeptsuche nach Namen und Zutaten
-- Kategorien und ungefilterte Rezeptübersicht
-- Trefferliste mit Bild, Zeit und Portionen
-- Rezeptdetails mit Zutaten und Zubereitung
+- Rezepte direkt auf dem Touchdisplay suchen
+- Kategorien dynamisch aus Mealie laden
+- Suchtreffer mit Bild, Zeit und Portionen anzeigen
+- Rezeptdetails mit Zutaten und Zubereitung darstellen
 - Portionenzahl anpassen
 - Kochmodus mit Zutaten-Checkliste und Schritt-Navigation
 
-## Projektstruktur (Zielbild)
+## Architektur
 
-- `backend/homeassistant/`: Mealie-Anbindung und Bereitstellung der Daten
-- `shared/`: gemeinsames Datenmodell und fachliche Logik
-- `frontend/home-assistant-card/`: Lovelace-Custom-Card
-- `tessera/plugin/`: Plugin für das große Tessera-Display
-- `docs/`: Architektur, Datenmodell und Entwicklungsentscheidungen
+- **Mealie:** Quelle für Rezepte, Kategorien und Rezeptdetails
+- **Home Assistant:** stellt über die installierte Mealie-Integration die Rezeptdaten bereit und vermittelt die Aufrufe
+- **Tessera-App:** führt deklarierte Home-Assistant-Befehle aus und übermittelt Antworten
+- **Tessera-Plugin:** rendert Suche, Treffer, Details und Kochmodus auf dem großen Display
 
-Die Struktur wird schrittweise aufgebaut. Es wird noch kein nicht getesteter Code als funktionsfähig vorausgesetzt.
+Eine eigene Lovelace-Karte ist nicht Bestandteil dieses Projekts. Für Home Assistant können bereits vorhandene Mealie-Karten aus dem Marketplace genutzt werden.
 
 ## Projektstatus
 
-In Home Assistant wurden `mealie.get_recipes` (Rezeptsuche) und `mealie.get_recipe` (vollständiger Rezeptabruf) praktisch getestet. Die beobachteten Felder sind in [docs/mealie-data-model.md](docs/mealie-data-model.md) dokumentiert.
+In Home Assistant wurden `mealie.get_recipes` (Rezeptsuche) und `mealie.get_recipe` (vollständiger Rezeptabruf) praktisch getestet. Die beobachteten Felder stehen in [docs/mealie-data-model.md](docs/mealie-data-model.md).
 
 ## Dokumentation
 
 - [Architektur](docs/architecture.md)
-- [Gemeinsamer Datenvertrag](docs/shared-data-contract.md)
+- [Tessera-Datenvertrag](docs/shared-data-contract.md)
 - [Bedienkonzept](docs/ui-concept.md)
 - [Beobachtetes Mealie-Datenmodell](docs/mealie-data-model.md)
 - [Home-Assistant-Aktionen](docs/home-assistant.md)
-- [Konzept der Home-Assistant-Karte](docs/home-assistant-card.md)
 - [Entwicklungsplan](docs/development.md)
 
 ## Sicherheit
