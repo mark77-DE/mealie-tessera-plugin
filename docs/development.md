@@ -1,26 +1,33 @@
 # Entwicklungsplan
 
+Das Projekt wird als gemeinsamer Rezeptbrowser mit zwei Oberflächen entwickelt. Die Home-Assistant-Karte ist die erste vollständige Referenzoberfläche. Tessera folgt als optimierte Oberfläche für das große Küchendisplay.
+
 ## Phase 0 – Grundlagen
 - [x] GitHub-Repository angelegt
 - [x] Mealie-Rezeptsuche in Home Assistant getestet
 - [x] Vollständigen Rezeptabruf in Home Assistant getestet
-- [x] Beobachtetes Datenmodell dokumentiert
-- [ ] Tessera-Template und Plugin-API-Version festlegen
-- [ ] Plugin-Prüfwerkzeuge und Preview-Umgebung einrichten
+- [x] Beobachtetes Mealie-Datenmodell dokumentiert
+- [x] Zielbild mit zwei Frontends festgelegt
+- [ ] Gemeinsamen Rezept-Datenvertrag finalisieren
+- [ ] Mealie-Kategorien zuverlässig abrufen
+- [ ] HA-Service-Rückgaben und Frontend-Zugriff verbindlich prüfen
 
-## Phase 1 – Datenfluss
-- [ ] Exakte Home-Assistant-Service-Namen und Eingabefelder der Mealie-Aktionen festhalten
-- [ ] Tessera-Manifest mit `permissions.ha_commands` und passenden `answers` erstellen
-- [ ] Suchantwort auf wenige Felder begrenzen
-- [ ] Rezeptdetails getrennt abrufen
-- [ ] Größenlimits mit realen Rezepten testen
+## Phase 1 – Gemeinsame Datenbasis
+- [ ] Rezept-, Zutaten-, Schritt- und Kategorienmodell festlegen
+- [ ] Mealie-Suche und Rezeptdetails über Home Assistant abrufen
+- [ ] Mealie-Antworten normalisieren
+- [ ] Fehler-, Leer- und Ladezustände definieren
+- [ ] Kategorienquelle und Filterstrategie festlegen
+- [ ] Portionsberechnung fachlich spezifizieren und mit Beispielen testen
 
-## Phase 2 – Erste Oberfläche
-- [ ] Plugin-Komponente aus dem offiziellen Tessera-Template erzeugen
-- [ ] Rezeptsuche als Touch-Oberfläche umsetzen
-- [ ] Suchtreffer darstellen
-- [ ] Rezeptdetailansicht mit Zutaten und Anleitung darstellen
-- [ ] Deutsch und Englisch als Übersetzungen pflegen
+## Phase 2 – Home-Assistant-Custom-Card
+- [ ] Minimal lauffähiges Custom-Card-Grundgerüst erstellen
+- [ ] Konfiguration und Auswahl der Mealie-Integration klären
+- [ ] Rezeptsuche und Kategorien integrieren
+- [ ] Trefferliste mit Zeiten, Portionen und optionalen Bildern
+- [ ] Rezeptdetailansicht mit Zutaten und Anleitung
+- [ ] Responsive Layout für Tablet und Desktop
+- [ ] In ein bestehendes HA-Dashboard integrieren und testen
 
 ## Phase 3 – Kochfunktionen
 - [ ] Portionenzahl anpassen
@@ -29,15 +36,25 @@
 - [ ] Vorheriger/Nächster Schritt
 - [ ] Optional Timer-Funktion prüfen
 
-## Phase 4 – Displaytest
+## Phase 4 – Tessera-Plugin für das große Display
+- [ ] Tatsächliche Tessera-App-/Plugin-API-Version feststellen
+- [ ] Offizielles Plugin-Template und Preview einrichten
+- [ ] HA-Kommandos und Antworttransport verifizieren
+- [ ] Große Touch-Suchoberfläche umsetzen
+- [ ] Kategorien und Trefferliste darstellen
+- [ ] Rezeptdetails und Kochmodus umsetzen
+- [ ] Nachrichtengrößen und Aufteilung langer Inhalte testen
+
+## Phase 5 – Zielgerät und Stabilisierung
 - [ ] Preview mit 1280 × 800 prüfen
-- [ ] Touch-Bedienung testen
+- [ ] Touch-Bedienung und Lesbarkeit aus typischem Betrachtungsabstand testen
 - [ ] Speicherbedarf und Antwortgrößen prüfen
 - [ ] Auf dem Guition JC8012P4A1C-I-W-Y / Hardware V3 testen, sobald vorhanden
+- [ ] Installations- und Update-Anleitung dokumentieren
 
 ## Entwicklungsregeln
 - Kleine, nachvollziehbare Commits.
 - Keine Annahmen über nicht getestete Mealie-Felder.
-- Tessera-Dateistruktur aus dem offiziellen Template übernehmen.
-- Vor einer Plugin-Version `tools/check.py` und Tessera-Preview ausführen.
+- Gemeinsame Datenmodelle vor UI-spezifischer Implementierung festlegen.
+- Keine Secrets oder installationsspezifischen IDs einchecken.
 - Bestehende Home-Assistant- und Tessera-Konfiguration nicht ungefragt überschreiben.
