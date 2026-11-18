@@ -2,86 +2,75 @@
 
 ## Zielbild
 
-Ein gemeinsamer Mealie-Rezeptbrowser erhält zwei eigenständige Oberflächen:
-
-1. eine Lovelace-Custom-Card für Home Assistant,
-2. ein Tessera-Plugin für das große 10,1-Zoll-Küchendisplay.
-
-Beide Oberflächen nutzen dieselbe fachliche Datenbasis und sollen dieselben Rezeptfunktionen anbieten. Die Darstellung und Bedienung werden nicht geteilt, sondern jeweils passend zur Plattform umgesetzt.
+Das Projekt ist ein Tessera-Plugin als Rezeptbrowser für das große 10,1-Zoll-Küchendisplay. Es ergänzt das bestehende Tessera-Dashboard, ersetzt es aber nicht.
 
 ## Architekturprinzip
 
 ```text
-                         Mealie
-                           |
-                  Home-Assistant-Integration
-                           |
-              zentrale Daten-/Vermittlungsschicht
-                           |
-              gemeinsamer Rezept-Datenvertrag
-                     /             \
-                    /               \
-        Home-Assistant-Karte     Tessera-Plugin
-        Lovelace / JavaScript    ESPHome / C++
+       Mealie
+          |
+  Home-Assistant-Mealie-Integration
+          |
+  deklarierte HA-Kommandos / Antworttransport
+          |
+    Tessera-App und Firmware
+          |
+      Tessera-Plugin
+          |
+ Suche · Kategorien · Treffer · Details · Kochmodus
 ```
 
-Home Assistant ist die zentrale Integrationsschicht. Die konkrete technische Form der Vermittlung (HA-Service-Aufrufe, Template-/REST-Helfer oder eine eigene Integration) wird anhand der benötigten Rückgabedaten und der Tessera-Nachrichtengrenzen festgelegt.
+Home Assistant ist die Vermittlungsschicht zwischen Plugin und Mealie. Das Plugin soll keine ungeschützte direkte Verbindung zu Mealie benötigen.
 
-## Gemeinsame Zuständigkeiten
+## Zuständigkeiten
 
-### Mealie und Home Assistant
-- Verbindung zur Mealie-Instanz
-- Rezeptsuche und Abruf vollständiger Rezeptdaten
-- Bereitstellung der Kategorien
-- sichere Verwaltung installationsspezifischer Zugangsdaten und IDs
-- Normalisierung der Mealie-Antworten in einen stabilen, frontend-neutralen Datenvertrag
+### Mealie
+- Quelle der Rezeptdaten, Kategorien, Zutaten und Zubereitungsschritte
+- liefert Suchergebnisse und vollständige Rezeptdetails
 
-### Gemeinsamer Datenvertrag und Fachlogik
-- einheitliche Felder für Rezepte, Zutaten, Schritte und Kategorien
-- Zeitformatierung und Behandlung optionaler Daten
-- Portionsfaktor und – sobald fachlich sauber möglich – Mengenberechnung
-- definierte Lade-, Leer- und Fehlerzustände
+### Home Assistant
+- Verbindung zur Mealie-Instanz über die installierte Integration
+- Aufruf von `mealie.get_recipes` und `mealie.get_recipe`
+- Bereitstellung der Kategorien über einen noch festzulegenden sicheren Weg
+- Verwaltung installationsspezifischer Zugangsdaten und IDs
 
-Der gemeinsame Vertrag beschreibt Daten und Verhalten, nicht die konkrete UI-Implementierung. Die Datenmodelle können in beiden Frontends sprachspezifisch abgebildet werden.
-
-## Frontend-Zuständigkeiten
-
-### Home-Assistant-Custom-Card
-- Einbettung in bestehende Lovelace-Dashboards
-- Suche, Kategorien, Trefferliste und Rezeptdetails
-- responsive Darstellung für Tablet, Desktop und HA-Touchscreens
-- Kochmodus innerhalb der Karte
-
-Die Karte soll sich in bestehende Dashboards integrieren lassen und keine separate HA-Installation oder ein eigenes Dashboard voraussetzen.
+### Tessera-App
+- liest das Plugin-Manifest
+- führt deklarierte Home-Assistant-Befehle aus
+- übergibt Antworten an die Plugin-Firmware
 
 ### Tessera-Plugin
-- zusätzlicher Einstieg aus dem bestehenden Tessera-Dashboard
-- Touch-Oberfläche optimiert für 1280 × 800 Pixel
-- große Trefferkarten und gut lesbare Rezeptdetails
-- Kochmodus mit großen Schritt-Schaltflächen
-- Rückkehr zum bestehenden Dashboard ohne dessen Layout zu verändern
-
-Kleine Tessera-Displays sind vorerst ausdrücklich nicht Ziel der Umsetzung.
-
-### Tessera-App und Firmware
-Die Tessera-App führt deklarierte Home-Assistant-Befehle aus und reicht Antworten an das Plugin weiter. Das Plugin soll keine ungeschützte direkte Verbindung zu Mealie benötigen. Die konkrete Manifest-Syntax und die Nachrichtengrenzen werden vor der Implementierung anhand der tatsächlich eingesetzten Tessera-Version geprüft.
+- Touch-Eingabe und Navigation
+- Rezeptsuche und Kategorienauswahl
+- Trefferliste und Rezeptdetails
+- Portionenfaktor und Zutaten-Checkliste
+- Kochmodus und Schritt-Navigation
 
 ## Datenfluss
 
-1. Ein Frontend fordert Kategorien, Suchtreffer oder ein Rezept an.
-2. Die Anfrage wird über die für das jeweilige Frontend vorgesehene HA-Schnittstelle ausgeführt.
-3. Home Assistant ruft die Mealie-Integration bzw. den festgelegten Kategorien-Endpunkt auf.
-4. Die Rückgabe wird in das gemeinsame Datenmodell überführt.
-5. Das jeweilige Frontend rendert die Daten plattformspezifisch.
+1. Der Nutzer öffnet den Rezeptbereich über das bestehende Tessera-Dashboard.
+2. Das Plugin fordert Kategorien oder Suchtreffer an.
+3. Die Tessera-App führt den im Manifest deklarierten Home-Assistant-Befehl aus.
+4. Home Assistant ruft die Mealie-Integration bzw. den festgelegten Kategorien-Endpunkt auf.
+5. Die Tessera-App übergibt die Antwort an das Plugin.
+6. Das Plugin stellt die Daten dar.
+7. Beim Öffnen eines Rezepts werden die vollständigen Details separat geladen.
 
-Suchtreffer und Rezeptdetails werden getrennt geladen. Für Tessera werden große Listen und lange Texte zusätzlich in transportgerechte Pakete aufgeteilt.
+Suchergebnisse bleiben kompakt. Zutaten und Anweisungen werden erst beim Öffnen eines Rezepts angefordert.
 
 ## Technische Leitplanken
 
-- Bestehende Home-Assistant- und Tessera-Dashboards bleiben unangetastet.
+- Vorhandenes Tessera-Dashboard bleibt unangetastet.
+- Zielauflösung: 1280 × 800 Pixel.
+- Kleine Tessera-Displays sind kein Ziel.
 - Keine Zugangsdaten, Tokens, privaten URLs oder Config-Entry-IDs im Repository.
-- Keine Mealie-API-Annahmen ohne Test gegen die verwendete Version.
-- Gemeinsame Fachlogik, aber getrennte UI-Implementierungen.
-- Suchergebnisse kompakt halten; vollständige Details erst bei Auswahl laden.
-- Tessera-API-Version so niedrig wie möglich wählen, aber nur nach Prüfung der benötigten Funktionen.
-- Keine vorzeitige Festlegung auf eine eigene HA-Integration, solange ein schlankerer und stabiler Weg genügt.
+- Keine Annahmen über nicht getestete Mealie-Felder.
+- Lange Texte und große Listen werden in transportgerechte Pakete aufgeteilt.
+- Tessera-API-Version so niedrig wie möglich wählen, aber benötigte Funktionen vorher prüfen.
+- Die tatsächliche Manifest-Syntax, dynamische Eingabewerte und Antwortzuordnung werden anhand der installierten Tessera-Version verifiziert.
+
+## Offene technische Kernfrage: Kategorien
+
+Die Mealie-API stellt eine Kategorienliste über `GET /api/organizers/categories` bereit. Die Home-Assistant-Mealie-Integration bietet nach bisherigem Test keine eigene Aktion zum Auflisten der Kategorien; ihr Kategorien-Sensor liefert nur die Anzahl. `mealie.get_recipes` nimmt einen Freitext-Suchbegriff, aber keine Kategorie-ID entgegen.
+
+Vor der UI-Implementierung muss geklärt werden, wie Home Assistant die Kategorien sicher an Tessera liefern kann und wie die Auswahl einer Kategorie in eine Mealie-Abfrage übersetzt wird.
