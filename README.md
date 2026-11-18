@@ -32,6 +32,7 @@ Die Mealie-Aktionen wurden in Home Assistant getestet: Rezeptsuche (Suchbegriff 
 
 - [Architektur](docs/architecture.md)
 - [Beobachtetes Mealie-Datenmodell](docs/mealie-data-model.md)
+- [Home-Assistant-Aktionen](docs/home-assistant.md)
 - [Entwicklungsplan](docs/development.md)
 
 Technische Grundlage: [Tessera Plugin-Dokumentation](https://github.com/MaxGramser/tessera-plugins).
