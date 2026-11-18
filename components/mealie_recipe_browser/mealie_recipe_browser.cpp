@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <string>
+#include <utility>
 
 namespace esphome::mealie_recipe_browser {
 
@@ -23,7 +24,7 @@ class RecipeBrowserTile : public tessera::Tile {
 
     query_ = context.options["query"] | "sauce";
     query_label_ = ui::label(context.parent, Font::BODY, theme::MUTED);
-    ui::set_text(query_label_, tessera::format(plugin_->text("searching_for"), query_));
+    ui::set_text(query_label_, tessera::fill(plugin_->text("searching_for"), "n", query_));
     lv_obj_set_pos(query_label_, 0, ui::line_height(Font::TITLE) + ui::px(8));
     lv_obj_set_size(query_label_, width_, ui::line_height(Font::BODY));
 
