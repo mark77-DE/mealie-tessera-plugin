@@ -1,0 +1,24 @@
+{
+  "_meta": { "name": "English" },
+  "screen": {
+    "screen_title": "Mealie recipes",
+    "searching_for": "Search: {n}",
+    "not_loaded": "Not loaded",
+    "loading": "Loading recipes…",
+    "loaded": "Recipes loaded",
+    "no_results": "No recipes found",
+    "missing_config": "Configure the Mealie integration first",
+    "request_failed": "Could not send request",
+    "service_error": "Home Assistant could not load recipes"
+  },
+  "app": {
+    "name": "Mealie Recipe Browser",
+    "summary": "Search and browse recipes from your Mealie instance.",
+    "tile_browser": "Recipe browser",
+    "tile_example": "A searchable list of recipes from Mealie.",
+    "config_entry_id": "Mealie integration entry",
+    "config_entry_id_hint": "The Home Assistant config entry ID of your Mealie integration. This value stays local to your Tessera setup.",
+    "query": "Search term",
+    "query_hint": "The initial search term shown on the recipe browser screen."
+  }
+}
