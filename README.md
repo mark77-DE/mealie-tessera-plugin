@@ -2,7 +2,7 @@
 
 Ein Tessera-Plugin zum Suchen, Anzeigen und Kochen von Rezepten aus einer Mealie-Instanz.
 
-> Entwicklungsstand: technische Grundlagen und Bedienkonzept dokumentiert; das Plugin ist noch nicht installierbar.
+> Entwicklungsstand: Plugin-Grundgerüst und erster Home-Assistant-Aufruf für die Rezeptsuche sind implementiert. Die Touch-Suche und Rezeptdetailansicht folgen.
 
 ## Ziel
 
@@ -10,27 +10,29 @@ Der Rezeptbrowser ergänzt ein bestehendes Tessera-Dashboard um eine eigenständ
 
 Zielgerät ist das große 10,1-Zoll-Touchdisplay Guition JC8012P4A1C-I-W-Y / JC8012P4A1, Hardware V3, mit 1280 × 800 Pixeln. Kleine Tessera-Displays sind ausdrücklich nicht Teil des aktuellen Projektziels.
 
-## Geplante Funktionen
-
-- Rezepte direkt auf dem Touchdisplay suchen
-- Kategorien dynamisch aus Mealie laden
-- Suchtreffer mit Bild, Zeit und Portionen anzeigen
-- Rezeptdetails mit Zutaten und Zubereitung darstellen
-- Portionenzahl anpassen
-- Kochmodus mit Zutaten-Checkliste und Schritt-Navigation
-
 ## Architektur
 
 - **Mealie:** Quelle für Rezepte, Kategorien und Rezeptdetails
-- **Home Assistant:** stellt über die installierte Mealie-Integration die Rezeptdaten bereit und vermittelt die Aufrufe
+- **Home Assistant:** stellt über die installierte Mealie-Integration Rezeptdaten bereit
 - **Tessera-App:** führt deklarierte Home-Assistant-Befehle aus und übermittelt Antworten
 - **Tessera-Plugin:** rendert Suche, Treffer, Details und Kochmodus auf dem großen Display
 
-Eine eigene Lovelace-Karte ist nicht Bestandteil dieses Projekts. Für Home Assistant können bereits vorhandene Mealie-Karten aus dem Marketplace genutzt werden.
+Eine eigene Lovelace-Karte ist nicht Bestandteil dieses Projekts.
 
-## Projektstatus
+## Aktueller Stand
 
-In Home Assistant wurden `mealie.get_recipes` (Rezeptsuche) und `mealie.get_recipe` (vollständiger Rezeptabruf) praktisch getestet. Die beobachteten Felder stehen in [docs/mealie-data-model.md](docs/mealie-data-model.md).
+- Plugin-Manifest für Tessera Plugin API 0.28 angelegt.
+- ESPHome-Komponente und Full-Screen-Tile angelegt.
+- Erster Datenaufruf über `mealie.get_recipes` implementiert.
+- Der erste Suchbegriff wird aktuell als Tile-Option gesetzt.
+- Die Suchergebnisliste zeigt Rezeptname, Gesamtzeit und Portionen.
+- Touch-Tastatur, Kategorien, Rezeptdetails und Kochmodus sind noch nicht implementiert.
+
+## Einrichtung und Sicherheit
+
+Beim Hinzufügen des Plugins wird die installationsspezifische Config-Entry-ID der Mealie-Integration als lokale Plugin-Eingabe abgefragt. Sie wird nicht im Repository gespeichert. Im Tile-Inspector kann ein erster Suchbegriff gesetzt werden.
+
+Keine Home-Assistant-Tokens, Mealie-Zugangsdaten, privaten URLs, Config-Entry-IDs oder sonstigen Secrets in dieses Repository einchecken.
 
 ## Dokumentation
 
@@ -40,7 +42,3 @@ In Home Assistant wurden `mealie.get_recipes` (Rezeptsuche) und `mealie.get_reci
 - [Beobachtetes Mealie-Datenmodell](docs/mealie-data-model.md)
 - [Home-Assistant-Aktionen](docs/home-assistant.md)
 - [Entwicklungsplan](docs/development.md)
-
-## Sicherheit
-
-Keine Home-Assistant-Tokens, Mealie-Zugangsdaten, privaten URLs, Config-Entry-IDs oder sonstigen Secrets in dieses Repository einchecken.
