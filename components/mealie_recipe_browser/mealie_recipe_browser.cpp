@@ -108,7 +108,7 @@ bool MealieRecipeBrowser::search(const std::string &terms) {
   request["ask"] = "call_service:mealie.get_recipes";
   request["data"]["config_entry_id"] = config_entry_id_;
   request["data"]["search_terms"] = terms;
-  request["data"]["result_limit"] = 6;
+  request["data"]["result_limit"] = 3;
 
   request_id_ = tessera::send(this, request.as<JsonObjectConst>());
   status_ = request_id_ ? "loading" : "request_failed";
