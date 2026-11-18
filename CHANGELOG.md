@@ -14,3 +14,9 @@
 - Architektur und Entwicklungsplan auf gemeinsame Datenbasis und getrennte Oberflächen umgestellt.
 - Konzept für die Home-Assistant-Custom-Card ergänzt.
 - Entwurf eines gemeinsamen Rezept-Datenvertrags ergänzt.
+
+
+## 0.3.0 - 2026-11-18
+- Projekt wieder auf Tessera als einziges zu entwickelndes Frontend fokussiert.
+- Eigene Lovelace-Custom-Card aus dem Projektumfang entfernt; vorhandene Marketplace-Karten werden vorausgesetzt.
+- Architektur, Datenvertrag und Entwicklungsplan entsprechend vereinfacht.
