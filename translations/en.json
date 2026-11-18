@@ -1,5 +1,7 @@
 {
-  "_meta": { "name": "English" },
+  "_meta": {
+    "name": "English"
+  },
   "screen": {
     "screen_title": "Mealie recipes",
     "searching_for": "Search: {n}",
@@ -9,7 +11,8 @@
     "no_results": "No recipes found",
     "missing_config": "Configure the Mealie integration first",
     "request_failed": "Could not send request",
-    "service_error": "Home Assistant could not load recipes"
+    "service_error": "Home Assistant could not load recipes",
+    "unexpected_response": "Unexpected response format from Mealie"
   },
   "app": {
     "name": "Mealie Recipe Browser",
