@@ -1,39 +1,36 @@
-# Gemeinsamer Rezept-Datenvertrag
+# Tessera-Rezeptdatenvertrag
 
 ## Zweck
 
-Dieses Dokument definiert die frontend-neutrale Datenstruktur zwischen der Home-Assistant-Daten-/Vermittlungsschicht und den beiden Oberflächen. Es ist ein Entwurf auf Basis der bisher beobachteten Mealie-Antworten, keine Behauptung über eine bereits implementierte API.
+Dieses Dokument beschreibt die Daten, die das Tessera-Plugin aus Home Assistant benötigt. Es ist ein Entwurf auf Basis der bisher beobachteten Mealie-Antworten, keine vollständige Mealie-API-Spezifikation.
 
-Die Lovelace-Karte und das Tessera-Plugin sollen dieselben fachlichen Felddefinitionen verwenden. Die konkrete Serialisierung darf je nach Transport unterschiedlich sein.
+Die Mealie-Feldnamen werden in der Plugin-Logik auf ein übersichtliches internes Modell abgebildet. Die konkrete Serialisierung muss die begrenzten Tessera-Nachrichtengrößen berücksichtigen.
 
 ## Grundsätze
 
-- Mealie-Feldnamen werden nicht ungeprüft bis in die UI durchgereicht.
-- Optionale oder fehlende Werte bleiben optional und werden nicht durch erfundene Standardwerte ersetzt.
+- Optionale oder fehlende Werte bleiben optional.
 - Suchergebnisse enthalten nur kompakte Metadaten.
 - Zutaten und Anweisungen werden erst beim Öffnen eines Rezepts geladen.
-- Tessera darf lange Inhalte in mehrere Transportpakete aufteilen; die fachliche Bedeutung der Daten bleibt identisch.
+- Lange Zutaten- und Anweisungslisten dürfen in mehrere Nachrichten aufgeteilt werden.
+- Für die erste Version wird Mealie's formatiertes Zutatenfeld `display` verwendet.
 
-## Entitäten
-
-### RecipeSummary
+## Rezepttreffer
 
 | Feld | Typ | Bedeutung |
 |---|---|---|
 | `id` | string | Mealie-Rezept-ID |
 | `name` | string | Anzeigename |
-| `slug` | string? | Slug, falls vorhanden |
+| `slug` | string? | Slug |
 | `description` | string? | Kurzbeschreibung |
-| `image` | string? | Bildreferenz oder auflösbare Bild-URL |
+| `image` | string? | Bildreferenz |
 | `totalTimeSeconds` | number? | Gesamtzeit |
 | `prepTimeSeconds` | number? | Vorbereitungszeit |
-| `cookTimeSeconds` | number? | Aktive Zubereitungszeit |
-| `servings` | number? | Rezeptportionen |
-| `categories` | CategoryRef[]? | Kategorien, sofern im Suchergebnis vorhanden |
+| `cookTimeSeconds` | number? | aktive Zubereitungszeit |
+| `servings` | number? | Portionen |
 
-### RecipeDetail
+## Rezeptdetails
 
-Enthält alle Felder aus `RecipeSummary` und zusätzlich:
+Zusätzlich zu den Trefferfeldern:
 
 - `ingredients: Ingredient[]`
 - `instructions: Instruction[]`
@@ -45,14 +42,12 @@ Enthält alle Felder aus `RecipeSummary` und zusätzlich:
 
 | Feld | Typ | Bedeutung |
 |---|---|---|
-| `display` | string | Von Mealie formatierte Zutatenzeile |
-| `quantity` | number? | Numerische Menge, falls vorhanden |
+| `display` | string | formatierte Zutatenzeile |
+| `quantity` | number? | numerische Menge, falls vorhanden |
 | `unit` | string? | Einheitenbezeichnung |
 | `food` | string? | Lebensmittelname |
 | `note` | string? | Zusatzhinweis |
-| `referenceId` | string? | Referenz für Rezept-/Schrittbezüge |
-
-Für die erste UI-Version ist `display` die maßgebliche Darstellung. Eine Portionsumrechnung darf erst aktiviert werden, wenn Mengen, Einheiten und nicht-numerische Angaben zuverlässig behandelt werden.
+| `referenceId` | string? | Zutatenreferenz |
 
 ### Instruction
 
@@ -61,43 +56,28 @@ Für die erste UI-Version ist `display` die maßgebliche Darstellung. Eine Porti
 | `id` | string? | Mealie-Schritt-ID |
 | `title` | string? | Schrittüberschrift |
 | `text` | string | Zubereitungstext |
-| `ingredientReferences` | string[]? | Verknüpfte Zutatenreferenzen |
+| `ingredientReferences` | string[]? | Zutatenreferenzen |
 | `notes` | string[]? | Schrittbezogene Notizen |
 
-### CategoryRef
+## Kategorien
 
 | Feld | Typ | Bedeutung |
 |---|---|---|
 | `id` | string | Mealie-Kategorie-ID |
 | `name` | string | Kategoriename |
 
-## Abfragekonzept
+## Logische Abfragen
 
-Fachliche Operationen:
+- Kategorien abrufen
+- Rezepte anhand eines Suchbegriffs abrufen
+- Rezeptdetails anhand der Rezept-ID abrufen
 
-- `listCategories()` → CategoryRef[]
-- `searchRecipes(query, categoryId?, limit, page?)` → RecipeSummary[]
-- `getRecipe(recipeId)` → RecipeDetail
-- `getRecipeImage(recipeId)` bzw. Bildreferenzauflösung, sofern separat nötig
+Diese Operationen beschreiben den benötigten Funktionsumfang. Die tatsächlichen HA-Service-Aufrufe und der Antworttransport müssen separat anhand der installierten Versionen geprüft werden.
 
-Die Operationen sind ein logisches Zielbild. Die konkreten Home-Assistant-Services und Rückgabewege werden separat verifiziert. Insbesondere ist noch zu klären, wie Kategorien und echte Kategorie-Filter mit der vorhandenen Mealie-Integration abgebildet werden.
+## Offene Punkte
 
-## Fehlerzustände
-
-Frontends müssen mindestens unterscheiden können:
-
-- Ladezustand
-- erfolgreiche Antwort mit Treffern
-- erfolgreiche Antwort ohne Treffer
-- ungültige Eingabe
-- Verbindungs-/Authentifizierungsfehler
-- nicht gefundenes Rezept
-- unerwartete Antwort bzw. Datenfehler
-
-## Offene Entscheidungen
-
-- Einheitliches Paging: Mealie-Parameter und tatsächliche Rückgabeform prüfen.
-- Bildreferenzen: Format, Authentifizierung und Auflösung testen.
-- Kategorien: API-Zugriff und Filterstrategie in Home Assistant festlegen.
-- Portionen: Rundung, Einheiten und nicht skalierbare Zutaten definieren.
-- Tessera: Paketierung langer Zutaten-/Anweisungstexte festlegen.
+- Kategorienquelle und Filterstrategie
+- Bildreferenz und Bildabruf
+- Paging und maximale Trefferzahl
+- Behandlung langer Texte und Tessera-Payload-Grenzen
+- Portionsumrechnung einschließlich Einheiten und nicht skalierbarer Zutaten
