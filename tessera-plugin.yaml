@@ -1,0 +1,29 @@
+id: mealie_recipe_browser
+version: 0.1.0
+api: "0.28"
+icon: food
+maintainer: mark77-DE
+license: MIT
+stage: beta
+topics: [home]
+requires:
+  esphome: 2026.6.2
+boards: [guition]
+flash_kb: 12
+
+inputs:
+  - id: config_entry_id
+    kind: text
+    scope: all
+    label: config_entry_id
+    hint: config_entry_id_hint
+
+tiles:
+  - id: browser
+    name: tile_browser
+    icon: food
+    sizes: { full: true }
+    memory: 2200
+    example: tile_example
+    options:
+      - { id: query, kind: text, default: sauce, label: query, hint: query_hint }
