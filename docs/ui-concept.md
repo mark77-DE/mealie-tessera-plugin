@@ -1,12 +1,10 @@
 # Bedienkonzept
 
-Das Projekt besitzt zwei Oberflächen mit gemeinsamer Rezeptdatenbasis: eine Lovelace-Custom-Card für Home Assistant und ein Tessera-Plugin für das große Küchendisplay. Dieses Dokument beschreibt vor allem die Tessera-Oberfläche; das Home-Assistant-Konzept steht in [home-assistant-card.md](home-assistant-card.md).
+## Ziel
 
-## Tessera-Zielgerät
+Der Rezeptbrowser ergänzt das bestehende Tessera-Dashboard. Er ersetzt weder das Dashboard noch verändert er dessen vorhandene Seiten. Der Einstieg erfolgt über eine zusätzliche Tessera-Kachel bzw. Plugin-Ansicht.
 
-Zielgerät ist das Guition JC8012P4A1C-I-W-Y / JC8012P4A1, Hardware V3, mit 1280 × 800 Pixeln und kapazitivem Touch. Die Entwicklung beginnt ohne das Display; Datenfluss und Ansichten werden zunächst mit Preview und Mock-Daten vorbereitet.
-
-Kleine Tessera-Displays sind vorerst kein Ziel. Die Rezeptoberfläche soll die Größe des Küchendisplays nutzen und nicht auf kleine Displays heruntergebrochen werden.
+Zielgerät ist das Guition JC8012P4A1C-I-W-Y / JC8012P4A1, Hardware V3, mit 1280 × 800 Pixeln und kapazitivem Touch. Kleine Tessera-Displays sind ausdrücklich nicht Ziel.
 
 ## Navigation
 
@@ -73,13 +71,15 @@ Jede Unteransicht erhält eine gut erreichbare Zurück-Schaltfläche. Der Rückw
 
 Die Mealie-API stellt eine Kategorienliste über `GET /api/organizers/categories` bereit. Die Home-Assistant-Mealie-Integration stellt dafür nach bisherigem Test keine eigene Aktion bereit; ihr Kategorien-Sensor liefert nur die Anzahl der Kategorien. `mealie.get_recipes` nimmt einen Freitext-Suchbegriff und kein separates Kategorie-ID-Feld entgegen.
 
-Die gemeinsame Architektur muss daher eine verlässliche Kategorienquelle und eine Strategie für die Kategorie-Suche festlegen. Diese Lösung soll nicht ausschließlich für Tessera gebaut werden, sondern auch der HA-Karte dienen.
+Vor der Umsetzung ist zu entscheiden, wie das Plugin die Kategorienliste sicher erreicht und wie eine ausgewählte Kategorie in eine Mealie-Suche übersetzt wird. Die Lösung muss mit der vorhandenen Tessera-/Home-Assistant-Verbindung funktionieren und darf keine Zugangsdaten offenlegen.
 
 ## Umsetzungsreihenfolge
 
-1. Gemeinsamen Datenvertrag und Kategorienzugriff klären
-2. HA-Karte mit Mock-Daten und anschließend echten Mealie-Daten umsetzen
-3. Suche, Trefferliste und Details vervollständigen
-4. Kochmodus und Portionsanpassung ergänzen
-5. Tessera-Oberfläche auf Basis desselben Datenvertrags implementieren
-6. Test auf dem Zielgerät
+1. Tessera-Version, Template und Preview festlegen
+2. Kategorienzugriff und Antworttransport technisch klären
+3. Bedienoberfläche und Navigation mit Mock-Daten
+4. Rezeptsuche über `mealie.get_recipes`
+5. Trefferliste und Auswahl
+6. Rezeptdetails über `mealie.get_recipe`
+7. Zutaten- und Schrittaufteilung anhand realer großer Rezepte
+8. Kochmodus und Test auf dem Zielgerät
