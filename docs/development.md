@@ -30,7 +30,7 @@ Ziel ist ein installierbares Tessera-Plugin als Rezeptbrowser für das große K�
 - [ ] Kategorienauswahl und „Alle Rezepte“
 - [ ] Treffer mit Bild und Pagination
 - [ ] Rezeptdetailansicht mit Zutaten und Anleitung
-- [ ] Deutsch und Englisch als Übersetzungen pflegen
+- [x] Deutsch und Englisch als Übersetzungen pflegen
 
 ## Phase 3 – Kochfunktionen
 - [ ] Portionenzahl anpassen
