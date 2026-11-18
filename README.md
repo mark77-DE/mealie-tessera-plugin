@@ -31,6 +31,7 @@ Die Mealie-Aktionen wurden in Home Assistant getestet: Rezeptsuche (Suchbegriff 
 ## Dokumentation
 
 - [Architektur](docs/architecture.md)
+- [Bedienkonzept und Ansichten](docs/ui-concept.md)
 - [Beobachtetes Mealie-Datenmodell](docs/mealie-data-model.md)
 - [Home-Assistant-Aktionen](docs/home-assistant.md)
 - [Entwicklungsplan](docs/development.md)
