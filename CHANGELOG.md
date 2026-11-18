@@ -5,6 +5,7 @@
 - Plugin API 0.28 und HA-Service-Berechtigung für `mealie.get_recipes` deklariert.
 - Config-Entry-ID als lokale Plugin-Eingabe vorgesehen.
 - Erste Full-Screen-Rezeptliste mit Name, Gesamtzeit und Portionen implementiert.
+- Englische und deutsche Plugin-Übersetzungen ergänzt.
 
 ## 0.3.0 - 2026-11-18
 - Projekt wieder auf Tessera als einziges zu entwickelndes Frontend fokussiert.
