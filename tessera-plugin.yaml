@@ -1,7 +1,7 @@
 id: mealie_recipe_browser
 version: 0.1.0
 api: "0.28"
-icon: food
+icon: chef-hat
 maintainer: mark77-DE
 license: MIT
 stage: beta
@@ -10,6 +10,9 @@ requires:
   esphome: 2026.6.2
 boards: [guition]
 flash_kb: 12
+
+permissions:
+  ha_commands: ["call_service:mealie.get_recipes"]
 
 inputs:
   - id: config_entry_id
@@ -21,7 +24,7 @@ inputs:
 tiles:
   - id: browser
     name: tile_browser
-    icon: food
+    icon: chef-hat
     sizes: { full: true }
     memory: 2200
     example: tile_example
