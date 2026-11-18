@@ -1,0 +1,24 @@
+{
+  "_meta": { "name": "Deutsch" },
+  "screen": {
+    "screen_title": "Mealie-Rezepte",
+    "searching_for": "Suche: {n}",
+    "not_loaded": "Noch nicht geladen",
+    "loading": "Rezepte werden geladen …",
+    "loaded": "Rezepte geladen",
+    "no_results": "Keine Rezepte gefunden",
+    "missing_config": "Mealie-Integration zuerst konfigurieren",
+    "request_failed": "Anfrage konnte nicht gesendet werden",
+    "service_error": "Home Assistant konnte die Rezepte nicht laden"
+  },
+  "app": {
+    "name": "Mealie-Rezeptbrowser",
+    "summary": "Rezepte aus einer Mealie-Instanz suchen und anzeigen.",
+    "tile_browser": "Rezeptbrowser",
+    "tile_example": "Rezeptliste aus Mealie.",
+    "config_entry_id": "Mealie-Integration",
+    "config_entry_id_hint": "Config-Entry-ID der Mealie-Integration in Home Assistant. Der Wert bleibt lokal in deiner Tessera-Konfiguration.",
+    "query": "Suchbegriff",
+    "query_hint": "Der anfängliche Suchbegriff für die Rezeptliste."
+  }
+}
