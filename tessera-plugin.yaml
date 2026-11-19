@@ -1,5 +1,5 @@
 id: mealie_recipe_browser
-version: 0.4.0
+version: 0.4.1
 api: "0.28"
 icon: chef-hat
 maintainer: mark77-DE
@@ -10,23 +10,24 @@ requires:
   esphome: 2026.6.2
 boards: [guition]
 flash_kb: 12
-
 permissions:
-  ha_commands: ["call_service:mealie.get_recipes"]
-
+  ha_commands:
+    - "call_service:mealie.get_recipes"
+    - "call_service:mealie.get_recipe"
 inputs:
   - id: config_entry_id
     kind: text
     scope: all
     label: config_entry_id
     hint: config_entry_id_hint
-
 tiles:
   - id: browser
     name: tile_browser
     icon: chef-hat
     sizes: { full: true }
-    memory: 2200
+    memory: 2600
     example: tile_example
     options:
       - { id: query, kind: text, default: sauce, label: query, hint: query_hint }
+cards:
+  - { id: recipe, name: card_recipe }
