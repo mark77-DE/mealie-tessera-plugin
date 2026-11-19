@@ -23,15 +23,16 @@ The first target is the 10.1-inch Guition JC8012P4A1C-I-W-Y / JC8012P4A1 (hardwa
 1. In Tessera, open **Plugins** and choose **Add with a link**.
 2. Add this repository: [mark77-DE/mealie-tessera-plugin](https://github.com/mark77-DE/mealie-tessera-plugin).
 3. Select the screen and install the plugin.
-4. Find the config entry ID of the Mealie integration using the [Home Assistant guide](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/home-assistant.md#config-entry-id-der-mealie-integration-ermitteln).
-5. Enter it in the `config_entry_id` field in the screen's plugin settings.
-6. In Layout, add **Recipe browser** from the Plugins group. The initial search term can be changed in the tile inspector.
+4. In Home Assistant, open **Settings → Devices & services**.
+5. Find the **Mealie** integration entry, open its three-dot menu and choose **Copy entry ID**.
+6. Paste the copied ID into the `config_entry_id` field in the screen's plugin settings.
+7. In Layout, add **Recipe browser** from the Plugins group. The initial search term can be changed in the tile inspector.
 
-The config entry ID is specific to your Home Assistant installation and is stored only in Tessera's local plugin configuration. Do not commit it to this repository.
+If you have multiple Mealie instances, copy the entry ID from the integration entry you want the recipe browser to use. The ID is specific to your Home Assistant installation and is stored only in Tessera's local plugin configuration. Do not commit it to this repository.
 
 ## Known limitations
 
-- The installed Mealie integration cannot currently be selected automatically in the plugin. Its config entry ID must be looked up and entered once.
+- The installed Mealie integration cannot currently be selected automatically in the plugin. Its config entry ID must be copied manually once using **Copy entry ID**.
 - Category listing and category filtering are not yet connected to the plugin.
 - The current detail response is deliberately kept small; very long recipes may be shortened until segmented loading is implemented.
 - A virtual preview in the Tessera app cannot install plugins. The separate developer preview/bench is intended for inspecting plugin rendering without a physical screen.
@@ -54,7 +55,7 @@ The config entry ID is specific to your Home Assistant installation and is store
 
 - [Architecture](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/architecture.md)
 - [UI concept](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/ui-concept.md)
-- [Home Assistant actions and config entry ID](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/home-assistant.md)
+- [Home Assistant actions and entry ID](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/home-assistant.md)
 - [Observed Mealie data model](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/mealie-data-model.md)
 - [Tessera data contract](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/shared-data-contract.md)
 - [Development plan](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/development.md)
