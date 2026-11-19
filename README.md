@@ -2,7 +2,7 @@
 
 Ein Tessera-Plugin zum Suchen, Anzeigen und Kochen von Rezepten aus einer Mealie-Instanz.
 
-> Entwicklungsstand: Plugin-Grundgerüst und erster Home-Assistant-Aufruf für die Rezeptsuche sind implementiert. Die Touch-Suche und Rezeptdetailansicht folgen.
+> Entwicklungsstand: Rezeptsuche und erste Rezeptdetailansicht sind implementiert. Touch-Suche, Kategorien und Kochmodus folgen.
 
 ## Ziel
 
@@ -10,23 +10,24 @@ Der Rezeptbrowser ergänzt ein bestehendes Tessera-Dashboard um eine eigenständ
 
 Zielgerät ist das große 10,1-Zoll-Touchdisplay Guition JC8012P4A1C-I-W-Y / JC8012P4A1, Hardware V3, mit 1280 × 800 Pixeln. Kleine Tessera-Displays sind ausdrücklich nicht Teil des aktuellen Projektziels.
 
-## Architektur
-
-- **Mealie:** Quelle für Rezepte, Kategorien und Rezeptdetails
-- **Home Assistant:** stellt über die installierte Mealie-Integration Rezeptdaten bereit
-- **Tessera-App:** führt deklarierte Home-Assistant-Befehle aus und übermittelt Antworten
-- **Tessera-Plugin:** rendert Suche, Treffer, Details und Kochmodus auf dem großen Display
-
-Eine eigene Lovelace-Karte ist nicht Bestandteil dieses Projekts.
-
 ## Aktueller Stand
 
-- Plugin-Manifest für Tessera Plugin API 0.28 angelegt.
-- ESPHome-Komponente und Full-Screen-Tile angelegt.
-- Erster Datenaufruf über `mealie.get_recipes` implementiert.
-- Der erste Suchbegriff wird aktuell als Tile-Option gesetzt.
-- Die Suchergebnisliste zeigt Rezeptname, Gesamtzeit und Portionen.
-- Touch-Tastatur, Kategorien, Rezeptdetails und Kochmodus sind noch nicht implementiert.
+- Tessera-Plugin API 0.28, nur für Guition-Displays.
+- Rezeptsuche über `mealie.get_recipes`.
+- Trefferliste mit Name, Gesamtzeit und Portionen.
+- Touch auf einen Treffer öffnet die Detailkarte.
+- Detailkarte zeigt Zutaten und Zubereitung nebeneinander.
+- Die Config-Entry-ID wird noch manuell in den Plugin-Einstellungen eingetragen.
+- Touch-Tastatur, Kategorien, Pagination und Kochmodus sind noch offen.
+
+## Architektur
+
+- **Mealie:** Quelle für Rezepte, Kategorien und Rezeptdetails.
+- **Home Assistant:** stellt über die installierte Mealie-Integration Rezeptdaten bereit.
+- **Tessera-App:** führt deklarierte Home-Assistant-Befehle aus und übermittelt Antworten.
+- **Tessera-Plugin:** rendert Suche, Treffer und Rezeptdetails auf dem großen Display.
+
+Eine eigene Lovelace-Karte ist nicht Bestandteil dieses Projekts.
 
 ## Einrichtung und Sicherheit
 
