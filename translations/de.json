@@ -12,7 +12,15 @@
     "missing_config": "Mealie-Integration zuerst konfigurieren",
     "request_failed": "Anfrage konnte nicht gesendet werden",
     "service_error": "Home Assistant konnte die Rezepte nicht laden",
-    "unexpected_response": "Unerwartetes Antwortformat von Mealie"
+    "unexpected_response": "Unerwartetes Antwortformat von Mealie",
+    "detail_loading": "Rezept wird geladen …",
+    "detail_failed": "Rezept konnte nicht geladen werden",
+    "recipe_details": "Rezeptdetails",
+    "ingredients": "Zutaten",
+    "instructions": "Zubereitung",
+    "servings": "Portionen",
+    "no_ingredients": "Keine Zutaten zurückgegeben",
+    "no_instructions": "Keine Zubereitungsschritte zurückgegeben"
   },
   "app": {
     "name": "Mealie-Rezeptbrowser",
@@ -22,6 +30,7 @@
     "config_entry_id": "Mealie-Integration",
     "config_entry_id_hint": "Config-Entry-ID der Mealie-Integration in Home Assistant. Der Wert bleibt lokal in deiner Tessera-Konfiguration.",
     "query": "Suchbegriff",
-    "query_hint": "Der anfängliche Suchbegriff für die Rezeptliste."
+    "query_hint": "Der anfängliche Suchbegriff für die Rezeptliste.",
+    "card_recipe": "Rezeptdetails"
   }
 }
