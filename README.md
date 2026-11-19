@@ -23,17 +23,18 @@ The first target is the 10.1-inch Guition JC8012P4A1C-I-W-Y / JC8012P4A1 (hardwa
 1. In Tessera, open **Plugins** and choose **Add with a link**.
 2. Add this repository: [mark77-DE/mealie-tessera-plugin](https://github.com/mark77-DE/mealie-tessera-plugin).
 3. Select the screen and install the plugin.
-4. In the screen's **Plugins** settings, enter the config entry ID of the Mealie integration.
-5. In Layout, add **Recipe browser** from the Plugins group. The initial search term can be changed in the tile inspector.
+4. Find the config entry ID of the Mealie integration using the [Home Assistant guide](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/home-assistant.md#find-the-mealie-config-entry-id).
+5. Enter it in the `config_entry_id` field in the screen's plugin settings.
+6. In Layout, add **Recipe browser** from the Plugins group. The initial search term can be changed in the tile inspector.
 
-The config entry ID is installation-specific. Do not commit it to this repository.
+The config entry ID is specific to your Home Assistant installation and is stored only in Tessera's local plugin configuration. Do not commit it to this repository.
 
 ## Known limitations
 
-- Tessera currently does not expose the protected `config_entries/get` endpoint to plugins, so the plugin cannot yet discover and offer installed Mealie integrations automatically.
+- The installed Mealie integration cannot currently be selected automatically in the plugin. Its config entry ID must be looked up and entered once.
 - Category listing and category filtering are not yet connected to the plugin.
 - The current detail response is deliberately kept small; very long recipes may be shortened until segmented loading is implemented.
-- A virtual preview in the Tessera app cannot install plugins. The separate developer preview/bench is the intended way to inspect plugin rendering without a physical screen.
+- A virtual preview in the Tessera app cannot install plugins. The separate developer preview/bench is intended for inspecting plugin rendering without a physical screen.
 
 ## Development status
 
@@ -47,13 +48,13 @@ The config entry ID is installation-specific. Do not commit it to this repositor
 | Categories and filters | Blocked on a suitable Home Assistant data path |
 | Pagination | Planned |
 | Cooking mode and ingredient checklist | Planned |
-| Automatic Mealie integration selection | Requires a Tessera API capability |
+| Automatic Mealie integration selection | Not currently exposed by the Tessera plugin API |
 
 ## Documentation
 
 - [Architecture](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/architecture.md)
 - [UI concept](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/ui-concept.md)
-- [Home Assistant actions](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/home-assistant.md)
+- [Home Assistant actions and config entry ID](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/home-assistant.md)
 - [Observed Mealie data model](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/mealie-data-model.md)
 - [Tessera data contract](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/shared-data-contract.md)
 - [Development plan](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/development.md)
