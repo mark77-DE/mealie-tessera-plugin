@@ -23,7 +23,7 @@ The first target is the 10.1-inch Guition JC8012P4A1C-I-W-Y / JC8012P4A1 (hardwa
 1. In Tessera, open **Plugins** and choose **Add with a link**.
 2. Add this repository: [mark77-DE/mealie-tessera-plugin](https://github.com/mark77-DE/mealie-tessera-plugin).
 3. Select the screen and install the plugin.
-4. Find the config entry ID of the Mealie integration using the [Home Assistant guide](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/home-assistant.md#find-the-mealie-config-entry-id).
+4. Find the config entry ID of the Mealie integration using the [Home Assistant guide](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/home-assistant.md#config-entry-id-der-mealie-integration-ermitteln).
 5. Enter it in the `config_entry_id` field in the screen's plugin settings.
 6. In Layout, add **Recipe browser** from the Plugins group. The initial search term can be changed in the tile inspector.
 
