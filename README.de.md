@@ -23,14 +23,15 @@ Das erste Ziel ist das 10,1-Zoll-Display Guition JC8012P4A1C-I-W-Y / JC8012P4A1 
 1. In Tessera **Plugins** öffnen und **Add with a link** wählen.
 2. Dieses Repository hinzufügen: [mark77-DE/mealie-tessera-plugin](https://github.com/mark77-DE/mealie-tessera-plugin).
 3. Das gewünschte Display auswählen und das Plugin installieren.
-4. In den Plugin-Einstellungen des Displays die Config-Entry-ID der Mealie-Integration eintragen.
-5. Im Layout unter der Gruppe **Plugins** die Kachel **Rezeptbrowser** hinzufügen. Den anfänglichen Suchbegriff kannst du im Kachel-Inspektor ändern.
+4. Die Config-Entry-ID der gewünschten Mealie-Integration ermitteln (siehe [Home-Assistant-Aktionen und ID ermitteln](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/home-assistant.md#config-entry-id-der-mealie-integration-ermitteln)).
+5. Die ID in den Plugin-Einstellungen des Displays in das Feld `config_entry_id` eintragen.
+6. Im Layout unter der Gruppe **Plugins** die Kachel **Rezeptbrowser** hinzufügen. Den anfänglichen Suchbegriff kannst du im Kachel-Inspektor ändern.
 
-Die Config-Entry-ID ist installationsspezifisch und gehört nicht in dieses Repository.
+Die Config-Entry-ID ist installationsspezifisch und wird nur lokal in Tessera eingetragen. Sie gehört nicht in dieses Repository.
 
 ## Bekannte Einschränkungen
 
-- Tessera gibt Plugins derzeit keinen Zugriff auf den geschützten Endpunkt `config_entries/get`. Daher kann das Plugin installierte Mealie-Integrationen noch nicht automatisch erkennen und zur Auswahl anbieten.
+- Die installierte Mealie-Integration kann derzeit nicht automatisch im Plugin ausgewählt werden. Die Config-Entry-ID muss einmalig manuell ermittelt und eingetragen werden.
 - Kategorienliste und Kategorienfilter sind noch nicht angebunden.
 - Die Detailantwort wird bewusst klein gehalten. Sehr lange Rezepte können gekürzt werden, bis die abschnittsweise Übertragung umgesetzt ist.
 - Die virtuelle Vorschau in der Tessera-App kann keine Plugins installieren. Für die Darstellung gibt es eine separate Entwickler-Vorschau (Bench), die keinen physischen Bildschirm benötigt.
@@ -47,7 +48,7 @@ Die Config-Entry-ID ist installationsspezifisch und gehört nicht in dieses Repo
 | Kategorien und Filter | Geeigneter Datenweg in Home Assistant noch offen |
 | Seitennavigation | Geplant |
 | Kochmodus und Zutaten-Checkliste | Geplant |
-| Automatische Auswahl der Mealie-Integration | Benötigt eine Erweiterung der Tessera-API |
+| Automatische Auswahl der Mealie-Integration | Derzeit nicht über die Tessera-Plugin-API verfügbar |
 
 ## Dokumentation
 
