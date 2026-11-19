@@ -2,16 +2,12 @@
 
 ## Rezeptsuche
 
-Bestätigter Aktionsname:
-
-`mealie.get_recipes`
+Bestätigter Aktionsname: `mealie.get_recipes`
 
 Benötigte Daten:
 - `search_terms`: Suchtext, z. B. `sauce`
 - `result_limit`: maximale Anzahl Treffer
 - `config_entry_id`: Config-Entry der Mealie-Integration in Home Assistant
-
-Beispiel zur manuellen Prüfung in Home Assistant:
 
 ```yaml
 action: mealie.get_recipes
@@ -21,27 +17,9 @@ data:
   result_limit: 3
 ```
 
-Das Tessera-Plugin ruft dieselbe Aktion als deklarierte Antwortaktion auf:
+## Rezeptdetails
 
-```yaml
-permissions:
-  ha_commands:
-    - "call_service:mealie.get_recipes"
-```
-
-Die Config-Entry-ID wird beim Hinzufügen des Plugins lokal als Eingabe erfasst. Sie gehört nicht in dieses Repository.
-
-## Einzelnes Rezept abrufen
-
-Bestätigter Aktionsname:
-
-`mealie.get_recipe`
-
-Benötigte Daten:
-- `recipe_id`: Mealie-Rezept-ID (UUID)
-- `config_entry_id`: Config-Entry der Mealie-Integration
-
-Beispiel zur manuellen Prüfung:
+Bestätigter Aktionsname: `mealie.get_recipe`
 
 ```yaml
 action: mealie.get_recipe
@@ -50,8 +28,19 @@ data:
   recipe_id: "<MEALIE_RECIPE_ID>"
 ```
 
-Diese Aktion wird in einer folgenden Plugin-Ausbaustufe ergänzt, wenn ein Treffer geöffnet wird.
+Das Plugin öffnet die Detailkarte nach einem Tipp auf einen Treffer und ruft Zutaten und Zubereitung ab.
+
+## Berechtigungen
+
+```yaml
+permissions:
+  ha_commands:
+    - "call_service:mealie.get_recipes"
+    - "call_service:mealie.get_recipe"
+```
+
+Die Config-Entry-ID wird weiterhin als lokale Plugin-Eingabe erfasst. Tessera blockiert ausdrücklich den Zugriff auf `config_entries/get`; eine automatische Auflistung installierter Integrationen ist mit der derzeitigen Plugin-Schnittstelle daher nicht möglich. Die ID gehört nicht in dieses Repository.
 
 ## Transportgrenzen
 
-Tessera übermittelt die Antwort einer Home-Assistant-Aktion an das Plugin. Die Antwort ist auf ungefähr 3 KB begrenzt; längere Texte werden gekürzt und Listen bei Bedarf verkürzt. Deshalb begrenzt die erste Implementierung die Suche auf drei Treffer. Zutaten und Anweisungen werden später getrennt geladen und müssen bei langen Rezepten in kleinere Abschnitte aufgeteilt werden.
+Tessera übermittelt die Antwort einer Home-Assistant-Aktion an das Plugin. Die Antwort ist auf ungefähr 3 KB begrenzt; längere Texte und Listen können gekürzt werden. Die Detailansicht begrenzt deshalb Zutaten und Anweisungen jeweils auf etwa 1.050 Zeichen. Für sehr lange Rezepte ist eine spätere abschnittsweise Abfrage erforderlich.
