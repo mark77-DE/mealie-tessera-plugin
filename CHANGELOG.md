@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1 - 2026-11-19
+- Rezeptdetails als eigene Tessera-Karte ergänzt.
+- Treffer lassen sich per Touch öffnen; Zutaten und Zubereitung werden nebeneinander angezeigt.
+- Berechtigung für `mealie.get_recipe` ergänzt.
+- Deutsche und englische Texte für die Detailansicht ergänzt.
+
 ## 0.4.0 - 2026-11-18
 - Erstes installierbares Tessera-Plugin-Grundgerüst ergänzt.
 - Plugin API 0.28 und HA-Service-Berechtigung für `mealie.get_recipes` deklariert.
