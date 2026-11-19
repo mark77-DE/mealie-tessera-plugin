@@ -4,31 +4,20 @@ Das Plugin verwendet die Home-Assistant-Mealie-Integration. Die Verbindung zu Me
 
 ## Config-Entry-ID der Mealie-Integration ermitteln
 
-Die Config-Entry-ID ist eine interne, installationsspezifische Kennung. Sie ist nicht mit dem Integrationsnamen `mealie` oder einer Entity-ID wie `sensor.mealie_recipes` identisch.
+Die Config-Entry-ID ist eine interne, installationsspezifische Kennung. Sie ist weder der Integrationsname `mealie` noch eine Entity-ID wie `sensor.mealie_recipes`. Du musst sie auch nicht über Entwicklerwerkzeuge oder Sensorattribute suchen.
 
-Am einfachsten lässt sie sich über eine vorhandene Entität der gewünschten Mealie-Integration ermitteln:
+Home Assistant bietet dafür direkt eine Funktion zum Kopieren der Eintrag-ID:
 
-1. Öffne in Home Assistant **Einstellungen → Geräte & Dienste → Entitäten**.
-2. Filtere die Liste nach der Integration **Mealie**.
-3. Suche eine Entität, die von der gewünschten Mealie-Instanz bereitgestellt wird, und notiere ihre Entity-ID, zum Beispiel `sensor.mealie_recipes`. Der konkrete Entity-Name kann bei dir abweichen.
-4. Öffne **Entwicklerwerkzeuge → Template**.
-5. Füge diese Vorlage ein und ersetze die Beispiel-Entity-ID durch deine tatsächliche Entity-ID:
+1. Öffne **Einstellungen → Geräte & Dienste**.
+2. Suche den Integrationseintrag **Mealie** und öffne dessen Menü über die drei Punkte.
+3. Wähle **Eintrag-ID kopieren**.
+4. Füge den kopierten Wert in Tessera in die lokale Plugin-Eingabe **config_entry_id** ein.
 
-```jinja
-{{ config_entry_id('sensor.mealie_recipes') }}
-```
+<text>Hinweis:</text> Die Schaltfläche **Eintrag-ID kopieren** befindet sich im Drei-Punkte-Menü des Integrationseintrags. Sie ist nicht das Menü einer einzelnen Entität oder eines Geräts.
 
-6. Home Assistant zeigt darunter die Config-Entry-ID an. Kopiere diesen Wert in die lokale Plugin-Eingabe **config_entry_id** in Tessera.
+**Bei mehreren Mealie-Instanzen:** Kopiere die Eintrag-ID genau des Mealie-Integrationseintrags, den der Rezeptbrowser verwenden soll. Jede konfigurierte Instanz hat eine eigene ID.
 
-Die Template-Funktion `config_entry_id(entity_id)` ist in Home Assistant Core ab Version 2023.3 verfügbar. Sie liefert die Config-Entry-ID der Integration, zu der die angegebene Entität gehört. Bei YAML-definierten Entitäten oder Helfern kann das Ergebnis `None` sein. Verwende deshalb eine echte Entität der Mealie-Integration.
-
-**Bei mehreren Mealie-Instanzen:** Verwende eine Entität derjenigen Instanz, die der Rezeptbrowser verwenden soll. Jede Integrationseinrichtung hat ihre eigene Config-Entry-ID.
-
-### Alternative, falls keine passende Entität vorhanden ist
-
-Die ID steht auch in der Home-Assistant-Konfigurationsdatei `.storage/core.config_entries` im Verzeichnis `/config`. Suche dort den Eintrag mit `"domain":"mealie"` und prüfe den zugehörigen Titel, bevor du den Wert aus `"entry_id"` verwendest.
-
-Die Datei ist eine interne JSON-Datei. Öffne sie nur lesend und ändere ihren Inhalt nicht. Home Assistant sollte währenddessen nicht manuell in dieser Datei bearbeitet werden.
+Die Config-Entry-ID wird nur lokal in Tessera eingetragen und darf nicht in dieses Repository oder in öffentliche Screenshots übernommen werden.
 
 ## Rezeptsuche
 
@@ -69,7 +58,7 @@ permissions:
     - "call_service:mealie.get_recipe"
 ```
 
-Die Config-Entry-ID wird aktuell als lokale Plugin-Eingabe erfasst. Tessera stellt Plugins derzeit keine freigegebene Schnittstelle bereit, um installierte Config-Entries aufzulisten und daraus eine Mealie-Instanz auswählen zu lassen. Die ID wird nicht im Repository gespeichert.
+Die Config-Entry-ID wird aktuell als lokale Plugin-Eingabe erfasst. Tessera stellt Plugins derzeit keine freigegebene Schnittstelle bereit, um installierte Config-Entries aufzulisten und daraus eine Mealie-Instanz auswählen zu lassen.
 
 ## Transportgrenzen
 
