@@ -23,15 +23,16 @@ Das erste Ziel ist das 10,1-Zoll-Display Guition JC8012P4A1C-I-W-Y / JC8012P4A1 
 1. In Tessera **Plugins** öffnen und **Add with a link** wählen.
 2. Dieses Repository hinzufügen: [mark77-DE/mealie-tessera-plugin](https://github.com/mark77-DE/mealie-tessera-plugin).
 3. Das gewünschte Display auswählen und das Plugin installieren.
-4. Die Config-Entry-ID der gewünschten Mealie-Integration ermitteln (siehe [Home-Assistant-Aktionen und ID ermitteln](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/home-assistant.md#config-entry-id-der-mealie-integration-ermitteln)).
-5. Die ID in den Plugin-Einstellungen des Displays in das Feld `config_entry_id` eintragen.
-6. Im Layout unter der Gruppe **Plugins** die Kachel **Rezeptbrowser** hinzufügen. Den anfänglichen Suchbegriff kannst du im Kachel-Inspektor ändern.
+4. In Home Assistant **Einstellungen → Geräte & Dienste** öffnen.
+5. Beim Integrationseintrag **Mealie** das Drei-Punkte-Menü öffnen und **Eintrag-ID kopieren** auswählen.
+6. Die kopierte ID in den Plugin-Einstellungen des Displays in das Feld `config_entry_id` eintragen.
+7. Im Layout unter der Gruppe **Plugins** die Kachel **Rezeptbrowser** hinzufügen. Den anfänglichen Suchbegriff kannst du im Kachel-Inspektor ändern.
 
-Die Config-Entry-ID ist installationsspezifisch und wird nur lokal in Tessera eingetragen. Sie gehört nicht in dieses Repository.
+Bei mehreren Mealie-Instanzen muss die Eintrag-ID des gewünschten Integrationseintrags kopiert werden. Die ID ist installationsspezifisch und wird nur lokal in Tessera eingetragen. Sie gehört nicht in dieses Repository.
 
 ## Bekannte Einschränkungen
 
-- Die installierte Mealie-Integration kann derzeit nicht automatisch im Plugin ausgewählt werden. Die Config-Entry-ID muss einmalig manuell ermittelt und eingetragen werden.
+- Die installierte Mealie-Integration kann derzeit nicht automatisch im Plugin ausgewählt werden. Die Config-Entry-ID muss einmalig über **Eintrag-ID kopieren** manuell übernommen werden.
 - Kategorienliste und Kategorienfilter sind noch nicht angebunden.
 - Die Detailantwort wird bewusst klein gehalten. Sehr lange Rezepte können gekürzt werden, bis die abschnittsweise Übertragung umgesetzt ist.
 - Die virtuelle Vorschau in der Tessera-App kann keine Plugins installieren. Für die Darstellung gibt es eine separate Entwickler-Vorschau (Bench), die keinen physischen Bildschirm benötigt.
@@ -54,7 +55,7 @@ Die Config-Entry-ID ist installationsspezifisch und wird nur lokal in Tessera ei
 
 - [Architektur](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/architecture.md)
 - [Bedienkonzept](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/ui-concept.md)
-- [Home-Assistant-Aktionen](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/home-assistant.md)
+- [Home-Assistant-Aktionen und Eintrag-ID](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/home-assistant.md)
 - [Beobachtetes Mealie-Datenmodell](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/mealie-data-model.md)
 - [Tessera-Datenvertrag](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/shared-data-contract.md)
 - [Entwicklungsplan](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/development.md)
