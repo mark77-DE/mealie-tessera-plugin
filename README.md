@@ -1,45 +1,63 @@
-# Mealie Recipe Browser für Tessera
+# Mealie Recipe Browser for Tessera
 
-Ein Tessera-Plugin zum Suchen, Anzeigen und Kochen von Rezepten aus einer Mealie-Instanz.
+Browse recipes from a Mealie instance on a Tessera touch screen. The plugin adds a dedicated recipe view and leaves the existing Tessera dashboard and its pages untouched.
 
-> Entwicklungsstand: Rezeptsuche und erste Rezeptdetailansicht sind implementiert. Touch-Suche, Kategorien und Kochmodus folgen.
+> **Status: beta / early development.** Recipe search and an initial recipe detail card are implemented. The search keyboard, category filters, paging and cooking mode are still planned. The plugin has not yet been built or tested on physical hardware.
 
-## Ziel
+## What it does
 
-Der Rezeptbrowser ergänzt ein bestehendes Tessera-Dashboard um eine eigenständige Rezeptoberfläche. Die normale Tessera-Oberfläche bleibt erhalten.
+- Searches recipes through Home Assistant's Mealie integration.
+- Shows recipe names, total time and servings.
+- Opens a recipe detail card when a result is tapped.
+- Shows ingredients and preparation instructions side by side.
+- Keeps the Mealie connection and its credentials in Home Assistant.
 
-Zielgerät ist das große 10,1-Zoll-Touchdisplay Guition JC8012P4A1C-I-W-Y / JC8012P4A1, Hardware V3, mit 1280 × 800 Pixeln. Kleine Tessera-Displays sind ausdrücklich nicht Teil des aktuellen Projektziels.
+The current implementation uses the Home Assistant actions `mealie.get_recipes` and `mealie.get_recipe`.
 
-## Aktueller Stand
+## Target screen
 
-- Tessera-Plugin API 0.28, nur für Guition-Displays.
-- Rezeptsuche über `mealie.get_recipes`.
-- Trefferliste mit Name, Gesamtzeit und Portionen.
-- Touch auf einen Treffer öffnet die Detailkarte.
-- Detailkarte zeigt Zutaten und Zubereitung nebeneinander.
-- Die Config-Entry-ID wird noch manuell in den Plugin-Einstellungen eingetragen.
-- Touch-Tastatur, Kategorien, Pagination und Kochmodus sind noch offen.
+The first target is the 10.1-inch Guition JC8012P4A1C-I-W-Y / JC8012P4A1 (hardware V3, 1280 × 800, ESP32-P4 + ESP32-C6). The manifest currently limits the plugin to Guition boards. Smaller screens are not a project target.
 
-## Architektur
+## Set up
 
-- **Mealie:** Quelle für Rezepte, Kategorien und Rezeptdetails.
-- **Home Assistant:** stellt über die installierte Mealie-Integration Rezeptdaten bereit.
-- **Tessera-App:** führt deklarierte Home-Assistant-Befehle aus und übermittelt Antworten.
-- **Tessera-Plugin:** rendert Suche, Treffer und Rezeptdetails auf dem großen Display.
+1. In Tessera, open **Plugins** and choose **Add with a link**.
+2. Add this repository: [mark77-DE/mealie-tessera-plugin](https://github.com/mark77-DE/mealie-tessera-plugin).
+3. Select the screen and install the plugin.
+4. In the screen's **Plugins** settings, enter the config entry ID of the Mealie integration.
+5. In Layout, add **Recipe browser** from the Plugins group. The initial search term can be changed in the tile inspector.
 
-Eine eigene Lovelace-Karte ist nicht Bestandteil dieses Projekts.
+The config entry ID is installation-specific. Do not commit it to this repository.
 
-## Einrichtung und Sicherheit
+## Known limitations
 
-Beim Hinzufügen des Plugins wird die installationsspezifische Config-Entry-ID der Mealie-Integration als lokale Plugin-Eingabe abgefragt. Sie wird nicht im Repository gespeichert. Im Tile-Inspector kann ein erster Suchbegriff gesetzt werden.
+- Tessera currently does not expose the protected `config_entries/get` endpoint to plugins, so the plugin cannot yet discover and offer installed Mealie integrations automatically.
+- Category listing and category filtering are not yet connected to the plugin.
+- The current detail response is deliberately kept small; very long recipes may be shortened until segmented loading is implemented.
+- A virtual preview in the Tessera app cannot install plugins. The separate developer preview/bench is the intended way to inspect plugin rendering without a physical screen.
 
-Keine Home-Assistant-Tokens, Mealie-Zugangsdaten, privaten URLs, Config-Entry-IDs oder sonstigen Secrets in dieses Repository einchecken.
+## Development status
 
-## Dokumentation
+| Feature | Status |
+|---|---|
+| Plugin manifest and Guition target | Implemented |
+| Recipe search via Home Assistant | Implemented; hardware verification pending |
+| Recipe result list | Initial implementation |
+| Recipe detail card | Initial implementation |
+| Search keyboard | Planned |
+| Categories and filters | Blocked on a suitable Home Assistant data path |
+| Pagination | Planned |
+| Cooking mode and ingredient checklist | Planned |
+| Automatic Mealie integration selection | Requires a Tessera API capability |
 
-- [Architektur](docs/architecture.md)
-- [Tessera-Datenvertrag](docs/shared-data-contract.md)
-- [Bedienkonzept](docs/ui-concept.md)
-- [Beobachtetes Mealie-Datenmodell](docs/mealie-data-model.md)
-- [Home-Assistant-Aktionen](docs/home-assistant.md)
-- [Entwicklungsplan](docs/development.md)
+## Documentation
+
+- [Architecture](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/architecture.md)
+- [UI concept](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/ui-concept.md)
+- [Home Assistant actions](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/home-assistant.md)
+- [Observed Mealie data model](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/mealie-data-model.md)
+- [Tessera data contract](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/shared-data-contract.md)
+- [Development plan](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/development.md)
+
+## Safety
+
+Never commit Home Assistant tokens, Mealie credentials, private URLs, config entry IDs or other secrets. The plugin calls Mealie through Home Assistant; it does not store Mealie credentials itself.
