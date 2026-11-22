@@ -16,13 +16,13 @@ The current implementation uses the Home Assistant actions `mealie.get_recipes` 
 
 ## Target screen
 
-The first target is the 10.1-inch Guition JC8012P4A1C-I-W-Y / JC8012P4A1 (hardware V3, 1280 × 800, ESP32-P4 + ESP32-C6). The manifest currently limits the plugin to Guition boards. Smaller screens are not a project target.
+The first and currently only supported target is the 10.1-inch Guition JC8012P4A1 V3 (`jc8012p4a1v3`, 1280 × 800, ESP32-P4). Smaller screens are deliberately not listed as compatible because the recipe browser is designed as a full-screen kitchen interface.
 
 ## Set up
 
 1. In Tessera, open **Plugins** and choose **Add with a link**.
 2. Add this repository: [mark77-DE/mealie-tessera-plugin](https://github.com/mark77-DE/mealie-tessera-plugin).
-3. Select the screen and install the plugin.
+3. Select the Guition JC8012P4A1 V3 screen and install the plugin.
 4. In Home Assistant, open **Settings → Devices & services**.
 5. Find the **Mealie** integration entry, open its three-dot menu and choose **Copy entry ID**.
 6. Paste the copied ID into the `config_entry_id` field in the screen's plugin settings.
@@ -41,7 +41,7 @@ If you have multiple Mealie instances, copy the entry ID from the integration en
 
 | Feature | Status |
 |---|---|
-| Plugin manifest and Guition target | Implemented |
+| Plugin manifest and Guition JC8012P4A1 V3 target | Implemented |
 | Recipe search via Home Assistant | Implemented; hardware verification pending |
 | Recipe result list | Initial implementation |
 | Recipe detail card | Initial implementation |
