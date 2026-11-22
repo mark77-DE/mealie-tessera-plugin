@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.3 - 2026-11-22
+- Alle derzeit im Tessera-Katalog geführten Touchdisplays ab 7 Zoll freigeschaltet, einschließlich Hardware-Revisionen sowie Modellen von Waveshare, Guition, reTerminal, CrowPanel und Sunton.
+- Automatisierten Preview-Build für alle freigeschalteten großen Displays ergänzt.
+- Board-IDs, Auflösungen und Katalogstatus dokumentiert.
+
 ## 0.4.2 - 2026-11-22
 - Die Board-Kompatibilität auf das 10,1-Zoll-Guition JC8012P4A1 V3 korrigiert.
 - Repräsentative Such- und Rezeptdetaildaten für die offizielle Preview-Bench ergänzt.
