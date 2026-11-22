@@ -7,8 +7,9 @@ Browse recipes from a Mealie instance on a Tessera touch screen. The plugin adds
 ## What it does
 
 - Searches recipes through Home Assistant's Mealie integration.
-- Shows recipe names, total time and servings.
-- Opens a recipe detail card when a result is tapped.
+- Shows recipes as a two-column, vertically scrollable card grid (up to 24 results per request).
+- Each card shows the recipe name, total time and servings.
+- Opens the existing recipe detail card when a result is tapped.
 - Shows ingredients and preparation instructions side by side.
 - Keeps the Mealie connection and its credentials in Home Assistant.
 
@@ -47,7 +48,7 @@ A local helper can connect the Tessera Preview Bench to the real Home Assistant 
 |---|---|
 | Plugin manifest with large-display board targets | Implemented; preview builds pending |
 | Recipe search via Home Assistant | Implemented; hardware verification pending |
-| Recipe result list | Initial implementation |
+| Recipe result list | Scrollable two-column card grid implemented; preview updated; hardware verification pending |
 | Recipe detail card | Initial implementation |
 | Search keyboard | Planned |
 | Categories and filters | Blocked on a suitable Home Assistant data path |
