@@ -13,7 +13,7 @@ permissions:
 jobs:
   validate-preview-store:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 90
     steps:
       - name: Check out this plugin
         uses: actions/checkout@v4
@@ -37,8 +37,24 @@ jobs:
       - name: Prepare the official preview bench
         run: python3 tessera-tools/tools/preview.py --setup
 
-      - name: Render the target Guition display
-        run: python3 tessera-tools/tools/preview.py plugin --board jc8012p4a1v3 --strict
+      - name: Render every supported large display
+        run: |
+          python3 tessera-tools/tools/preview.py plugin \
+            --board crowpanel101 \
+            --board jc1060p470 \
+            --board jc1060p470v2 \
+            --board jc8012p4a1 \
+            --board jc8012p4a1v2 \
+            --board jc8012p4a1v3 \
+            --board reterminald1001 \
+            --board sunton8048s070 \
+            --board waveshare101 \
+            --board waveshare101v3 \
+            --board waveshare7 \
+            --board waveshare7b \
+            --board wavesharep47 \
+            --board wavesharep47b \
+            --strict
 
       - name: Generate the official store image
         run: |
