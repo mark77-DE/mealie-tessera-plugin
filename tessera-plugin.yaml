@@ -27,7 +27,5 @@ tiles:
     sizes: { full: true }
     memory: 2600
     example: tile_example
-    options:
-      - { id: query, kind: text, default: sauce, label: query, hint: query_hint }
 cards:
   - { id: recipe, name: card_recipe }
