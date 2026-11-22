@@ -101,7 +101,8 @@ class RecipeDetailCard : public tessera::Card {
   void answer(JsonObjectConst m) {
     if((m["re"]|0u)!=plugin_->detail_request_id_) return;
     if(!(m["ok"]|false)){ui::set_text(title_,plugin_->text("detail_failed"));return;}
-    JsonObjectConst r=m["result"].as<JsonObjectConst>();
+    JsonObjectConst r=m["result"]["recipe"].as<JsonObjectConst>();
+    if(r.isNull()) r=m["result"].as<JsonObjectConst>();
     ui::set_text(title_,r["name"]|plugin_->text("recipe_details"));
     const uint32_t total=r["total_time_seconds"]|0u, minutes=(total+59)/60;
     const float servings=r["recipe_servings"]|0.0f;
