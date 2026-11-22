@@ -1,0 +1,74 @@
+name: Tessera plugin validation and store image
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "store.png"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  validate-preview-store:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out this plugin
+        uses: actions/checkout@v4
+        with:
+          path: plugin
+
+      - name: Check out the official Tessera plugin tools
+        uses: actions/checkout@v4
+        with:
+          repository: MaxGramser/tessera-plugins
+          path: tessera-tools
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libsdl2-dev git python3 python3-venv python3-pip python3-yaml python3-pil
+
+      - name: Validate plugin manifest and source
+        run: python3 tessera-tools/tools/check.py plugin
+
+      - name: Prepare the official preview bench
+        run: python3 tessera-tools/tools/preview.py --setup
+
+      - name: Render the target Guition display
+        run: python3 tessera-tools/tools/preview.py plugin --board jc8012p4a1v3 --strict
+
+      - name: Generate the official store image
+        run: |
+          python3 tessera-tools/tools/store_image.py plugin \
+            --large jc8012p4a1v3 \
+            --small jc8012p4a1v3 \
+            --tiny jc8012p4a1v3
+
+      - name: Commit the generated store image
+        working-directory: plugin
+        run: |
+          if [ -f store.png ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add store.png
+            if ! git diff --cached --quiet; then
+              git commit -m "Generate Tessera plugin store image"
+              git push
+            fi
+          else
+            echo "store_image.py did not produce store.png" >&2
+            exit 1
+          fi
+
+      - name: Upload preview report and store image
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tessera-preview
+          path: |
+            plugin/.preview/
+            plugin/store.png
+          if-no-files-found: warn
