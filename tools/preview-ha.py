@@ -116,6 +116,8 @@ async def live_ha_service(base_url, token, ask, service_data):
 def main() -> int:
     if not os.environ.get("TESSERA_HA_URL") or not os.environ.get("TESSERA_HA_TOKEN"):
         fail("set TESSERA_HA_URL and TESSERA_HA_TOKEN before running")
+    if not os.environ.get("TESSERA_MEALIE_CONFIG_ENTRY_ID"):
+        fail("set TESSERA_MEALIE_CONFIG_ENTRY_ID to the Mealie integration entry ID from Home Assistant")
     if not os.environ["TESSERA_HA_URL"].startswith(("http://", "https://")):
         fail("TESSERA_HA_URL must start with http:// or https://")
 
@@ -135,9 +137,20 @@ def main() -> int:
 
     env = os.environ.copy()
     env["TESSERA_TREE"] = str(TREE)
+    plugin_config = plugin_root / "plugin.yaml"
+    original_config = plugin_config.read_text(encoding="utf-8")
+    marker = '  CONFIG_ENTRY_ID: ""'
+    replacement = '  CONFIG_ENTRY_ID: "' + env["TESSERA_MEALIE_CONFIG_ENTRY_ID"].replace('"', '') + '"'
+    if marker not in original_config:
+        fail(f"cannot find the empty CONFIG_ENTRY_ID default in {plugin_config}")
+    plugin_config.write_text(original_config.replace(marker, replacement, 1), encoding="utf-8")
     command = [sys.executable, str(preview_script), str(plugin_root), *sys.argv[1:]]
     print("Starting Tessera Preview Bench with live Home Assistant service calls ...")
-    return subprocess.run(command, env=env).returncode
+    try:
+        return subprocess.run(command, env=env).returncode
+    finally:
+        plugin_config.write_text(original_config, encoding="utf-8")
+        print("Restored plugin.yaml; the local Mealie entry ID was not saved in the repository.")
 
 
 if __name__ == "__main__":
