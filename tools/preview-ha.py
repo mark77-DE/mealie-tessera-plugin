@@ -135,8 +135,6 @@ def main() -> int:
             shutil.rmtree(TREE)
         print(f"Cloning official Tessera firmware tools into {TREE} ...")
         subprocess.run(["git", "clone", "--depth", "1", REPOSITORY, str(TREE)], check=True)
-    patched_bench, original_bench = patch_bench(preview_repo)
-
     env = os.environ.copy()
     env["TESSERA_TREE"] = str(TREE)
     plugin_config = plugin_root / "plugin.yaml"
@@ -145,6 +143,7 @@ def main() -> int:
     replacement = '  CONFIG_ENTRY_ID: "' + env["TESSERA_MEALIE_CONFIG_ENTRY_ID"].replace('"', '') + '"'
     if marker not in original_config:
         fail(f"cannot find the empty CONFIG_ENTRY_ID default in {plugin_config}")
+    patched_bench, original_bench = patch_bench(preview_repo)
     plugin_config.write_text(original_config.replace(marker, replacement, 1), encoding="utf-8")
     command = [sys.executable, str(preview_script), str(plugin_root), *sys.argv[1:]]
     print("Starting Tessera Preview Bench with live Home Assistant service calls ...")
