@@ -24,6 +24,7 @@ class MealieRecipeBrowser : public Component, public tessera::Plugin {
   void on_message(JsonObjectConst message) override;
  private:
   friend class RecipeDetailCard;
+  friend class RecipeBrowserTile;
   std::string config_entry_id_;
   std::string status_ = "not_loaded";
   std::string selected_recipe_id_;
