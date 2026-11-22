@@ -17,7 +17,7 @@ class MealieRecipeBrowser : public Component, public tessera::Plugin {
   void setup() override;
   float get_setup_priority() const override { return setup_priority::DATA; }
   void set_config_entry_id(const std::string &value) { config_entry_id_ = value; }
-  bool search(const std::string &terms);
+  bool load_recipes();
   bool load_recipe(const std::string &recipe_id);
   const std::vector<RecipeSummary> &recipes() const { return recipes_; }
   const std::string &status() const { return status_; }
