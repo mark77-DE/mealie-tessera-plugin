@@ -25,6 +25,18 @@ commands:
           name: "Ofengemüse mit Kräutern"
           total_time_seconds: 2700
           recipe_servings: 3
+        - recipe_id: "106fd7ba-2df2-43f7-950f-5e725194f001"
+          name: "Mediterraner Nudelsalat mit Tomaten und Rucola"
+          total_time_seconds: 1200
+          recipe_servings: 4
+        - recipe_id: "206fd7ba-2df2-43f7-950f-5e725194f002"
+          name: "Cremige Kürbissuppe"
+          total_time_seconds: 2100
+          recipe_servings: 6
+        - recipe_id: "306fd7ba-2df2-43f7-950f-5e725194f003"
+          name: "Knusprige Ofenkartoffeln mit Rosmarin"
+          total_time_seconds: 2400
+          recipe_servings: 2
 
   "call_service:mealie.get_recipe":
     name: "Pasta mit Tomatensauce"
