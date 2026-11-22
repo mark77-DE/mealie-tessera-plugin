@@ -1,5 +1,5 @@
 id: mealie_recipe_browser
-version: 0.4.2
+version: 0.4.3
 api: "0.28"
 icon: chef-hat
 maintainer: mark77-DE
@@ -8,7 +8,7 @@ stage: beta
 topics: [home]
 requires:
   esphome: 2026.6.2
-boards: [jc8012p4a1v3]
+boards: [crowpanel101, jc1060p470, jc1060p470v2, jc8012p4a1, jc8012p4a1v2, jc8012p4a1v3, reterminald1001, sunton8048s070, waveshare101, waveshare101v3, waveshare7, waveshare7b, wavesharep47, wavesharep47b]
 flash_kb: 12
 permissions:
   ha_commands:
