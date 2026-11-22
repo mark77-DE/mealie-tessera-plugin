@@ -54,10 +54,10 @@ class RecipeBrowserTile : public tessera::Tile {
       lv_obj_set_pos(cards_[i].panel, static_cast<int>(i % 2) * (card_width_ + gap),
                      static_cast<int>(i / 2) * (card_height_ + gap));
       lv_obj_set_style_radius(cards_[i].panel, ui::px(12), 0);
-      lv_obj_set_style_bg_color(cards_[i].panel, lv_color_hex(0xE9EDF2), 0);
+      lv_obj_set_style_bg_color(cards_[i].panel, ui::color(theme::CARD), 0);
       lv_obj_set_style_bg_opa(cards_[i].panel, LV_OPA_COVER, 0);
       lv_obj_set_style_border_width(cards_[i].panel, 1, 0);
-      lv_obj_set_style_border_color(cards_[i].panel, lv_color_hex(0xD5DCE5), 0);
+      lv_obj_set_style_border_color(cards_[i].panel, ui::color(theme::LINE), 0);
       lv_obj_set_style_pad_all(cards_[i].panel, ui::px(14), 0);
       lv_obj_clear_flag(cards_[i].panel, LV_OBJ_FLAG_SCROLLABLE);
 
