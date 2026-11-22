@@ -25,11 +25,11 @@ def fail(message: str, code: int = 2) -> None:
     raise SystemExit(f"HA preview: {message}")
 
 
-def patch_bench(tree: Path) -> None:
-    bench = tree / "tools" / "bench.py"
+def patch_bench(preview_repo: Path) -> tuple[Path, str]:
+    bench = preview_repo / "tools" / "bench.py"
     source = bench.read_text(encoding="utf-8")
     if MARKER in source:
-        return
+        fail(f"{bench} already contains a live-preview patch; restore the original file before continuing")
 
     import_line = "import yaml\n"
     if import_line not in source:
@@ -110,7 +110,8 @@ async def live_ha_service(base_url, token, ask, service_data):
         fail("cannot find the expected service-answer block in bench.py; upstream code has changed")
     source = source.replace(old, new, 1)
     bench.write_text(source, encoding="utf-8")
-    print(f"Patched local Tessera preview checkout: {bench}")
+    print(f"Temporarily patched local Preview Bench: {bench}")
+    return bench, source
 
 
 def main() -> int:
@@ -133,7 +134,7 @@ def main() -> int:
             shutil.rmtree(TREE)
         print(f"Cloning official Tessera firmware tools into {TREE} ...")
         subprocess.run(["git", "clone", "--depth", "1", REPOSITORY, str(TREE)], check=True)
-    patch_bench(TREE)
+    patched_bench, original_bench = patch_bench(preview_repo)
 
     env = os.environ.copy()
     env["TESSERA_TREE"] = str(TREE)
@@ -150,7 +151,8 @@ def main() -> int:
         return subprocess.run(command, env=env).returncode
     finally:
         plugin_config.write_text(original_config, encoding="utf-8")
-        print("Restored plugin.yaml; the local Mealie entry ID was not saved in the repository.")
+        patched_bench.write_text(original_bench, encoding="utf-8")
+        print("Restored plugin.yaml and the original Preview Bench; no local credentials or entry IDs were saved.")
 
 
 if __name__ == "__main__":
