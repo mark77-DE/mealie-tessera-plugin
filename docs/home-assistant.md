@@ -19,22 +19,20 @@ Home Assistant bietet dafür direkt eine Funktion zum Kopieren der Eintrag-ID:
 
 Die Config-Entry-ID wird nur lokal in Tessera eingetragen und darf nicht in dieses Repository oder in öffentliche Screenshots übernommen werden.
 
-## Rezeptsuche
+## Rezeptübersicht ohne Suchfilter
 
 Bestätigter Aktionsname: `mealie.get_recipes`
 
-Benötigte Daten:
-- `search_terms`: Suchtext, z. B. `sauce`
-- `result_limit`: maximale Anzahl Treffer
-- `config_entry_id`: Config-Entry der Mealie-Integration in Home Assistant
+Für die Übersicht wird `search_terms` bewusst weggelassen. Home Assistant dokumentiert dieses Feld als optional. `result_limit` begrenzt die Anzahl der zurückgegebenen Rezepte.
 
 ```yaml
 action: mealie.get_recipes
 data:
   config_entry_id: "<MEALIE_CONFIG_ENTRY_ID>"
-  search_terms: "sauce"
-  result_limit: 3
+  result_limit: 12
 ```
+
+Das Plugin zeigt derzeit maximal 12 Einträge an. Eine vollständige Auflistung größerer Mealie-Bibliotheken benötigt eine spätere Pagination; der Suchfilter ist davon unabhängig und bleibt deaktiviert.
 
 ## Rezeptdetails
 
