@@ -36,13 +36,13 @@ export TESSERA_PLUGINS_DIR="/path/to/tessera-plugins"
 
 ## What it does
 
-- Clones the official Tessera firmware/render repository into `~/.cache/tessera-ha-preview` the first time and applies a small local patch to the Preview Bench's service-answer handler.
+- Clones the official Tessera firmware/render repository into `~/.cache/tessera-ha-preview` the first time. It temporarily patches `tools/bench.py` in the local `tessera-plugins` checkout so plugin service calls can be answered from Home Assistant, then restores the original file when the run ends.
 - Uses Home Assistant's authenticated REST service endpoint with `?return_response` for plugin commands such as `mealie.get_recipes` and `mealie.get_recipe`.
 - Supplies the Mealie `config_entry_id` to the component for the duration of the preview run. The helper restores `plugin.yaml` afterwards, including if the preview exits with an error.
 - Leaves `preview.yaml` unchanged. It remains the fallback fixture source when using the official preview command without this helper.
-- Does not modify the official `tessera-plugins` checkout or commit credentials/entry IDs.
+- Makes no lasting changes to the `tessera-plugins` checkout and does not commit credentials/entry IDs.
 
-The local firmware checkout is deliberately separate from the official previewer's normal cache. It is not updated automatically, because that would overwrite the local patch. To refresh it manually, remove `~/.cache/tessera-ha-preview`; the next run clones it again and reapplies the patch.
+The local firmware checkout is deliberately separate from the official previewer's normal cache. It is not updated automatically. To refresh it manually, remove `~/.cache/tessera-ha-preview`; the next run clones it again. The Preview Bench patch is temporary and is restored after each run.
 
 ## Security
 
