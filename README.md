@@ -37,6 +37,10 @@ If you have multiple Mealie instances, copy the entry ID from the integration en
 - The current detail response is deliberately kept small; very long recipes may be shortened until segmented loading is implemented.
 - A virtual preview in the Tessera app cannot install plugins. The separate developer preview/bench is intended for inspecting plugin rendering without a physical screen.
 
+## Live development preview
+
+A local helper can connect the Tessera Preview Bench to the real Home Assistant Mealie services. See [Live Home Assistant preview](docs/live-preview.md) for setup and security notes. This is a local development tool and does not change the installed plugin.
+
 ## Development status
 
 | Feature | Status |
