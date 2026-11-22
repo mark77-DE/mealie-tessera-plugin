@@ -15,17 +15,11 @@ class RecipeBrowserTile : public tessera::Tile {
     ui::set_text(title_, plugin_->text("screen_title"));
     lv_obj_set_pos(title_, 0, 0); lv_obj_set_size(title_, width_, ui::line_height(Font::TITLE));
 
-    query_ = c.options["query"] | "sauce";
-    query_label_ = ui::label(c.parent, Font::BODY, theme::MUTED);
-    ui::set_text(query_label_, tessera::fill(plugin_->text("searching_for"), "n", query_));
-    lv_obj_set_pos(query_label_, 0, ui::line_height(Font::TITLE) + ui::px(6));
-    lv_obj_set_size(query_label_, width_, ui::line_height(Font::BODY));
-
     status_label_ = ui::label(c.parent, Font::BODY, theme::MUTED);
-    lv_obj_set_pos(status_label_, 0, ui::line_height(Font::TITLE) + ui::line_height(Font::BODY) + ui::px(12));
+    lv_obj_set_pos(status_label_, 0, ui::line_height(Font::TITLE) + ui::px(6));
     lv_obj_set_size(status_label_, width_, ui::line_height(Font::BODY));
 
-    list_top_ = ui::line_height(Font::TITLE) + ui::line_height(Font::BODY) + ui::px(42);
+    list_top_ = ui::line_height(Font::TITLE) + ui::line_height(Font::BODY) + ui::px(24);
     list_ = lv_obj_create(c.parent);
     lv_obj_set_pos(list_, 0, list_top_);
     lv_obj_set_size(list_, width_, height_ - list_top_);
@@ -71,7 +65,7 @@ class RecipeBrowserTile : public tessera::Tile {
       lv_obj_set_size(cards_[i].meta, card_width_ - ui::px(28), ui::px(28));
     }
     update_cards();
-    plugin_->search(query_);
+    plugin_->load_recipes();
   }
   void on_tick(uint32_t) override {
     ui::set_text(status_label_, plugin_->text(plugin_->status().c_str()));
@@ -79,7 +73,6 @@ class RecipeBrowserTile : public tessera::Tile {
   }
   void on_theme() override {
     ui::set_color(title_, theme::INK);
-    ui::set_color(query_label_, theme::MUTED);
     ui::set_color(status_label_, theme::MUTED);
     for (auto &card : cards_) {
       ui::set_color(card.name, theme::INK);
@@ -132,8 +125,7 @@ class RecipeBrowserTile : public tessera::Tile {
   static constexpr size_t MAX_VISIBLE_RECIPES = 12;
   MealieRecipeBrowser *plugin_;
   int width_ = 0, height_ = 0, tile_ = -1, list_top_ = 0, card_width_ = 0, card_height_ = 0;
-  std::string query_;
-  lv_obj_t *title_ = nullptr, *query_label_ = nullptr, *status_label_ = nullptr, *list_ = nullptr, *content_ = nullptr;
+  lv_obj_t *title_ = nullptr, *status_label_ = nullptr, *list_ = nullptr, *content_ = nullptr;
   RecipeCard cards_[MAX_VISIBLE_RECIPES];
 };
 class RecipeDetailCard : public tessera::Card {
@@ -209,10 +201,10 @@ void MealieRecipeBrowser::setup(){
   add_tile("browser",[this](){return new RecipeBrowserTile(this);});
   add_card("recipe",[this](){return new RecipeDetailCard(this);});
 }
-bool MealieRecipeBrowser::search(const std::string &terms){
+bool MealieRecipeBrowser::load_recipes(){
   if(config_entry_id_.empty()){status_="missing_config";return false;}
   JsonDocument request; request["ask"]="call_service:mealie.get_recipes";
-  request["data"]["config_entry_id"]=config_entry_id_; request["data"]["search_terms"]=terms; request["data"]["result_limit"]=12;
+  request["data"]["config_entry_id"]=config_entry_id_; request["data"]["result_limit"]=12;
   request_id_=tessera::send(this,request.as<JsonObjectConst>());
   status_=request_id_?"loading":"request_failed"; return request_id_!=0;
 }
