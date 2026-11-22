@@ -1,6 +1,52 @@
-# Data shown by the Tessera preview bench.
+# Realistic sample answers for Tessera's official plugin preview bench.
+# No live Home Assistant connection or private IDs are used here.
+time_zone: Europe/Berlin
+
 tiles:
   - tile: browser
-    name: Mealie – Rezeptsuche
+    name: 01-Rezeptbrowser
     options:
-      query: sauce
+      query: pasta
+    sizes: [full]
+
+commands:
+  "call_service:mealie.get_recipes":
+    recipes:
+      items:
+        - recipe_id: "406fd7ba-2df2-43f7-950f-5e725194fbbb"
+          name: "Pasta mit Tomatensauce"
+          total_time_seconds: 1800
+          recipe_servings: 4
+        - recipe_id: "bf9ed69c-bef1-4a14-a686-e358924708e6"
+          name: "Cremige Knoblauch-Pasta"
+          total_time_seconds: 1500
+          recipe_servings: 2
+        - recipe_id: "f0ccba41-3b0f-4d7e-bc1e-81e3a5010a2d"
+          name: "Ofengemüse mit Kräutern"
+          total_time_seconds: 2700
+          recipe_servings: 3
+
+  "call_service:mealie.get_recipe":
+    name: "Pasta mit Tomatensauce"
+    description: "Ein einfaches Pastagericht mit aromatischer Tomatensauce."
+    total_time_seconds: 1800
+    recipe_servings: 4
+    ingredients:
+      - display: "400 g Spaghetti"
+        title: "Spaghetti"
+      - display: "1 Dose gehackte Tomaten"
+        title: "Gehackte Tomaten"
+      - display: "1 Zwiebel"
+        title: "Zwiebel"
+      - display: "2 Knoblauchzehen"
+        title: "Knoblauch"
+      - display: "2 EL Olivenöl"
+        title: "Olivenöl"
+      - display: "Salz und Pfeffer"
+        title: "Salz und Pfeffer"
+    instructions:
+      - text: "Zwiebel und Knoblauch fein würfeln."
+      - text: "Olivenöl erhitzen und Zwiebel sowie Knoblauch glasig dünsten."
+      - text: "Tomaten hinzufügen und die Sauce etwa 15 Minuten köcheln lassen."
+      - text: "Spaghetti in Salzwasser al dente kochen."
+      - text: "Pasta mit der Sauce vermengen und abschmecken."
