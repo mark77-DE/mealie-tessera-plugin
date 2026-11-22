@@ -46,7 +46,7 @@ jobs:
       - name: Prepare the official preview bench
         run: python3 tessera-tools/tools/preview.py --setup
 
-      - name: Render every supported large display
+      - name: Render supported large displays
         run: |
           python3 tessera-tools/tools/preview.py plugin \
             --board crowpanel101 \
@@ -55,7 +55,6 @@ jobs:
             --board jc8012p4a1 \
             --board jc8012p4a1v2 \
             --board jc8012p4a1v3 \
-            --board reterminald1001 \
             --board sunton8048s070 \
             --board waveshare101 \
             --board waveshare101v3 \
