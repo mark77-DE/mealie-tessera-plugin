@@ -129,7 +129,7 @@ class RecipeBrowserTile : public tessera::Tile {
     lv_obj_set_height(content_, static_cast<int>(rows) * (card_height_ + ui::px(14)));
     lv_obj_update_layout(content_);
   }
-  static constexpr size_t MAX_VISIBLE_RECIPES = 24;
+  static constexpr size_t MAX_VISIBLE_RECIPES = 12;
   MealieRecipeBrowser *plugin_;
   int width_ = 0, height_ = 0, tile_ = -1, list_top_ = 0, card_width_ = 0, card_height_ = 0;
   std::string query_;
@@ -212,7 +212,7 @@ void MealieRecipeBrowser::setup(){
 bool MealieRecipeBrowser::search(const std::string &terms){
   if(config_entry_id_.empty()){status_="missing_config";return false;}
   JsonDocument request; request["ask"]="call_service:mealie.get_recipes";
-  request["data"]["config_entry_id"]=config_entry_id_; request["data"]["search_terms"]=terms; request["data"]["result_limit"]=24;
+  request["data"]["config_entry_id"]=config_entry_id_; request["data"]["search_terms"]=terms; request["data"]["result_limit"]=12;
   request_id_=tessera::send(this,request.as<JsonObjectConst>());
   status_=request_id_?"loading":"request_failed"; return request_id_!=0;
 }
