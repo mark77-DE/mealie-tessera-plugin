@@ -28,6 +28,7 @@ def fail(message: str, code: int = 2) -> None:
 def patch_bench(preview_repo: Path) -> tuple[Path, str]:
     bench = preview_repo / "tools" / "bench.py"
     source = bench.read_text(encoding="utf-8")
+    original_source = source
     if MARKER in source:
         fail(f"{bench} already contains a live-preview patch; restore the original file before continuing")
 
@@ -111,7 +112,7 @@ async def live_ha_service(base_url, token, ask, service_data):
     source = source.replace(old, new, 1)
     bench.write_text(source, encoding="utf-8")
     print(f"Temporarily patched local Preview Bench: {bench}")
-    return bench, source
+    return bench, original_source
 
 
 def main() -> int:
