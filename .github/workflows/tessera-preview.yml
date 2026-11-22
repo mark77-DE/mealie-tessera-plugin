@@ -3,9 +3,18 @@ name: Tessera plugin validation and store image
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - "store.png"
+    paths:
+      - "tessera-plugin.yaml"
+      - "plugin.yaml"
+      - "preview.yaml"
+      - "components/**"
+      - "translations/**"
+      - ".github/workflows/tessera-preview.yml"
   workflow_dispatch:
+
+concurrency:
+  group: tessera-preview-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write
