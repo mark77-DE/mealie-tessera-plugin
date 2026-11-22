@@ -10,6 +10,7 @@ Ziel ist ein installierbares Tessera-Plugin als Rezeptbrowser für das große 10
 - [x] Tessera als einziges Frontend festgelegt
 - [x] Zielgerät auf das große 10,1-Zoll-Display begrenzt
 - [x] Tessera Screen Manager 0.4.98 / Firmware 0.61.0 festgestellt
+- [x] Ziel-Board-ID `jc8012p4a1v3` anhand des aktuellen Tessera-Boardkatalogs verifiziert
 - [x] Plugin API 0.28 und offizielles Plugin-Schema geprüft
 - [x] Plugin-Grundgerüst und erste Full-Screen-Ansicht angelegt
 
@@ -18,7 +19,8 @@ Ziel ist ein installierbares Tessera-Plugin als Rezeptbrowser für das große 10
 - [x] Config-Entry-ID als lokale Plugin-Eingabe vorsehen
 - [x] Ersten Suchaufruf und Antwortverarbeitung implementieren
 - [x] Aufruf von `mealie.get_recipe` für die Detailansicht implementieren
-- [ ] Tatsächliche Antwortstruktur und Größenlimits mit dem Screen bzw. der offiziellen Preview-Bench prüfen
+- [x] Repräsentative Such- und Rezeptdetailantworten für die Preview-Bench hinterlegen
+- [ ] Tatsächliche Antwortstruktur und Größenlimits mit dem Screen prüfen
 - [ ] Lange Zutaten- und Anweisungstexte abschnittsweise übertragen
 - [ ] Kategorienquelle und Kategorie-Filterstrategie festlegen
 - [ ] Automatische Erkennung der installierten Mealie-Integrationen ermöglichen (benötigt Tessera-API-Erweiterung)
@@ -41,8 +43,8 @@ Ziel ist ein installierbares Tessera-Plugin als Rezeptbrowser für das große 10
 - [ ] Optional Timer-Funktion prüfen
 
 ## Phase 4 – Vorschau, Test und Veröffentlichung
-- [ ] Offiziellen Tessera-Plugin-Checker ausführen
-- [ ] Offizielle Preview-Bench mit repräsentativen Beispieldaten ausführen
+- [x] Offiziellen Tessera-Plugin-Checker in GitHub Actions einrichten
+- [ ] Offizielle Preview-Bench erfolgreich durchlaufen lassen
 - [ ] Layout und Lesbarkeit bei 1280 × 800 prüfen
 - [ ] `store.png` aus dem geprüften Preview-Bench erzeugen
 - [ ] Plugin über „Add with a link“ auf einem Testscreen installieren
