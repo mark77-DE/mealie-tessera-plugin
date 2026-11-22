@@ -38,11 +38,18 @@ class RecipeBrowserTile : public tessera::Tile {
     lv_obj_set_scrollbar_mode(list_, LV_SCROLLBAR_MODE_AUTO);
     lv_obj_add_flag(list_, LV_OBJ_FLAG_SCROLLABLE);
 
+    content_ = lv_obj_create(list_);
+    lv_obj_set_pos(content_, 0, 0);
+    lv_obj_set_size(content_, width_, height_ - list_top_);
+    lv_obj_set_style_bg_opa(content_, LV_OPA_TRANSP, 0);
+    lv_obj_set_style_border_width(content_, 0, 0);
+    lv_obj_set_style_pad_all(content_, 0, 0);
+    lv_obj_clear_flag(content_, LV_OBJ_FLAG_SCROLLABLE);
     const int gap = ui::px(14);
     card_width_ = (width_ - gap) / 2;
     card_height_ = ui::px(176);
     for (size_t i = 0; i < MAX_VISIBLE_RECIPES; ++i) {
-      cards_[i].panel = lv_obj_create(list_);
+      cards_[i].panel = lv_obj_create(content_);
       lv_obj_set_size(cards_[i].panel, card_width_, card_height_);
       lv_obj_set_pos(cards_[i].panel, static_cast<int>(i % 2) * (card_width_ + gap),
                      static_cast<int>(i / 2) * (card_height_ + gap));
@@ -119,15 +126,14 @@ class RecipeBrowserTile : public tessera::Tile {
       ui::set_text(cards_[i].meta, meta);
     }
     const size_t rows = (recipes.size() + 1) / 2;
-    lv_obj_set_height(list_, height_ - list_top_);
-    lv_obj_set_style_min_height(list_, static_cast<int>(rows) * (card_height_ + ui::px(14)), 0);
-    lv_obj_update_layout(list_);
+    lv_obj_set_height(content_, static_cast<int>(rows) * (card_height_ + ui::px(14)));
+    lv_obj_update_layout(content_);
   }
   static constexpr size_t MAX_VISIBLE_RECIPES = 24;
   MealieRecipeBrowser *plugin_;
   int width_ = 0, height_ = 0, tile_ = -1, list_top_ = 0, card_width_ = 0, card_height_ = 0;
   std::string query_;
-  lv_obj_t *title_ = nullptr, *query_label_ = nullptr, *status_label_ = nullptr, *list_ = nullptr;
+  lv_obj_t *title_ = nullptr, *query_label_ = nullptr, *status_label_ = nullptr, *list_ = nullptr, *content_ = nullptr;
   RecipeCard cards_[MAX_VISIBLE_RECIPES];
 };
 class RecipeDetailCard : public tessera::Card {
