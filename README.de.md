@@ -16,13 +16,13 @@ Aktuell verwendet das Plugin die Home-Assistant-Aktionen `mealie.get_recipes` un
 
 ## Zielgerät
 
-Das einzige derzeit unterstützte Zielgerät ist das 10,1-Zoll-Display Guition JC8012P4A1 V3 (`jc8012p4a1v3`, 1280 × 800, ESP32-P4). Kleinere Displays sind bewusst nicht als kompatibel eingetragen, da der Rezeptbrowser als vollflächige Küchenoberfläche ausgelegt ist.
+Das Plugin gibt alle derzeit im Tessera-Katalog geführten Touchdisplays ab 7 Zoll frei: unter anderem Guition JC8012P4A1 V1/V2/V3, Guition 7 Zoll, reTerminal D1001, CrowPanel, Sunton sowie Waveshare 7 Zoll und 10,1 Zoll. Die vollständige Liste mit Board-IDs und Auflösungen steht in der [Display-Kompatibilitätsliste](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/supported-displays.md). Kleinere Displays bleiben bewusst ausgeschlossen.
 
 ## Einrichtung
 
 1. In Tessera **Plugins** öffnen und **Add with a link** wählen.
 2. Dieses Repository hinzufügen: [mark77-DE/mealie-tessera-plugin](https://github.com/mark77-DE/mealie-tessera-plugin).
-3. Das Guition JC8012P4A1 V3 auswählen und das Plugin installieren.
+3. Eines der unterstützten großen Displays auswählen und das Plugin installieren.
 4. In Home Assistant **Einstellungen → Geräte & Dienste** öffnen.
 5. Beim Integrationseintrag **Mealie** das Drei-Punkte-Menü öffnen und **Eintrag-ID kopieren** auswählen.
 6. Die kopierte ID in den Plugin-Einstellungen des Displays in das Feld `config_entry_id` eintragen.
@@ -41,7 +41,7 @@ Bei mehreren Mealie-Instanzen muss die Eintrag-ID des gewünschten Integrationse
 
 | Funktion | Stand |
 |---|---|
-| Plugin-Manifest und Zielgerät Guition JC8012P4A1 V3 | Implementiert |
+| Plugin-Manifest mit großen Display-Varianten | Implementiert; Preview-Builds laufen noch |
 | Rezeptsuche über Home Assistant | Implementiert; Hardwaretest offen |
 | Rezepttrefferliste | Erste Implementierung |
 | Rezeptdetailansicht | Erste Implementierung |
