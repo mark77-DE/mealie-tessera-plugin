@@ -63,15 +63,30 @@ async def live_ha_service(base_url, token, ask, service_data):
             except ValueError as error:
                 raise RuntimeError("Home Assistant returned invalid JSON") from error
     service_response = payload.get("service_response") if isinstance(payload, dict) else None
+    result = None
     if isinstance(service_response, dict):
         key = domain + "." + service
         if key in service_response:
-            return service_response[key]
-        if len(service_response) == 1:
-            return next(iter(service_response.values()))
-    if isinstance(payload, dict) and "service_response" in payload:
-        return service_response
-    raise RuntimeError("Home Assistant did not return service_response; check that this action supports response data")
+            result = service_response[key]
+        elif len(service_response) == 1:
+            result = next(iter(service_response.values()))
+    elif isinstance(payload, dict) and "service_response" in payload:
+        result = service_response
+    else:
+        raise RuntimeError("Home Assistant did not return service_response; check that this action supports response data")
+
+    if ask == "call_service:mealie.get_recipes":
+        result_keys = sorted(result.keys()) if isinstance(result, dict) else []
+        recipes = result.get("recipes") if isinstance(result, dict) else None
+        items = recipes.get("items") if isinstance(recipes, dict) else None
+        if not isinstance(items, list) and isinstance(result, dict):
+            items = result.get("items")
+        if isinstance(items, list):
+            names = [str(item.get("name", "<no name>")) for item in items[:12] if isinstance(item, dict)]
+            print(f"[Mealie diagnostics] requested_limit={service_data.get('result_limit')}; result_keys={result_keys}; received_items={len(items)}; names={names}", flush=True)
+        else:
+            print(f"[Mealie diagnostics] requested_limit={service_data.get('result_limit')}; result_type={type(result).__name__}; result_keys={result_keys}; recipes_type={type(recipes).__name__}", flush=True)
+    return result
 
 
 '''
