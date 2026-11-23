@@ -111,7 +111,21 @@ async def live_ha_service(base_url, token, ask, service_data):
         elif os.environ.get('TESSERA_HA_URL') and os.environ.get('TESSERA_HA_TOKEN'):
             try:
                 result = await live_ha_service(os.environ['TESSERA_HA_URL'], os.environ['TESSERA_HA_TOKEN'], ask, body.get('data') or {})
-                reply.update(ok=True, result=answer_of(self.entry, ask, result, self.spec.get('time_zone') or ZONE))
+                answered = answer_of(self.entry, ask, result, self.spec.get('time_zone') or ZONE)
+                if ask == "call_service:mealie.get_recipes":
+                    import json
+                    keys = sorted(answered.keys()) if isinstance(answered, dict) else []
+                    items = answered.get("items") if isinstance(answered, dict) else None
+                    if not isinstance(items, list) and isinstance(answered, dict):
+                        nested = answered.get("recipes")
+                        items = nested.get("items") if isinstance(nested, dict) else None
+                    if isinstance(items, list):
+                        names = [str(item.get("name", "<no name>")) for item in items[:12] if isinstance(item, dict)]
+                        print(f"[Mealie bridge diagnostics] answer_of_type={type(answered).__name__}; answer_keys={keys}; items={len(items)}; names={names}", flush=True)
+                    else:
+                        preview = json.dumps(answered, ensure_ascii=False, default=str)[:1600]
+                        print(f"[Mealie bridge diagnostics] answer_of_type={type(answered).__name__}; answer_keys={keys}; payload={preview}", flush=True)
+                reply.update(ok=True, result=answered)
             except Exception as error:
                 reply.update(ok=False, error='ha_preview_failed')
                 self.find('warning', 'questions', f'live Home Assistant call {ask!r} failed: {str(error)[:220]}')
