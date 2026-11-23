@@ -1,10 +1,8 @@
 #include "mealie_recipe_browser.h"
-#include "esphome/core/log.h"
 #include <cstdio>
 #include <string>
 #include <utility>
 namespace esphome::mealie_recipe_browser {
-static const char *const TAG = "mealie_browser";
 using tessera::Font;
 namespace ui = tessera::ui;
 
@@ -41,30 +39,30 @@ class RecipeBrowserTile : public tessera::Tile {
     lv_obj_set_style_border_width(content_, 0, 0);
     lv_obj_set_style_pad_all(content_, 0, 0);
     lv_obj_clear_flag(content_, LV_OBJ_FLAG_SCROLLABLE);
-    const int gap = ui::px(14);
-    card_width_ = (width_ - gap) / 2;
-    card_height_ = ui::px(176);
+    const int gap = ui::px(8);
+    card_width_ = (width_ - 2 * gap) / 3;
+    card_height_ = ui::px(86);
     for (size_t i = 0; i < MAX_VISIBLE_RECIPES; ++i) {
       cards_[i].panel = lv_obj_create(content_);
       lv_obj_set_size(cards_[i].panel, card_width_, card_height_);
-      lv_obj_set_pos(cards_[i].panel, static_cast<int>(i % 2) * (card_width_ + gap),
-                     static_cast<int>(i / 2) * (card_height_ + gap));
+      lv_obj_set_pos(cards_[i].panel, static_cast<int>(i % 3) * (card_width_ + gap),
+                     static_cast<int>(i / 3) * (card_height_ + gap));
       lv_obj_set_style_radius(cards_[i].panel, ui::px(12), 0);
       lv_obj_set_style_bg_color(cards_[i].panel, ui::color(theme::CARD), 0);
       lv_obj_set_style_bg_opa(cards_[i].panel, LV_OPA_COVER, 0);
       lv_obj_set_style_border_width(cards_[i].panel, 1, 0);
       lv_obj_set_style_border_color(cards_[i].panel, ui::color(theme::LINE), 0);
-      lv_obj_set_style_pad_all(cards_[i].panel, ui::px(14), 0);
+      lv_obj_set_style_pad_all(cards_[i].panel, ui::px(10), 0);
       lv_obj_clear_flag(cards_[i].panel, LV_OBJ_FLAG_SCROLLABLE);
 
       cards_[i].name = ui::label(cards_[i].panel, Font::BODY_LARGE, theme::INK);
       lv_obj_set_pos(cards_[i].name, 0, 0);
-      lv_obj_set_size(cards_[i].name, card_width_ - ui::px(28), ui::px(92));
+      lv_obj_set_size(cards_[i].name, card_width_ - ui::px(20), ui::px(46));
       lv_label_set_long_mode(cards_[i].name, LV_LABEL_LONG_WRAP);
 
       cards_[i].meta = ui::label(cards_[i].panel, Font::BODY, theme::MUTED);
-      lv_obj_set_pos(cards_[i].meta, 0, ui::px(104));
-      lv_obj_set_size(cards_[i].meta, card_width_ - ui::px(28), ui::px(28));
+      lv_obj_set_pos(cards_[i].meta, 0, ui::px(54));
+      lv_obj_set_size(cards_[i].meta, card_width_ - ui::px(20), ui::px(22));
     }
     update_cards();
     plugin_->load_recipes();
@@ -86,14 +84,14 @@ class RecipeBrowserTile : public tessera::Tile {
     const tessera::Point p = tessera::tap_point();
     if (p.y < list_top_ || card_height_ <= 0) return;
     const int local_y = p.y - list_top_ + lv_obj_get_scroll_y(list_);
-    const int gap = ui::px(14);
+    const int gap = ui::px(8);
     const int row_stride = card_height_ + gap;
     const int col_stride = card_width_ + gap;
     const int col = p.x / col_stride;
     const int row = local_y / row_stride;
-    if (col < 0 || col > 1 || row < 0) return;
+    if (col < 0 || col > 2 || row < 0) return;
     if ((p.x % col_stride) >= card_width_ || (local_y % row_stride) >= card_height_) return;
-    const size_t index = static_cast<size_t>(row * 2 + col);
+    const size_t index = static_cast<size_t>(row * 3 + col);
     if (index >= plugin_->recipes().size()) return;
     const auto &recipe = plugin_->recipes()[index];
     if (recipe.id.empty()) return;
@@ -120,8 +118,15 @@ class RecipeBrowserTile : public tessera::Tile {
         snprintf(meta, sizeof(meta), "%lu min", static_cast<unsigned long>(minutes));
       ui::set_text(cards_[i].meta, meta);
     }
-    const size_t rows = (recipes.size() + 1) / 2;
-    lv_obj_set_height(content_, static_cast<int>(rows) * (card_height_ + ui::px(14)));
+    char count_text[40];
+    snprintf(count_text, sizeof(count_text), "%u / 12 Rezepte",
+             static_cast<unsigned>(recipes.size()));
+    ui::set_text(status_label_, count_text);
+    const size_t rows = (recipes.size() + 2) / 3;
+    const int gap = ui::px(8);
+    const int content_height = rows == 0 ? 0 :
+        static_cast<int>(rows) * card_height_ + static_cast<int>(rows - 1) * gap;
+    lv_obj_set_height(content_, content_height);
     lv_obj_update_layout(content_);
   }
   static constexpr size_t MAX_VISIBLE_RECIPES = 12;
@@ -223,15 +228,13 @@ void MealieRecipeBrowser::on_message(JsonObjectConst message){
   JsonObjectConst result=message["result"].as<JsonObjectConst>();
   JsonArrayConst items=result["recipes"]["items"].as<JsonArrayConst>();
   if(items.isNull()) items=result["items"].as<JsonArrayConst>();
-  if(items.isNull()){ESP_LOGW(TAG, "get_recipes: response contains no recipes.items array");recipes_.clear();status_="unexpected_response";return;}
-  ESP_LOGI(TAG, "get_recipes: Home Assistant returned %u recipe items", static_cast<unsigned>(items.size()));
+  if(items.isNull()){recipes_.clear();status_="unexpected_response";return;}
   recipes_.clear();
   for(JsonObjectConst item:items){
     RecipeSummary recipe; recipe.id=item["recipe_id"]|""; recipe.name=item["name"]|"";
     recipe.total_seconds=item["total_time_seconds"]|0u; recipe.servings=item["recipe_servings"]|0.0f;
     if(!recipe.name.empty()) recipes_.push_back(std::move(recipe));
   }
-  ESP_LOGI(TAG, "get_recipes: parsed %u recipes for display", static_cast<unsigned>(recipes_.size()));
   status_=recipes_.empty()?"no_results":"loaded";
 }
 }  // namespace esphome::mealie_recipe_browser
