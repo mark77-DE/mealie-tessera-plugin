@@ -1,8 +1,10 @@
 #include "mealie_recipe_browser.h"
+#include "esphome/core/log.h"
 #include <cstdio>
 #include <string>
 #include <utility>
 namespace esphome::mealie_recipe_browser {
+static const char *const TAG = "mealie_browser";
 using tessera::Font;
 namespace ui = tessera::ui;
 
@@ -221,13 +223,15 @@ void MealieRecipeBrowser::on_message(JsonObjectConst message){
   JsonObjectConst result=message["result"].as<JsonObjectConst>();
   JsonArrayConst items=result["recipes"]["items"].as<JsonArrayConst>();
   if(items.isNull()) items=result["items"].as<JsonArrayConst>();
-  if(items.isNull()){recipes_.clear();status_="unexpected_response";return;}
+  if(items.isNull()){ESP_LOGW(TAG, "get_recipes: response contains no recipes.items array");recipes_.clear();status_="unexpected_response";return;}
+  ESP_LOGI(TAG, "get_recipes: Home Assistant returned %u recipe items", static_cast<unsigned>(items.size()));
   recipes_.clear();
   for(JsonObjectConst item:items){
     RecipeSummary recipe; recipe.id=item["recipe_id"]|""; recipe.name=item["name"]|"";
     recipe.total_seconds=item["total_time_seconds"]|0u; recipe.servings=item["recipe_servings"]|0.0f;
     if(!recipe.name.empty()) recipes_.push_back(std::move(recipe));
   }
+  ESP_LOGI(TAG, "get_recipes: parsed %u recipes for display", static_cast<unsigned>(recipes_.size()));
   status_=recipes_.empty()?"no_results":"loaded";
 }
 }  // namespace esphome::mealie_recipe_browser
