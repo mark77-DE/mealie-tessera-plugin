@@ -113,7 +113,6 @@ async def live_ha_service(base_url, token, ask, service_data):
                 result = await live_ha_service(os.environ['TESSERA_HA_URL'], os.environ['TESSERA_HA_TOKEN'], ask, body.get('data') or {})
                 answered = answer_of(self.entry, ask, result, self.spec.get('time_zone') or ZONE)
                 if ask == "call_service:mealie.get_recipes":
-                    import json
                     keys = sorted(answered.keys()) if isinstance(answered, dict) else []
                     items = answered.get("items") if isinstance(answered, dict) else None
                     if not isinstance(items, list) and isinstance(answered, dict):
