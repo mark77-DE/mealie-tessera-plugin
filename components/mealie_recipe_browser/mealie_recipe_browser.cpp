@@ -118,9 +118,16 @@ class RecipeBrowserTile : public tessera::Tile {
         snprintf(meta, sizeof(meta), "%lu min", static_cast<unsigned long>(minutes));
       ui::set_text(cards_[i].meta, meta);
     }
-    char count_text[40];
-    snprintf(count_text, sizeof(count_text), "%u / 12 Rezepte",
-             static_cast<unsigned>(recipes.size()));
+    char count_text[80];
+    if (plugin_->status() == "loaded") {
+      snprintf(count_text, sizeof(count_text), "%u / 12 Rezepte",
+               static_cast<unsigned>(recipes.size()));
+    } else if (plugin_->status() == "loading") {
+      snprintf(count_text, sizeof(count_text), "Lade Rezepte …");
+    } else {
+      snprintf(count_text, sizeof(count_text), "%s (%u / 12)",
+               plugin_->status().c_str(), static_cast<unsigned>(recipes.size()));
+    }
     ui::set_text(status_label_, count_text);
     const size_t rows = (recipes.size() + 2) / 3;
     const int gap = ui::px(8);
