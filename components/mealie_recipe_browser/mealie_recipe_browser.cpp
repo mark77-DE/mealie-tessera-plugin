@@ -28,9 +28,10 @@ class RecipeBrowserTile : public tessera::Tile {
     lv_obj_set_style_pad_all(list_, 0, 0);
     lv_obj_set_style_pad_row(list_, ui::px(14), 0);
     lv_obj_set_style_pad_column(list_, ui::px(14), 0);
-    lv_obj_set_scroll_dir(list_, LV_DIR_VER);
-    lv_obj_set_scrollbar_mode(list_, LV_SCROLLBAR_MODE_AUTO);
-    lv_obj_add_flag(list_, LV_OBJ_FLAG_SCROLLABLE);
+    // Five recipe cards fit in two rows. Keep this container non-scrollable so
+    // taps reach the tile's touch guard and RecipeBrowserTile::on_tap().
+    lv_obj_set_scrollbar_mode(list_, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_clear_flag(list_, LV_OBJ_FLAG_SCROLLABLE);
 
     content_ = lv_obj_create(list_);
     lv_obj_set_pos(content_, 0, 0);
@@ -86,7 +87,7 @@ class RecipeBrowserTile : public tessera::Tile {
            card_width_, card_height_, static_cast<unsigned>(plugin_->recipes().size()));
     if (!list_) { printf("[Mealie tap] rejected: no list\\n"); fflush(stdout); return; }
     if (p.y < list_top_ || card_height_ <= 0) { printf("[Mealie tap] rejected: above list or invalid card height\\n"); fflush(stdout); return; }
-    const int local_y = p.y - list_top_ + lv_obj_get_scroll_y(list_);
+    const int local_y = p.y - list_top_;
     const int gap = ui::px(8);
     const int row_stride = card_height_ + gap;
     const int col_stride = card_width_ + gap;
