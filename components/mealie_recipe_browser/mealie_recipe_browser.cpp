@@ -230,11 +230,12 @@ bool MealieRecipeBrowser::load_recipe(const std::string &id){
 }
 void MealieRecipeBrowser::on_message(JsonObjectConst message){
   const uint32_t received_id = message["re"] | 0u;
-  printf("[Mealie plugin] on_message re=%lu expected_list=%lu expected_detail=%lu ok=%s\\n",
+  printf("[Mealie plugin] on_message re=%lu expected_list=%lu expected_detail=%lu ok=%s\n",
          static_cast<unsigned long>(received_id),
          static_cast<unsigned long>(request_id_),
          static_cast<unsigned long>(detail_request_id_),
          (message["ok"] | false) ? "true" : "false");
+  fflush(stdout);
   if(open_card_) open_card_->answer(message);
   if(received_id != request_id_) {
     if(received_id != detail_request_id_) {
