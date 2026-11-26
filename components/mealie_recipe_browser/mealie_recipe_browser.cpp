@@ -6,6 +6,30 @@ namespace esphome::mealie_recipe_browser {
 using tessera::Font;
 namespace ui = tessera::ui;
 
+// Tessera's fonts hold a fixed set of glyphs (packages/core.yaml); anything else is drawn as a box.
+// Write vulgar fractions out ("½" -> "1/2"), turn no-break spaces into spaces and drop what the font lacks.
+static std::string printable(const std::string &in) {
+  static const struct { const char *from, *to; } words[] = {
+      {"\xC2\xBD", "1/2"}, {"\xC2\xBC", "1/4"}, {"\xC2\xBE", "3/4"},
+      {"\xE2\x85\x93", "1/3"}, {"\xE2\x85\x94", "2/3"}, {"\xE2\x85\x95", "1/5"}, {"\xE2\x85\x96", "2/5"},
+      {"\xE2\x85\x97", "3/5"}, {"\xE2\x85\x98", "4/5"}, {"\xE2\x85\x99", "1/6"}, {"\xE2\x85\x9A", "5/6"},
+      {"\xE2\x85\x9B", "1/8"}, {"\xE2\x85\x9C", "3/8"}, {"\xE2\x85\x9D", "5/8"}, {"\xE2\x85\x9E", "7/8"},
+      {"\xC2\xA0", " "}, {"\xE2\x80\xAF", " "}, {"\xE2\x80\x89", " "}};
+  std::string out;
+  for (size_t i = 0; i < in.size();) {
+    const unsigned char lead = static_cast<unsigned char>(in[i]);
+    const size_t len = lead < 0x80 ? 1 : lead >= 0xF0 ? 4 : lead >= 0xE0 ? 3 : lead >= 0xC0 ? 2 : 1;
+    const std::string ch = in.substr(i, len);
+    i += len;
+    bool replaced = false;
+    for (const auto &w : words)
+      if (ch == w.from) { out += w.to; replaced = true; break; }
+    if (replaced) continue;
+    if (ch == "\n" || ui::covers(ch, tessera::Font::BODY)) out += ch;  // a character the font lacks is left out
+  }
+  return out;
+}
+
 class RecipeBrowserTile : public tessera::Tile {
  public:
   explicit RecipeBrowserTile(MealieRecipeBrowser *plugin) : plugin_(plugin) {}
@@ -101,7 +125,8 @@ class RecipeBrowserTile : public tessera::Tile {
     plugin_->selected_recipe_id_ = recipes[i].id;
     printf("[Mealie tap] opening recipe index=%u id=%s\n", static_cast<unsigned>(i), recipes[i].id.c_str());
     fflush(stdout);
-    tessera::open_card(plugin_->plugin_id(), "recipe", "", tile_);
+
+    tessera::open_card(plugin_->plugin_id(), "recipe", "", tile_, recipes[i].name);
     return;
   }
   printf("[Mealie tap] no card under the finger\n");
@@ -120,11 +145,15 @@ class RecipeBrowserTile : public tessera::Tile {
       ui::set_text(cards_[i].name, recipes[i].name);
       char meta[80];
       const uint32_t minutes = (recipes[i].total_seconds + 59) / 60;
-      if (recipes[i].servings > 0)
+      if (minutes > 0 && recipes[i].servings > 0)
         snprintf(meta, sizeof(meta), "%lu min  ·  %.1f %s",
                  static_cast<unsigned long>(minutes), recipes[i].servings, plugin_->text("servings"));
-      else
+      else if (minutes > 0)
         snprintf(meta, sizeof(meta), "%lu min", static_cast<unsigned long>(minutes));
+      else if (recipes[i].servings > 0)
+        snprintf(meta, sizeof(meta), "%.1f %s", recipes[i].servings, plugin_->text("servings"));
+      else
+        meta[0] = 0;
       ui::set_text(cards_[i].meta, meta);
     }
     char count_text[80];
@@ -157,13 +186,11 @@ class RecipeDetailCard : public tessera::Card {
   ~RecipeDetailCard() override { if(plugin_->open_card_==this) plugin_->open_card_=nullptr; }
   void open(const tessera::CardContext &c) override {
     parent_=c.parent; width_=c.width; height_=c.height; plugin_->open_card_=this;
-    title_=ui::label(parent_,Font::TITLE,theme::INK);
-    lv_obj_set_pos(title_,0,0); lv_obj_set_size(title_,width_,ui::line_height(Font::TITLE));
-    ui::set_text(title_,plugin_->text("detail_loading"));
     meta_=ui::label(parent_,Font::BODY,theme::MUTED);
-    lv_obj_set_pos(meta_,0,ui::line_height(Font::TITLE)+ui::px(8));
+    lv_obj_set_pos(meta_,0,0);
     lv_obj_set_size(meta_,width_,ui::line_height(Font::BODY));
-    const int top=ui::line_height(Font::TITLE)+ui::line_height(Font::BODY)+ui::px(28);
+    ui::set_text(meta_,plugin_->text("detail_loading"));  // status text until the data arrives
+    const int top=ui::line_height(Font::BODY)+ui::px(20);
     const int gap=ui::px(24), col=(width_-gap)/2;
     ingredients_title_=ui::label(parent_,Font::HEADLINE,theme::INK);
     lv_obj_set_pos(ingredients_title_,0,top); lv_obj_set_size(ingredients_title_,col,ui::line_height(Font::HEADLINE));
@@ -178,45 +205,45 @@ class RecipeDetailCard : public tessera::Card {
     instructions_=ui::label(parent_,Font::BODY,theme::INK);
     lv_obj_set_pos(instructions_,col+gap,body_y); lv_obj_set_size(instructions_,col,body_h);
     lv_label_set_long_mode(instructions_,LV_LABEL_LONG_WRAP);
-    if(!plugin_->load_recipe(plugin_->selected_recipe_id_)) ui::set_text(title_,plugin_->text("detail_failed"));
+    if(!plugin_->load_recipe(plugin_->selected_recipe_id_)) ui::set_text(meta_,plugin_->text("detail_failed"));
   }
   void answer(JsonObjectConst m) {
     if((m["re"]|0u)!=plugin_->detail_request_id_) return;
-    if(!(m["ok"]|false)){ui::set_text(title_,plugin_->text("detail_failed"));return;}
-    JsonObjectConst r=m["result"]["recipe"].as<JsonObjectConst>();
-    if(r.isNull()) r=m["result"].as<JsonObjectConst>();
-    ui::set_text(title_,r["name"]|plugin_->text("recipe_details"));
-    const uint32_t total=r["total_time_seconds"]|0u, minutes=(total+59)/60;
-    const float servings=r["recipe_servings"]|0.0f;
-    char meta[96];
-    if(servings>0) snprintf(meta,sizeof(meta),"%lu min  ·  %.1f %s",static_cast<unsigned long>(minutes),servings,plugin_->text("servings"));
-    else snprintf(meta,sizeof(meta),"%lu min",static_cast<unsigned long>(minutes));
+    if(!(m["ok"]|false)){ui::set_text(meta_,plugin_->text("detail_failed"));return;}
+    // Result of the manifest "answers" mapping: name, time, serv, i0..i5, s0..s2 (texts are cut at 48 bytes)
+    JsonObjectConst r=m["result"].as<JsonObjectConst>();
+    if(r.isNull()){ui::set_text(meta_,plugin_->text("detail_failed"));return;}
+    const std::string time=printable(std::string(r["time"]|""));
+    const float servings=r["serv"]|0.0f;
+    char meta[96]; meta[0]=0;
+    if(!time.empty() && servings>0) snprintf(meta,sizeof(meta),"%s  ·  %.1f %s",time.c_str(),servings,plugin_->text("servings"));
+    else if(!time.empty()) snprintf(meta,sizeof(meta),"%s",time.c_str());
+    else if(servings>0) snprintf(meta,sizeof(meta),"%.1f %s",servings,plugin_->text("servings"));
     ui::set_text(meta_,meta);
     std::string ing;
-    for(JsonObjectConst item:r["ingredients"].as<JsonArrayConst>()){
-      const char *display=item["display"]|""; const char *name=item["title"]|"";
-      const std::string line=*display?display:name; if(line.empty()) continue;
-      if(!ing.empty()) ing+="\n"; ing+="• "+line;
-      if(ing.size()>1050){ing+="\n…";break;}
+    for(int i=0;i<6;++i){
+      char key[8]; snprintf(key,sizeof(key),"i%d",i);
+      const char *line=r[key]|""; if(!*line) continue;
+      if(!ing.empty()) ing+="\n"; ing+="• "; ing+=printable(line);
     }
     std::string steps; int n=0;
-    for(JsonObjectConst item:r["instructions"].as<JsonArrayConst>()){
-      const char *txt=item["text"]|""; if(!*txt) continue;
+    for(int i=0;i<3;++i){
+      char key[8]; snprintf(key,sizeof(key),"s%d",i);
+      const char *txt=r[key]|""; if(!*txt) continue;
       if(!steps.empty()) steps+="\n\n";
-      char number[12]; snprintf(number,sizeof(number),"%d. ",++n); steps+=number; steps+=txt;
-      if(steps.size()>1050){steps+="\n…";break;}
+      char number[12]; snprintf(number,sizeof(number),"%d. ",++n); steps+=number; steps+=printable(txt);
     }
     ui::set_text(ingredients_,ing.empty()?plugin_->text("no_ingredients"):ing);
     ui::set_text(instructions_,steps.empty()?plugin_->text("no_instructions"):steps);
   }
   void on_theme() override {
-    ui::set_color(title_,theme::INK); ui::set_color(meta_,theme::MUTED);
+    ui::set_color(meta_,theme::MUTED);
     ui::set_color(ingredients_title_,theme::INK); ui::set_color(instructions_title_,theme::INK);
     ui::set_color(ingredients_,theme::INK); ui::set_color(instructions_,theme::INK);
   }
  private:
   MealieRecipeBrowser *plugin_;
-  lv_obj_t *parent_=nullptr,*title_=nullptr,*meta_=nullptr,*ingredients_title_=nullptr,*instructions_title_=nullptr,*ingredients_=nullptr,*instructions_=nullptr;
+  lv_obj_t *parent_=nullptr,*meta_=nullptr,*ingredients_title_=nullptr,*instructions_title_=nullptr,*ingredients_=nullptr,*instructions_=nullptr;
   int width_=0,height_=0;
 };
 
@@ -267,7 +294,7 @@ void MealieRecipeBrowser::on_message(JsonObjectConst message){
     snprintf(key_name,sizeof(key_name),"n%u",static_cast<unsigned>(i));
     RecipeSummary recipe;
     recipe.id=result[key_id]|"";
-    recipe.name=result[key_name]|"";
+    recipe.name=printable(std::string(result[key_name]|""));
     if(recipe.name.empty()) continue;
     if(!secs.isNull() && i<secs.size()) recipe.total_seconds=secs[i]|0u;
     if(!serv.isNull() && i<serv.size()) recipe.servings=serv[i]|0.0f;
