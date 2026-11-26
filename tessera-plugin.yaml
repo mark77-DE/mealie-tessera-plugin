@@ -29,6 +29,20 @@ answers:
       n4:  { path: "recipes.items[4].name" }
       secs: { path: "recipes.items[*].total_time_seconds", as: numbers }
       serv: { path: "recipes.items[*].recipe_servings", as: numbers }
+        - command: call_service:mealie.get_recipe
+          fields:
+            name: { path: "recipe.name" }
+            time: { path: "recipe.total_time" }
+            serv: { path: "recipe.recipe_servings", as: number }
+            i0: { path: "recipe.ingredients[0].display" }
+            i1: { path: "recipe.ingredients[1].display" }
+            i2: { path: "recipe.ingredients[2].display" }
+            i3: { path: "recipe.ingredients[3].display" }
+            i4: { path: "recipe.ingredients[4].display" }
+            i5: { path: "recipe.ingredients[5].display" }
+            s0: { path: "recipe.instructions[0].text" }
+            s1: { path: "recipe.instructions[1].text" }
+            s2: { path: "recipe.instructions[2].text" }
 inputs:
   - id: config_entry_id
     kind: text
