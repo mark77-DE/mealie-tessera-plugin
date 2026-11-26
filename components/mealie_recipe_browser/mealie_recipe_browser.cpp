@@ -10,7 +10,7 @@ class RecipeBrowserTile : public tessera::Tile {
  public:
   explicit RecipeBrowserTile(MealieRecipeBrowser *plugin) : plugin_(plugin) {}
   void create(const tessera::TileContext &c) override {
-    width_ = c.width; height_ = c.height; tile_ = c.tile;
+    width_ = c.width; height_ = c.height; tile_ = c.tile; parent_ = c.parent;
     title_ = ui::label(c.parent, Font::TITLE, theme::INK);
     ui::set_text(title_, plugin_->text("screen_title"));
     lv_obj_set_pos(title_, 0, 0); lv_obj_set_size(title_, width_, ui::line_height(Font::TITLE));
@@ -84,29 +84,29 @@ class RecipeBrowserTile : public tessera::Tile {
     }
   }
   void on_tap() override {
-    const tessera::Point p = tessera::tap_point();
-    printf("[Mealie tap] x=%d y=%d list_top=%d scroll=%d card=%dx%d recipes=%u\\n",
-           p.x, p.y, list_top_, list_ ? lv_obj_get_scroll_y(list_) : 0,
-           card_width_, card_height_, static_cast<unsigned>(plugin_->recipes().size()));
-    if (!list_) { printf("[Mealie tap] rejected: no list\\n"); fflush(stdout); return; }
-    if (p.y < list_top_ || card_height_ <= 0) { printf("[Mealie tap] rejected: above list or invalid card height\\n"); fflush(stdout); return; }
-    const int local_y = p.y - list_top_;
-    const int gap = ui::px(8);
-    const int row_stride = card_height_ + gap;
-    const int col_stride = card_width_ + gap;
-    const int col = p.x / col_stride;
-    const int row = local_y / row_stride;
-    if (col < 0 || col > 2 || row < 0) { printf("[Mealie tap] rejected: row/col out of range (%d,%d)\\n", row, col); fflush(stdout); return; }
-    if ((p.x % col_stride) >= card_width_ || (local_y % row_stride) >= card_height_) { printf("[Mealie tap] rejected: in card gap\\n"); fflush(stdout); return; }
-    const size_t index = static_cast<size_t>(row * 3 + col);
-    if (index >= plugin_->recipes().size()) { printf("[Mealie tap] rejected: index=%u\\n", static_cast<unsigned>(index)); fflush(stdout); return; }
-    const auto &recipe = plugin_->recipes()[index];
-    if (recipe.id.empty()) { printf("[Mealie tap] rejected: empty recipe id at index=%u\\n", static_cast<unsigned>(index)); fflush(stdout); return; }
-    plugin_->selected_recipe_id_ = recipe.id;
-    printf("[Mealie tap] opening recipe index=%u id=%s\\n", static_cast<unsigned>(index), recipe.id.c_str());
+  const tessera::Point p = tessera::tap_point();
+  // tap_point() is relative to the tile's parent; convert to absolute glass pixels
+  lv_area_t pa;
+  lv_obj_get_coords(parent_, &pa);
+  const int ax = pa.x1 + p.x, ay = pa.y1 + p.y;
+  printf("[Mealie tap] tile=(%d,%d) abs=(%d,%d) parent=(%d,%d)-(%d,%d)\n",
+         p.x, p.y, ax, ay, pa.x1, pa.y1, pa.x2, pa.y2);
+  const auto &recipes = plugin_->recipes();
+  for (size_t i = 0; i < recipes.size() && i < MAX_VISIBLE_RECIPES; ++i) {
+    lv_area_t a;
+    lv_obj_get_coords(cards_[i].panel, &a);
+    printf("[Mealie tap]   card %u: (%d,%d)-(%d,%d)\n", static_cast<unsigned>(i), a.x1, a.y1, a.x2, a.y2);
+    if (ax < a.x1 || ax > a.x2 || ay < a.y1 || ay > a.y2) continue;
+    if (recipes[i].id.empty()) break;
+    plugin_->selected_recipe_id_ = recipes[i].id;
+    printf("[Mealie tap] opening recipe index=%u id=%s\n", static_cast<unsigned>(i), recipes[i].id.c_str());
     fflush(stdout);
     tessera::open_card(plugin_->plugin_id(), "recipe", "", tile_);
+    return;
   }
+  printf("[Mealie tap] no card under the finger\n");
+  fflush(stdout);
+}
  private:
   struct RecipeCard { lv_obj_t *panel = nullptr; lv_obj_t *name = nullptr; lv_obj_t *meta = nullptr; };
   void update_cards() {
@@ -148,7 +148,7 @@ class RecipeBrowserTile : public tessera::Tile {
   static constexpr size_t MAX_VISIBLE_RECIPES = 5;
   MealieRecipeBrowser *plugin_;
   int width_ = 0, height_ = 0, tile_ = -1, list_top_ = 0, card_width_ = 0, card_height_ = 0;
-  lv_obj_t *title_ = nullptr, *status_label_ = nullptr, *list_ = nullptr, *content_ = nullptr;
+  lv_obj_t *title_ = nullptr, *status_label_ = nullptr, *list_ = nullptr, *content_ = nullptr; lv_obj_t *parent_ = nullptr;
   RecipeCard cards_[MAX_VISIBLE_RECIPES];
 };
 class RecipeDetailCard : public tessera::Card {
