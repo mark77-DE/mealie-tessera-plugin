@@ -120,12 +120,12 @@ class RecipeBrowserTile : public tessera::Tile {
     }
     char count_text[80];
     if (plugin_->status() == "loaded") {
-      snprintf(count_text, sizeof(count_text), "%u / 12 Rezepte",
+      snprintf(count_text, sizeof(count_text), "%u / 5 Rezepte",
                static_cast<unsigned>(recipes.size()));
     } else if (plugin_->status() == "loading") {
       snprintf(count_text, sizeof(count_text), "Lade Rezepte …");
     } else {
-      snprintf(count_text, sizeof(count_text), "%s (%u / 12)",
+      snprintf(count_text, sizeof(count_text), "%s (%u / 5)",
                plugin_->status().c_str(), static_cast<unsigned>(recipes.size()));
     }
     ui::set_text(status_label_, count_text);
@@ -136,7 +136,7 @@ class RecipeBrowserTile : public tessera::Tile {
     lv_obj_set_height(content_, content_height);
     lv_obj_update_layout(content_);
   }
-  static constexpr size_t MAX_VISIBLE_RECIPES = 12;
+  static constexpr size_t MAX_VISIBLE_RECIPES = 5;
   MealieRecipeBrowser *plugin_;
   int width_ = 0, height_ = 0, tile_ = -1, list_top_ = 0, card_width_ = 0, card_height_ = 0;
   lv_obj_t *title_ = nullptr, *status_label_ = nullptr, *list_ = nullptr, *content_ = nullptr;
@@ -218,7 +218,7 @@ void MealieRecipeBrowser::setup(){
 bool MealieRecipeBrowser::load_recipes(){
   if(config_entry_id_.empty()){status_="missing_config";return false;}
   JsonDocument request; request["ask"]="call_service:mealie.get_recipes";
-  request["data"]["config_entry_id"]=config_entry_id_; request["data"]["result_limit"]=12;
+  request["data"]["config_entry_id"]=config_entry_id_; request["data"]["result_limit"]=5;
   request_id_=tessera::send(this,request.as<JsonObjectConst>());
   status_=request_id_?"loading":"request_failed"; return request_id_!=0;
 }
@@ -246,15 +246,22 @@ void MealieRecipeBrowser::on_message(JsonObjectConst message){
     return;
   }
   if(!(message["ok"]|false)){recipes_.clear();status_="service_error";return;}
+  // The manifest maps the large Mealie response to five compact recipe entries.
   JsonObjectConst result=message["result"].as<JsonObjectConst>();
-  JsonArrayConst items=result["recipes"]["items"].as<JsonArrayConst>();
-  if(items.isNull()) items=result["items"].as<JsonArrayConst>();
-  if(items.isNull()){recipes_.clear();status_="unexpected_response";return;}
+  JsonArrayConst secs=result["secs"].as<JsonArrayConst>();
+  JsonArrayConst serv=result["serv"].as<JsonArrayConst>();
   recipes_.clear();
-  for(JsonObjectConst item:items){
-    RecipeSummary recipe; recipe.id=item["recipe_id"]|""; recipe.name=item["name"]|"";
-    recipe.total_seconds=item["total_time_seconds"]|0u; recipe.servings=item["recipe_servings"]|0.0f;
-    if(!recipe.name.empty()) recipes_.push_back(std::move(recipe));
+  for(size_t i=0;i<5;++i){
+    char key_id[8], key_name[8];
+    snprintf(key_id,sizeof(key_id),"id%u",static_cast<unsigned>(i));
+    snprintf(key_name,sizeof(key_name),"n%u",static_cast<unsigned>(i));
+    RecipeSummary recipe;
+    recipe.id=result[key_id]|"";
+    recipe.name=result[key_name]|"";
+    if(recipe.name.empty()) continue;
+    if(!secs.isNull() && i<secs.size()) recipe.total_seconds=secs[i]|0u;
+    if(!serv.isNull() && i<serv.size()) recipe.servings=serv[i]|0.0f;
+    recipes_.push_back(std::move(recipe));
   }
   status_=recipes_.empty()?"no_results":"loaded";
 }
