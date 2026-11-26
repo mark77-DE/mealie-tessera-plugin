@@ -80,22 +80,27 @@ class RecipeBrowserTile : public tessera::Tile {
     }
   }
   void on_tap() override {
-    if (!list_) return;
     const tessera::Point p = tessera::tap_point();
-    if (p.y < list_top_ || card_height_ <= 0) return;
+    printf("[Mealie tap] x=%d y=%d list_top=%d scroll=%d card=%dx%d recipes=%u\\n",
+           p.x, p.y, list_top_, list_ ? lv_obj_get_scroll_y(list_) : 0,
+           card_width_, card_height_, static_cast<unsigned>(plugin_->recipes().size()));
+    if (!list_) { printf("[Mealie tap] rejected: no list\\n"); fflush(stdout); return; }
+    if (p.y < list_top_ || card_height_ <= 0) { printf("[Mealie tap] rejected: above list or invalid card height\\n"); fflush(stdout); return; }
     const int local_y = p.y - list_top_ + lv_obj_get_scroll_y(list_);
     const int gap = ui::px(8);
     const int row_stride = card_height_ + gap;
     const int col_stride = card_width_ + gap;
     const int col = p.x / col_stride;
     const int row = local_y / row_stride;
-    if (col < 0 || col > 2 || row < 0) return;
-    if ((p.x % col_stride) >= card_width_ || (local_y % row_stride) >= card_height_) return;
+    if (col < 0 || col > 2 || row < 0) { printf("[Mealie tap] rejected: row/col out of range (%d,%d)\\n", row, col); fflush(stdout); return; }
+    if ((p.x % col_stride) >= card_width_ || (local_y % row_stride) >= card_height_) { printf("[Mealie tap] rejected: in card gap\\n"); fflush(stdout); return; }
     const size_t index = static_cast<size_t>(row * 3 + col);
-    if (index >= plugin_->recipes().size()) return;
+    if (index >= plugin_->recipes().size()) { printf("[Mealie tap] rejected: index=%u\\n", static_cast<unsigned>(index)); fflush(stdout); return; }
     const auto &recipe = plugin_->recipes()[index];
-    if (recipe.id.empty()) return;
+    if (recipe.id.empty()) { printf("[Mealie tap] rejected: empty recipe id at index=%u\\n", static_cast<unsigned>(index)); fflush(stdout); return; }
     plugin_->selected_recipe_id_ = recipe.id;
+    printf("[Mealie tap] opening recipe index=%u id=%s\\n", static_cast<unsigned>(index), recipe.id.c_str());
+    fflush(stdout);
     tessera::open_card(plugin_->plugin_id(), "recipe", "", tile_);
   }
  private:
