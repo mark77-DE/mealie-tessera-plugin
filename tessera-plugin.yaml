@@ -1,5 +1,5 @@
 id: mealie_recipe_browser
-version: 0.4.3
+version: 0.4.4
 api: "0.28"
 icon: chef-hat
 maintainer: mark77-DE
@@ -14,6 +14,21 @@ permissions:
   ha_commands:
     - "call_service:mealie.get_recipes"
     - "call_service:mealie.get_recipe"
+answers:
+  - command: call_service:mealie.get_recipes
+    fields:
+      id0: { path: "recipes.items[0].recipe_id" }
+      n0:  { path: "recipes.items[0].name" }
+      id1: { path: "recipes.items[1].recipe_id" }
+      n1:  { path: "recipes.items[1].name" }
+      id2: { path: "recipes.items[2].recipe_id" }
+      n2:  { path: "recipes.items[2].name" }
+      id3: { path: "recipes.items[3].recipe_id" }
+      n3:  { path: "recipes.items[3].name" }
+      id4: { path: "recipes.items[4].recipe_id" }
+      n4:  { path: "recipes.items[4].name" }
+      secs: { path: "recipes.items[*].total_time_seconds", as: numbers }
+      serv: { path: "recipes.items[*].recipe_servings", as: numbers }
 inputs:
   - id: config_entry_id
     kind: text
