@@ -32,6 +32,7 @@ class RecipeBrowserTile : public tessera::Tile {
     // taps reach the tile's touch guard and RecipeBrowserTile::on_tap().
     lv_obj_set_scrollbar_mode(list_, LV_SCROLLBAR_MODE_OFF);
     lv_obj_clear_flag(list_, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(list_, LV_OBJ_FLAG_CLICKABLE);  // let taps reach on_tap()
 
     content_ = lv_obj_create(list_);
     lv_obj_set_pos(content_, 0, 0);
@@ -40,6 +41,7 @@ class RecipeBrowserTile : public tessera::Tile {
     lv_obj_set_style_border_width(content_, 0, 0);
     lv_obj_set_style_pad_all(content_, 0, 0);
     lv_obj_clear_flag(content_, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(content_, LV_OBJ_FLAG_CLICKABLE);
     const int gap = ui::px(8);
     card_width_ = (width_ - 2 * gap) / 3;
     card_height_ = ui::px(86);
@@ -55,6 +57,7 @@ class RecipeBrowserTile : public tessera::Tile {
       lv_obj_set_style_border_color(cards_[i].panel, ui::color(theme::LINE), 0);
       lv_obj_set_style_pad_all(cards_[i].panel, ui::px(10), 0);
       lv_obj_clear_flag(cards_[i].panel, LV_OBJ_FLAG_SCROLLABLE);
+      lv_obj_remove_flag(cards_[i].panel, LV_OBJ_FLAG_CLICKABLE);
 
       cards_[i].name = ui::label(cards_[i].panel, Font::BODY_LARGE, theme::INK);
       lv_obj_set_pos(cards_[i].name, 0, 0);
