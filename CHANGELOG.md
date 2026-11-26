@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.4 - 2026-11-26
+- Map Mealie recipe responses to compact fields to stay within the Tessera plugin response limit.
+- Limit the recipe browser to five results and read recipe IDs, names, total time and servings from the mapped response.
+- Keep the live Home Assistant preview response envelope intact and apply the manifest answer mapping.
+
 ## 0.4.3 - 2026-11-22
 - Enable all currently cataloged Tessera touch displays of 7 inches and larger, including hardware revisions and Waveshare, Guition, reTerminal, CrowPanel and Sunton models.
 - Add an automated preview build for every enabled large display.
