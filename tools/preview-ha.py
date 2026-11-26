@@ -111,7 +111,9 @@ async def live_ha_service(base_url, token, ask, service_data):
         elif os.environ.get('TESSERA_HA_URL') and os.environ.get('TESSERA_HA_TOKEN'):
             try:
                 result = await live_ha_service(os.environ['TESSERA_HA_URL'], os.environ['TESSERA_HA_TOKEN'], ask, body.get('data') or {})
-                answered = answer_of(self.entry, ask, result, self.spec.get('time_zone') or ZONE)
+                # Mealie already returns the exact response shape expected by the plugin.
+                # The generic answer_of() normalizer truncates list responses to two entries.
+                answered = result if ask == "call_service:mealie.get_recipes" else answer_of(self.entry, ask, result, self.spec.get('time_zone') or ZONE)
                 if ask == "call_service:mealie.get_recipes":
                     keys = sorted(answered.keys()) if isinstance(answered, dict) else []
                     items = answered.get("items") if isinstance(answered, dict) else None
