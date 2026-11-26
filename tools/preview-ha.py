@@ -65,11 +65,9 @@ async def live_ha_service(base_url, token, ask, service_data):
     service_response = payload.get("service_response") if isinstance(payload, dict) else None
     result = None
     if isinstance(service_response, dict):
-        key = domain + "." + service
-        if key in service_response:
-            result = service_response[key]
-        elif len(service_response) == 1:
-            result = next(iter(service_response.values()))
+        # Keep Home Assistant's service_response envelope intact. The plugin
+        # manifest answers mapping expects paths such as recipes.items[0].name.
+        result = service_response
     elif isinstance(payload, dict) and "service_response" in payload:
         result = service_response
     else:
@@ -111,9 +109,8 @@ async def live_ha_service(base_url, token, ask, service_data):
         elif os.environ.get('TESSERA_HA_URL') and os.environ.get('TESSERA_HA_TOKEN'):
             try:
                 result = await live_ha_service(os.environ['TESSERA_HA_URL'], os.environ['TESSERA_HA_TOKEN'], ask, body.get('data') or {})
-                # Mealie already returns the exact response shape expected by the plugin.
-                # The generic answer_of() normalizer truncates list responses to two entries.
-                answered = result if ask == "call_service:mealie.get_recipes" else answer_of(self.entry, ask, result, self.spec.get('time_zone') or ZONE)
+                # Use the same manifest answer mapping as the real Tessera app.
+                answered = answer_of(self.entry, ask, result, self.spec.get('time_zone') or ZONE)
                 if ask == "call_service:mealie.get_recipes":
                     keys = sorted(answered.keys()) if isinstance(answered, dict) else []
                     items = answered.get("items") if isinstance(answered, dict) else None
