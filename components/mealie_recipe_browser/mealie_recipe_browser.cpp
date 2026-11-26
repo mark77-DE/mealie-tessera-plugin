@@ -229,8 +229,22 @@ bool MealieRecipeBrowser::load_recipe(const std::string &id){
   detail_request_id_=tessera::send(this,request.as<JsonObjectConst>()); return detail_request_id_!=0;
 }
 void MealieRecipeBrowser::on_message(JsonObjectConst message){
+  const uint32_t received_id = message["re"] | 0u;
+  printf("[Mealie plugin] on_message re=%lu expected_list=%lu expected_detail=%lu ok=%s\\n",
+         static_cast<unsigned long>(received_id),
+         static_cast<unsigned long>(request_id_),
+         static_cast<unsigned long>(detail_request_id_),
+         (message["ok"] | false) ? "true" : "false");
   if(open_card_) open_card_->answer(message);
-  if((message["re"]|0u)!=request_id_) return;
+  if(received_id != request_id_) {
+    if(received_id != detail_request_id_) {
+      char diagnostic[80];
+      snprintf(diagnostic, sizeof(diagnostic), "reply_id_mismatch (%lu/%lu)",
+               static_cast<unsigned long>(received_id), static_cast<unsigned long>(request_id_));
+      status_ = diagnostic;
+    }
+    return;
+  }
   if(!(message["ok"]|false)){recipes_.clear();status_="service_error";return;}
   JsonObjectConst result=message["result"].as<JsonObjectConst>();
   JsonArrayConst items=result["recipes"]["items"].as<JsonArrayConst>();
