@@ -48,7 +48,7 @@ answers:
   recipe:
     "slug=pasta-mit-tomatensauce":
       name: "Pasta mit Tomatensauce"
-      totalTime: "PT30M"
+      totalTimeSeconds: 1800
       recipeServings: 4
       recipeIngredient:
         - { display: "400 g Spaghetti" }
