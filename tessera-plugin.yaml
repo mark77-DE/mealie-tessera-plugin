@@ -15,12 +15,6 @@ permissions:
     - "call_service:mealie.get_recipes"
     - "call_service:mealie.get_recipe"
 answers:
-  - command: call_service:mealie.get_recipes
-    fields:
-      ids:   { path: "recipes.items[*].recipe_id", as: strings }
-      names: { path: "recipes.items[*].name", as: strings }
-      secs: { path: "recipes.items[*].total_time_seconds", as: numbers }
-      serv: { path: "recipes.items[*].recipe_servings", as: numbers }
   - command: call_service:mealie.get_recipe
     fields:
       name: { path: "recipe.name" }
