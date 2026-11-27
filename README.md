@@ -1,70 +1,78 @@
 # Mealie Recipe Browser for Tessera
 
-Browse recipes from a Mealie instance on a Tessera touch screen. The plugin adds a dedicated recipe view and leaves the existing Tessera dashboard and its pages untouched.
+Browse your Mealie recipe collection on a large Tessera touch display. The plugin adds a dedicated recipe view and leaves the existing Tessera dashboard and its pages untouched.
 
-> **Status: beta / early development.** An unfiltered recipe overview and an initial recipe detail card are implemented. The search keyboard, category filters, paging and cooking mode are still planned. The plugin has not yet been built or tested on physical hardware.
+> **Status: beta / early development.** The plugin loads recipe summaries in five-item pages and can display up to 24 recipes in a three-column, eight-row grid. Live API and hardware verification are still pending.
 
 ## What it does
 
-- Loads the recipe list through Home Assistant's Mealie integration without applying a search term.
-- Shows up to 12 recipes in a three-column, four-row card grid.
-- Each card shows the recipe name, total time and servings.
-- Opens the existing recipe detail card when a result is tapped.
-- Shows ingredients and preparation instructions side by side.
-- Keeps the Mealie connection and its credentials in Home Assistant.
+- Reads recipes directly from the Mealie REST API over HTTPS.
+- Loads five recipes per API request and combines up to five pages.
+- Shows up to 24 recipes on the full-screen tile.
+- Displays each recipe's name, total time and servings.
+- Opens a recipe detail card when a result is tapped.
+- Loads ingredients and preparation steps only when a recipe is opened.
+- Keeps the Mealie API token in Tessera's secret storage; the token is not sent to the ESP32 firmware.
 
-The current implementation uses the Home Assistant actions `mealie.get_recipes` and `mealie.get_recipe`.
+The plugin is currently configured for the Mealie instance at `https://luigi.mahlen.biz`. Tessera requires every fetch host to be declared explicitly in the manifest. To use another Mealie instance, change the host in `permissions.network` and both fetch URLs before installing the plugin.
 
 ## Target screen
 
-The plugin manifest enables all currently cataloged Tessera touch displays of 7 inches and larger, including Guition JC8012P4A1 V1/V2/V3, Guition 7-inch models, reTerminal D1001, CrowPanel, Sunton and Waveshare 7-inch/10.1-inch models. See [supported displays](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/supported-displays.en.md). Smaller screens are deliberately excluded.
+The manifest enables currently cataloged Tessera touch displays of 7 inches and larger, including Guition JC8012P4A1 V1/V2/V3, Guition 7-inch models, reTerminal D1001, CrowPanel, Sunton and Waveshare 7-inch/10.1-inch models. The recipe browser uses the whole page so all 24 entries can fit. See [supported displays](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/supported-displays.en.md).
 
 ## Set up
 
-1. In Tessera, open **Plugins** and choose **Add with a link**.
-2. Add this repository: [mark77-DE/mealie-tessera-plugin](https://github.com/mark77-DE/mealie-tessera-plugin).
-3. Select one of the supported large displays and install the plugin.
-4. In Home Assistant, open **Settings → Devices & services**.
-5. Find the **Mealie** integration entry, open its three-dot menu and choose **Copy entry ID**.
-6. Paste the copied ID into the `config_entry_id` field in the screen's plugin settings.
-7. In Layout, add **Recipe browser** from the Plugins group. The initial search term can be changed in the tile inspector.
+1. In Mealie, open **User Profile → API Tokens** (usually `/user/profile/api-tokens`) and create a long-lived API token.
+2. In Tessera, open **Plugins** and choose **Add with a link**.
+3. Add this repository: [mark77-DE/mealie-tessera-plugin](https://github.com/mark77-DE/mealie-tessera-plugin).
+4. Select your large display and install the plugin.
+5. When Tessera asks for **Mealie API token**, paste the token you created in Mealie. Tessera stores it as a secret.
+6. In Layout, add **Recipe browser** from the Plugins group as a full-page tile.
 
-If you have multiple Mealie instances, copy the entry ID from the integration entry you want the recipe browser to use. The ID is specific to your Home Assistant installation and is stored only in Tessera's local plugin configuration. Do not commit it to this repository.
+No Home Assistant Mealie integration or config-entry ID is required for the recipe list or recipe details. Mealie must be reachable at the configured public HTTPS hostname from the Tessera app's fetch service.
+
+## Pagination
+
+The browser makes five requests to `GET /api/recipes?page=<page>&perPage=5`. It combines their results and displays the first 24 recipes. The fifth page may return fewer than five items. Mealie's API provides the pagination; the Home Assistant Mealie actions do not expose a page parameter.
+
+## Privacy
+
+The Tessera app sends the API token in the HTTPS `Authorization: Bearer` header to `luigi.mahlen.biz` only. It requests recipe summaries from `/api/recipes` and a single recipe's details from `/api/recipes/{slug}`. The token is stored by Tessera as a secret and is not included in the plugin manifest, source code, preview fixtures or screen firmware. Mealie receives the API requests and may record them in its normal server logs.
+
+The plugin does not send recipe data or the API token to any other host.
 
 ## Known limitations
 
-- The installed Mealie integration cannot currently be selected automatically in the plugin. Its config entry ID must be copied manually once using **Copy entry ID**.
-- Category listing and category filtering are not yet connected to the plugin.
-- The current detail response is deliberately kept small; very long recipes may be shortened until segmented loading is implemented.
-- A virtual preview in the Tessera app cannot install plugins. The separate developer preview/bench is intended for inspecting plugin rendering without a physical screen.
+- The Mealie hostname is fixed in the manifest because Tessera's network permission model does not allow a user-supplied hostname in a fetch URL.
+- The initial list is unfiltered and alphabetically ordered. Search, category filters and cooking mode are planned for later work.
+- The detail card currently shows up to six ingredients and three preparation steps. Longer recipes need segmented detail loading.
+- The virtual preview does not install plugins or replace a test on the physical display.
 
 ## Live development preview
 
-A local helper can connect the Tessera Preview Bench to the real Home Assistant Mealie services. See [Live Home Assistant preview](docs/live-preview.md) for setup and security notes. This is a local development tool and does not change the installed plugin.
+The official Tessera Preview Bench can use the real Mealie API. See [Live Mealie preview](docs/live-preview.md) for setup and security notes.
 
 ## Development status
 
 | Feature | Status |
 |---|---|
-| Plugin manifest with large-display board targets | Implemented; preview builds pending |
-| Unfiltered recipe list via Home Assistant | Implemented (up to 12 results); hardware verification pending |
-| Recipe result list | Three-column grid for up to 12 recipes; live preview verification pending |
-| Recipe detail card | Initial implementation |
-| Search and filters | Planned for a later step |
-| Categories and filters | Blocked on a suitable Home Assistant data path |
-| Pagination | Planned |
+| Direct Mealie API connection using a Tessera secret input | Implemented; live verification pending |
+| Five-item pagination and collection of up to 24 recipes | Implemented; live verification pending |
+| Three-column, eight-row full-screen recipe grid | Implemented; layout verification pending |
+| Recipe details loaded on demand | Implemented; live verification pending |
+| Search and category filters | Planned |
 | Cooking mode and ingredient checklist | Planned |
-| Automatic Mealie integration selection | Not currently exposed by the Tessera plugin API |
+| Preview Bench and supported-board builds | Pending |
+| Physical display test | Pending |
 
 ## Documentation
 
-- [Architecture](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/architecture.md)
-- [UI concept](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/ui-concept.md)
-- [Home Assistant actions and entry ID](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/home-assistant.md)
-- [Observed Mealie data model](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/mealie-data-model.md)
-- [Tessera data contract](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/shared-data-contract.md)
-- [Development plan](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/development.md)
+- [Architecture](docs/architecture.md)
+- [Mealie API data model](docs/mealie-data-model.md)
+- [Tessera data contract](docs/shared-data-contract.md)
+- [Development plan](docs/development.md)
+- [Live Mealie preview](docs/live-preview.md)
 
 ## Safety
 
-Never commit Home Assistant tokens, Mealie credentials, private URLs, config entry IDs or other secrets. The plugin calls Mealie through Home Assistant; it does not store Mealie credentials itself.
+Never commit Mealie API tokens, private URLs or other credentials. Use the Tessera secret input for the token. The manifest declares the one public Mealie hostname this plugin is allowed to contact.
