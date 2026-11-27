@@ -1,5 +1,5 @@
 id: mealie_recipe_browser
-version: 0.4.5
+version: 0.4.6
 api: "0.28"
 icon: chef-hat
 maintainer: mark77-DE
@@ -10,37 +10,60 @@ requires:
   esphome: 2026.6.2
 boards: [crowpanel101, jc1060p470, jc1060p470v2, jc8012p4a1, jc8012p4a1v2, jc8012p4a1v3, reterminald1001, sunton8048s070, waveshare101, waveshare101v3, waveshare7, waveshare7b, wavesharep47, wavesharep47b]
 flash_kb: 12
+
 permissions:
-  ha_commands:
-    - "call_service:mealie.get_recipes"
-    - "call_service:mealie.get_recipe"
-answers:
-  - command: call_service:mealie.get_recipe
-    fields:
-      name: { path: "recipe.name" }
-      time: { path: "recipe.total_time" }
-      serv: { path: "recipe.recipe_servings", as: number }
-      i0: { path: "recipe.ingredients[0].display" }
-      i1: { path: "recipe.ingredients[1].display" }
-      i2: { path: "recipe.ingredients[2].display" }
-      i3: { path: "recipe.ingredients[3].display" }
-      i4: { path: "recipe.ingredients[4].display" }
-      i5: { path: "recipe.ingredients[5].display" }
-      s0: { path: "recipe.instructions[0].text" }
-      s1: { path: "recipe.instructions[1].text" }
-      s2: { path: "recipe.instructions[2].text" }
+  network: [luigi.mahlen.biz]
+attributes: [cloud]
+privacy: https://github.com/mark77-DE/mealie-tessera-plugin#privacy
+
 inputs:
-  - id: config_entry_id
-    kind: text
+  - id: api_token
+    kind: secret
     scope: all
-    label: config_entry_id
-    hint: config_entry_id_hint
+    label: api_token
+    hint: api_token_hint
+
 tiles:
   - id: browser
     name: tile_browser
     icon: chef-hat
-    sizes: { min: 3x2, max: 3x3, full: true }
-    memory: 2600
+    sizes: { full: true }
+    memory: 3600
     example: tile_example
+
 cards:
   - { id: recipe, name: card_recipe }
+
+fetch:
+  - id: recipes
+    asked: [page]
+    url: https://luigi.mahlen.biz/api/recipes?page={page}&perPage=5&orderBy=name&orderDirection=asc
+    headers: { Authorization: "Bearer {api_token}" }
+    every: 30s
+    map:
+      items: "$.items[*]"
+      fields:
+        id: slug
+        name: name
+        seconds: { path: totalTimeSeconds, as: number }
+        servings: { path: recipeServings, as: number }
+      limit: 5
+  - id: recipe
+    asked: [slug]
+    url: https://luigi.mahlen.biz/api/recipes/{slug}
+    headers: { Authorization: "Bearer {api_token}" }
+    every: 30s
+    map:
+      fields:
+        name: name
+        time: totalTime
+        serv: { path: recipeServings, as: number }
+        i0: recipeIngredient[0].display
+        i1: recipeIngredient[1].display
+        i2: recipeIngredient[2].display
+        i3: recipeIngredient[3].display
+        i4: recipeIngredient[4].display
+        i5: recipeIngredient[5].display
+        s0: recipeInstructions[0].text
+        s1: recipeInstructions[1].text
+        s2: recipeInstructions[2].text
