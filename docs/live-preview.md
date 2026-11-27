@@ -7,7 +7,7 @@ The official Tessera Preview Bench can call the same Mealie API fetches used by 
 - The official `tessera-plugins` repository checked out next to this repository, unless `TESSERA_PLUGINS_DIR` is set.
 - The Preview Bench set up once (`python3 tools/preview.py --setup` in the official checkout).
 - A long-lived Mealie API token.
-- Network access from the preview environment to `https://luigi.mahlen.biz`.
+- Network access from the preview environment to the public HTTPS hostname configured in the manifest.
 
 ## Run from WSL
 
@@ -41,4 +41,4 @@ Revoke the token in Mealie when it is no longer needed.
 
 ## Limitations
 
-This is a local development preview, not a physical-screen test. It depends on the official Preview Bench and the Mealie host being reachable from WSL/Linux. The plugin manifest currently names `luigi.mahlen.biz`; a different Mealie host requires updating the manifest's network permission and fetch URLs.
+This is a local development preview, not a physical-screen test. It depends on the official Preview Bench and the Mealie host being reachable from WSL/Linux. The plugin manifest currently names the configured Mealie hostname; a different Mealie host requires updating the manifest's network permission and fetch URLs.
