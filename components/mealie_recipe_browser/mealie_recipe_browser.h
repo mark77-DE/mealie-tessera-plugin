@@ -24,7 +24,6 @@ class MealieRecipeBrowser : public Component, public tessera::Plugin {
  private:
   friend class RecipeDetailCard;
   friend class RecipeBrowserTile;
-  static constexpr size_t RECIPE_PAGE_SIZE = 5;
   static constexpr size_t RECIPE_PAGE_COUNT = 5;
   static constexpr size_t MAX_RECIPES = 24;
   std::string status_ = "not_loaded";
