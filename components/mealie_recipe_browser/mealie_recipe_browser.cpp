@@ -5,7 +5,6 @@
 #include <utility>
 
 namespace esphome::mealie_recipe_browser {
-using tessera::Font;
 namespace ui = tessera::ui;
 namespace st = style;
 
