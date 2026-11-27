@@ -47,26 +47,27 @@ commands:
           recipe_servings: 6
 
   "call_service:mealie.get_recipe":
-    name: "Pasta mit Tomatensauce"
-    description: "Ein einfaches Pastagericht mit aromatischer Tomatensauce."
-    total_time_seconds: 1800
-    recipe_servings: 4
-    ingredients:
-      - display: "400 g Spaghetti"
-        title: "Spaghetti"
-      - display: "1 Dose gehackte Tomaten"
-        title: "Gehackte Tomaten"
-      - display: "1 Zwiebel"
-        title: "Zwiebel"
-      - display: "2 Knoblauchzehen"
-        title: "Knoblauch"
-      - display: "2 EL Olivenöl"
-        title: "Olivenöl"
-      - display: "Salz und Pfeffer"
-        title: "Salz und Pfeffer"
-    instructions:
-      - text: "Zwiebel und Knoblauch fein würfeln."
-      - text: "Olivenöl erhitzen und Zwiebel sowie Knoblauch glasig dünsten."
-      - text: "Tomaten hinzufügen und die Sauce etwa 15 Minuten köcheln lassen."
-      - text: "Spaghetti in Salzwasser al dente kochen."
-      - text: "Pasta mit der Sauce vermengen und abschmecken."
+    recipe:
+      name: "Pasta mit Tomatensauce"
+      description: "Ein einfaches Pastagericht mit aromatischer Tomatensauce."
+      total_time: "30 Minuten"
+      recipe_servings: 4
+      ingredients:
+        - display: "400 g Spaghetti"
+          title: "Spaghetti"
+        - display: "1 Dose gehackte Tomaten"
+          title: "Gehackte Tomaten"
+        - display: "1 Zwiebel"
+          title: "Zwiebel"
+        - display: "2 Knoblauchzehen"
+          title: "Knoblauch"
+        - display: "2 EL Olivenöl"
+          title: "Olivenöl"
+        - display: "Salz und Pfeffer"
+          title: "Salz und Pfeffer"
+      instructions:
+        - text: "Zwiebel und Knoblauch fein würfeln."
+        - text: "Olivenöl erhitzen und Zwiebel sowie Knoblauch glasig dünsten."
+        - text: "Tomaten hinzufügen und die Sauce etwa 15 Minuten köcheln lassen."
+        - text: "Spaghetti in Salzwasser al dente kochen."
+        - text: "Pasta mit der Sauce vermengen und abschmecken."
