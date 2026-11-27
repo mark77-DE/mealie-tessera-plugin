@@ -290,7 +290,7 @@ void MealieRecipeBrowser::on_message(JsonObjectConst message){
   JsonObjectConst result=message["result"].as<JsonObjectConst>();
   if(result.isNull()){
     recipes_.clear();
-    status_="invalid_response";
+    status_="unexpected_response";
     return;
   }
   JsonObjectConst recipe_result=result["recipes"].as<JsonObjectConst>();
@@ -300,7 +300,7 @@ void MealieRecipeBrowser::on_message(JsonObjectConst message){
 
   recipes_.clear();
   if(items.isNull()){
-    status_="invalid_response";
+    status_="unexpected_response";
     return;
   }
   for(JsonObjectConst item : items){
