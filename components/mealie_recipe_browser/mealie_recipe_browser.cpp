@@ -156,10 +156,10 @@ class RecipeBrowserTile : public tessera::Tile {
       char meta[80];
       const uint32_t minutes = (recipes[i].total_seconds + 59) / 60;
       if (minutes > 0 && recipes[i].servings > 0)
-        snprintf(meta, sizeof(meta), "%lu min  ·  %.1f %s",
-                 static_cast<unsigned long>(minutes), recipes[i].servings, plugin_->text("servings"));
+        snprintf(meta, sizeof(meta), "%lu %s  ·  %.1f %s",
+                 static_cast<unsigned long>(minutes), plugin_->text("minutes"), recipes[i].servings, plugin_->text("servings"));
       else if (minutes > 0)
-        snprintf(meta, sizeof(meta), "%lu min", static_cast<unsigned long>(minutes));
+        snprintf(meta, sizeof(meta), "%lu %s", static_cast<unsigned long>(minutes), plugin_->text("minutes"));
       else if (recipes[i].servings > 0)
         snprintf(meta, sizeof(meta), "%.1f %s", recipes[i].servings, plugin_->text("servings"));
       else
@@ -274,10 +274,10 @@ class RecipeDetailCard : public tessera::Card {
     char meta[96];
     meta[0] = 0;
     if (minutes > 0 && servings > 0)
-      snprintf(meta, sizeof(meta), "%lu min  ·  %.1f %s",
-               static_cast<unsigned long>(minutes), servings, plugin_->text("servings"));
+      snprintf(meta, sizeof(meta), "%lu %s  ·  %.1f %s",
+               static_cast<unsigned long>(minutes), plugin_->text("minutes"), servings, plugin_->text("servings"));
     else if (minutes > 0)
-      snprintf(meta, sizeof(meta), "%lu min", static_cast<unsigned long>(minutes));
+      snprintf(meta, sizeof(meta), "%lu %s", static_cast<unsigned long>(minutes), plugin_->text("minutes"));
     else if (servings > 0)
       snprintf(meta, sizeof(meta), "%.1f %s", servings, plugin_->text("servings"));
     ui::set_text(meta_, meta);
