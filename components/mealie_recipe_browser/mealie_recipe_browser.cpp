@@ -269,14 +269,16 @@ class RecipeDetailCard : public tessera::Card {
       return;
     }
 
-    const std::string time = printable(std::string(r["time"] | ""));
+    const uint32_t seconds = r["time"] | 0u;
+    const uint32_t minutes = (seconds + 59) / 60;
     const float servings = r["serv"] | 0.0f;
     char meta[96];
     meta[0] = 0;
-    if (!time.empty() && servings > 0)
-      snprintf(meta, sizeof(meta), "%s  ·  %.1f %s", time.c_str(), servings, plugin_->text("servings"));
-    else if (!time.empty())
-      snprintf(meta, sizeof(meta), "%s", time.c_str());
+    if (minutes > 0 && servings > 0)
+      snprintf(meta, sizeof(meta), "%lu min  ·  %.1f %s",
+               static_cast<unsigned long>(minutes), servings, plugin_->text("servings"));
+    else if (minutes > 0)
+      snprintf(meta, sizeof(meta), "%lu min", static_cast<unsigned long>(minutes));
     else if (servings > 0)
       snprintf(meta, sizeof(meta), "%.1f %s", servings, plugin_->text("servings"));
     ui::set_text(meta_, meta);
