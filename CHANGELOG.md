@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.5 - 2026-11-27
+- Read the recipe list from Mealie's raw `get_recipes` response instead of unsupported array mappings.
+- Keep the mapped `get_recipe` response for recipe details.
+
 ## 0.4.4 - 2026-11-26
 - Map Mealie recipe responses to compact fields to stay within the Tessera plugin response limit.
 - Limit the recipe browser to five results and read recipe IDs, names, total time and servings from the mapped response.
