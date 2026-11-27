@@ -1,6 +1,6 @@
 # Development plan
 
-The goal is an installable Tessera recipe browser for large touch displays from 7 inches. A separate Lovelace card is not part of the project.
+The goal is an installable Tessera recipe browser for large 1280 × 800 touch displays. A separate Lovelace card is not part of the project.
 
 ## Phase 0 – Foundations
 - [x] GitHub repository created
