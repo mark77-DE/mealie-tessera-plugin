@@ -18,7 +18,7 @@ The plugin is currently configured for the Mealie instance at `https://luigi.mah
 
 ## Target screen
 
-The manifest enables currently cataloged Tessera touch displays of 7 inches and larger, including Guition JC8012P4A1 V1/V2/V3, Guition 7-inch models, reTerminal D1001, CrowPanel, Sunton and Waveshare 7-inch/10.1-inch models. The recipe browser uses the whole page so all 24 entries can fit. See [supported displays](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/supported-displays.en.md).
+The 24-card layout is designed for 1280 × 800 displays, including Guition JC8012P4A1 V1/V2/V3, reTerminal D1001 and Waveshare 10.1-inch models. The recipe browser uses the whole page so all 24 entries can fit. Smaller 7-inch displays are not enabled because their lower resolution cannot fit this grid. See [supported displays](docs/supported-displays.en.md).
 
 ## Set up
 
