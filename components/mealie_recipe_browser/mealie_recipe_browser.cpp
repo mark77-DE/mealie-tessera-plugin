@@ -256,7 +256,7 @@ void MealieRecipeBrowser::setup(){
 bool MealieRecipeBrowser::load_recipes(){
   if(config_entry_id_.empty()){status_="missing_config";return false;}
   JsonDocument request; request["ask"]="call_service:mealie.get_recipes";
-  request["data"]["config_entry_id"]=config_entry_id_; request["data"]["result_limit"]=5;
+  request["data"]["config_entry_id"]=config_entry_id_; request["data"]["result_limit"]=24;
   request_id_=tessera::send(this,request.as<JsonObjectConst>());
   status_=request_id_?"loading":"request_failed"; return request_id_!=0;
 }
@@ -287,17 +287,17 @@ void MealieRecipeBrowser::on_message(JsonObjectConst message){
   if(!(message["ok"]|false)){recipes_.clear();status_="service_error";return;}
   // The manifest maps the large Mealie response to five compact recipe entries.
   JsonObjectConst result=message["result"].as<JsonObjectConst>();
+  JsonArrayConst ids=result["ids"].as<JsonArrayConst>();
+  JsonArrayConst names=result["names"].as<JsonArrayConst>();
   JsonArrayConst secs=result["secs"].as<JsonArrayConst>();
   JsonArrayConst serv=result["serv"].as<JsonArrayConst>();
   recipes_.clear();
-  for(size_t i=0;i<5;++i){
-    char key_id[8], key_name[8];
-    snprintf(key_id,sizeof(key_id),"id%u",static_cast<unsigned>(i));
-    snprintf(key_name,sizeof(key_name),"n%u",static_cast<unsigned>(i));
+  const size_t count=ids.isNull() || names.isNull() ? 0 : (ids.size()<names.size()?ids.size():names.size());
+  for(size_t i=0;i<count && i<24;++i){
     RecipeSummary recipe;
-    recipe.id=result[key_id]|"";
-    recipe.name=printable(std::string(result[key_name]|""));
-    if(recipe.name.empty()) continue;
+    recipe.id=ids[i].as<std::string>();
+    recipe.name=printable(names[i].as<std::string>());
+    if(recipe.name.empty() || recipe.id.empty()) continue;
     if(!secs.isNull() && i<secs.size()) recipe.total_seconds=secs[i]|0u;
     if(!serv.isNull() && i<serv.size()) recipe.servings=serv[i]|0.0f;
     recipes_.push_back(std::move(recipe));
