@@ -28,7 +28,7 @@ tiles:
     name: tile_browser
     icon: chef-hat
     sizes: { full: true }
-    memory: 3600
+    memory: 8000
     example: tile_example
 
 cards:
@@ -56,7 +56,7 @@ fetch:
     map:
       fields:
         name: name
-        time: totalTime
+        time: { path: totalTimeSeconds, as: number }
         serv: { path: recipeServings, as: number }
         i0: recipeIngredient[0].display
         i1: recipeIngredient[1].display
