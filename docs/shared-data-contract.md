@@ -1,83 +1,48 @@
-# Tessera-Rezeptdatenvertrag
+# Mealie recipe data contract
 
-## Zweck
+## Purpose
 
-Dieses Dokument beschreibt die Daten, die das Tessera-Plugin aus Home Assistant benötigt. Es ist ein Entwurf auf Basis der bisher beobachteten Mealie-Antworten, keine vollständige Mealie-API-Spezifikation.
+This document describes the compact data that the Tessera plugin receives from the Mealie REST API. The manifest maps Mealie's camelCase API fields to short names before they reach the ESP32.
 
-Die Mealie-Feldnamen werden in der Plugin-Logik auf ein übersichtliches internes Modell abgebildet. Die konkrete Serialisierung muss die begrenzten Tessera-Nachrichtengrößen berücksichtigen.
+## Principles
 
-## Grundsätze
+- Recipe summaries contain only the fields needed by the list.
+- Recipe details are fetched only after a recipe is opened.
+- The Mealie API token is a Tessera secret and never reaches the firmware.
+- Each mapped text field is limited to 48 bytes.
+- The list uses five requests with five results per page and keeps at most 24 recipes.
 
-- Optionale oder fehlende Werte bleiben optional.
-- Suchergebnisse enthalten nur kompakte Metadaten.
-- Zutaten und Anweisungen werden erst beim Öffnen eines Rezepts geladen.
-- Lange Zutaten- und Anweisungslisten dürfen in mehrere Nachrichten aufgeteilt werden.
-- Für die erste Version wird Mealie's formatiertes Zutatenfeld `display` verwendet.
+## Recipe summary
 
-## Rezepttreffer
-
-| Feld | Typ | Bedeutung |
+| Mapped field | Mealie API field | Meaning |
 |---|---|---|
-| `id` | string | Mealie-Rezept-ID |
-| `name` | string | Anzeigename |
-| `slug` | string? | Slug |
-| `description` | string? | Kurzbeschreibung |
-| `image` | string? | Bildreferenz |
-| `totalTimeSeconds` | number? | Gesamtzeit |
-| `prepTimeSeconds` | number? | Vorbereitungszeit |
-| `cookTimeSeconds` | number? | aktive Zubereitungszeit |
-| `servings` | number? | Portionen |
+| `id` | `slug` | Recipe slug used by the detail endpoint |
+| `name` | `name` | Display name |
+| `seconds` | `totalTimeSeconds` | Total preparation time in seconds |
+| `servings` | `recipeServings` | Number of servings |
 
-## Rezeptdetails
+The API response is paginated under `items[]`.
 
-Zusätzlich zu den Trefferfeldern:
+## Recipe details
 
-- `ingredients: Ingredient[]`
-- `instructions: Instruction[]`
-- `notes: string[]`
-- `yield: string?`
-- `yieldQuantity: number?`
-
-### Ingredient
-
-| Feld | Typ | Bedeutung |
+| Mapped field | Mealie API field | Meaning |
 |---|---|---|
-| `display` | string | formatierte Zutatenzeile |
-| `quantity` | number? | numerische Menge, falls vorhanden |
-| `unit` | string? | Einheitenbezeichnung |
-| `food` | string? | Lebensmittelname |
-| `note` | string? | Zusatzhinweis |
-| `referenceId` | string? | Zutatenreferenz |
+| `name` | `name` | Recipe name |
+| `time` | `totalTime` | Human-readable/ISO duration from Mealie |
+| `serv` | `recipeServings` | Number of servings |
+| `i0` … `i5` | `recipeIngredient[0..5].display` | Formatted ingredient lines |
+| `s0` … `s2` | `recipeInstructions[0..2].text` | Preparation steps |
 
-### Instruction
+The detail map uses all 12 available fields. More ingredients or steps require a second, segmented request.
 
-| Feld | Typ | Bedeutung |
-|---|---|---|
-| `id` | string? | Mealie-Schritt-ID |
-| `title` | string? | Schrittüberschrift |
-| `text` | string | Zubereitungstext |
-| `ingredientReferences` | string[]? | Zutatenreferenzen |
-| `notes` | string[]? | Schrittbezogene Notizen |
+## API requests
 
-## Kategorien
+- List: `GET /api/recipes?page={page}&perPage=5&orderBy=name&orderDirection=asc`
+- Detail: `GET /api/recipes/{slug}`
+- Authentication: `Authorization: Bearer <api_token>`
 
-| Feld | Typ | Bedeutung |
-|---|---|---|
-| `id` | string | Mealie-Kategorie-ID |
-| `name` | string | Kategoriename |
+The list fetch asks for pages 1 to 5. The plugin retains the first 24 results from the 25 possible slots.
 
-## Logische Abfragen
+## Categories and search
 
-- Kategorien abrufen
-- Rezepte anhand eines Suchbegriffs abrufen
-- Rezeptdetails anhand der Rezept-ID abrufen
-
-Diese Operationen beschreiben den benötigten Funktionsumfang. Die tatsächlichen HA-Service-Aufrufe und der Antworttransport müssen separat anhand der installierten Versionen geprüft werden.
-
-## Offene Punkte
-
-- Kategorienquelle und Filterstrategie
-- Bildreferenz und Bildabruf
-- Paging und maximale Trefferzahl
-- Behandlung langer Texte und Tessera-Payload-Grenzen
-- Portionsumrechnung einschließlich Einheiten und nicht skalierbarer Zutaten
+The current list is unfiltered and alphabetically ordered. Search and category filtering are planned separately.
