@@ -37,7 +37,7 @@ The browser makes five requests to `GET /api/recipes?page=<page>&perPage=5`. It 
 
 ## Privacy
 
-The Tessera app sends the API token in the HTTPS `Authorization: Bearer` header to `luigi.mahlen.biz` only. It requests recipe summaries from `/api/recipes` and a single recipe's details from `/api/recipes/{slug}`. The token is stored by Tessera as a secret and is not included in the plugin manifest, source code, preview fixtures or screen firmware. Mealie receives the API requests and may record them in its normal server logs.
+The Tessera app sends the API token in the HTTPS `Authorization: Bearer` header to the hostname declared in the manifest only. It requests recipe summaries from `/api/recipes` and a single recipe's details from `/api/recipes/{slug}`. The token is stored by Tessera as a secret and is not included in the plugin manifest, source code, preview fixtures or screen firmware. Mealie receives the API requests and may record them in its normal server logs.
 
 The plugin does not send recipe data or the API token to any other host.
 
