@@ -12,7 +12,8 @@ boards: [jc8012p4a1, jc8012p4a1v2, jc8012p4a1v3, reterminald1001, waveshare101, 
 flash_kb: 12
 
 permissions:
-  network: [luigi.mahlen.biz]
+  network:
+    - luigi.mahlen.biz
 attributes: [cloud]
 privacy: https://github.com/mark77-DE/mealie-tessera-plugin#privacy
 
