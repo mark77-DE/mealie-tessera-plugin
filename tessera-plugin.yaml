@@ -51,7 +51,7 @@ fetch:
       limit: 5
   - id: recipe
     asked: [slug]
-    url: https://mealie.example.com/api/recipes/{slug}
+    url: https://luigi.mahlen.biz/api/recipes/{slug}
     headers: { Authorization: "Bearer {api_token}" }
     every: 30s
     map:
