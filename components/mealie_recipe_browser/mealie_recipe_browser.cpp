@@ -1,10 +1,12 @@
 #include "mealie_recipe_browser.h"
+#include "mealie_style.h"
 #include <cstdio>
 #include <string>
 #include <utility>
 namespace esphome::mealie_recipe_browser {
 using tessera::Font;
 namespace ui = tessera::ui;
+namespace st = style;  // fonts, colors and spacing: see mealie_style.h
 
 // Tessera's fonts hold a fixed set of glyphs (packages/core.yaml); anything else is drawn as a box.
 // Write vulgar fractions out ("½" -> "1/2"), turn no-break spaces into spaces and drop what the font lacks.
@@ -35,15 +37,15 @@ class RecipeBrowserTile : public tessera::Tile {
   explicit RecipeBrowserTile(MealieRecipeBrowser *plugin) : plugin_(plugin) {}
   void create(const tessera::TileContext &c) override {
     width_ = c.width; height_ = c.height; tile_ = c.tile; parent_ = c.parent;
-    title_ = ui::label(c.parent, Font::TITLE, theme::INK);
+    title_ = ui::label(c.parent, st::LIST_TITLE_FONT, st::LIST_TITLE_COLOR);
     ui::set_text(title_, plugin_->text("screen_title"));
-    lv_obj_set_pos(title_, 0, 0); lv_obj_set_size(title_, width_, ui::line_height(Font::TITLE));
+    lv_obj_set_pos(title_, 0, 0); lv_obj_set_size(title_, width_, ui::line_height(st::LIST_TITLE_FONT));
 
-    status_label_ = ui::label(c.parent, Font::BODY, theme::MUTED);
-    lv_obj_set_pos(status_label_, 0, ui::line_height(Font::TITLE) + ui::px(6));
-    lv_obj_set_size(status_label_, width_, ui::line_height(Font::BODY));
+    status_label_ = ui::label(c.parent, st::LIST_STATUS_FONT, st::LIST_STATUS_COLOR);
+    lv_obj_set_pos(status_label_, 0, ui::line_height(st::LIST_TITLE_FONT) + ui::px(st::LIST_STATUS_GAP_PX));
+    lv_obj_set_size(status_label_, width_, ui::line_height(st::LIST_STATUS_FONT));
 
-    list_top_ = ui::line_height(Font::TITLE) + ui::line_height(Font::BODY) + ui::px(24);
+    list_top_ = ui::line_height(st::LIST_TITLE_FONT) + ui::line_height(st::LIST_STATUS_FONT) + ui::px(st::LIST_TOP_GAP_PX);
     list_ = lv_obj_create(c.parent);
     lv_obj_set_pos(list_, 0, list_top_);
     lv_obj_set_size(list_, width_, height_ - list_top_);
@@ -66,31 +68,31 @@ class RecipeBrowserTile : public tessera::Tile {
     lv_obj_set_style_pad_all(content_, 0, 0);
     lv_obj_clear_flag(content_, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_remove_flag(content_, LV_OBJ_FLAG_CLICKABLE);
-    const int gap = ui::px(8);
-    card_width_ = (width_ - 2 * gap) / 3;
-    card_height_ = ui::px(86);
+    const int gap = ui::px(st::CARD_GAP_PX), cols = st::CARD_COLUMNS;
+    card_width_ = (width_ - (cols - 1) * gap) / cols;
+    card_height_ = ui::px(st::CARD_HEIGHT_PX);
     for (size_t i = 0; i < MAX_VISIBLE_RECIPES; ++i) {
       cards_[i].panel = lv_obj_create(content_);
       lv_obj_set_size(cards_[i].panel, card_width_, card_height_);
-      lv_obj_set_pos(cards_[i].panel, static_cast<int>(i % 3) * (card_width_ + gap),
-                     static_cast<int>(i / 3) * (card_height_ + gap));
-      lv_obj_set_style_radius(cards_[i].panel, ui::px(12), 0);
-      lv_obj_set_style_bg_color(cards_[i].panel, ui::color(theme::CARD), 0);
+      lv_obj_set_pos(cards_[i].panel, (static_cast<int>(i) % cols) * (card_width_ + gap),
+                     (static_cast<int>(i) / cols) * (card_height_ + gap));
+      lv_obj_set_style_radius(cards_[i].panel, ui::px(st::CARD_RADIUS_PX), 0);
+      lv_obj_set_style_bg_color(cards_[i].panel, ui::color(st::CARD_BG_COLOR), 0);
       lv_obj_set_style_bg_opa(cards_[i].panel, LV_OPA_COVER, 0);
-      lv_obj_set_style_border_width(cards_[i].panel, 1, 0);
-      lv_obj_set_style_border_color(cards_[i].panel, ui::color(theme::LINE), 0);
-      lv_obj_set_style_pad_all(cards_[i].panel, ui::px(10), 0);
+      lv_obj_set_style_border_width(cards_[i].panel, st::CARD_BORDER_WIDTH, 0);
+      lv_obj_set_style_border_color(cards_[i].panel, ui::color(st::CARD_BORDER_COLOR), 0);
+      lv_obj_set_style_pad_all(cards_[i].panel, ui::px(st::CARD_PADDING_PX), 0);
       lv_obj_clear_flag(cards_[i].panel, LV_OBJ_FLAG_SCROLLABLE);
       lv_obj_remove_flag(cards_[i].panel, LV_OBJ_FLAG_CLICKABLE);
 
-      cards_[i].name = ui::label(cards_[i].panel, Font::BODY_LARGE, theme::INK);
+      cards_[i].name = ui::label(cards_[i].panel, st::CARD_NAME_FONT, st::CARD_NAME_COLOR);
       lv_obj_set_pos(cards_[i].name, 0, 0);
-      lv_obj_set_size(cards_[i].name, card_width_ - ui::px(20), ui::px(46));
+      lv_obj_set_size(cards_[i].name, card_width_ - 2 * ui::px(st::CARD_PADDING_PX), ui::px(st::CARD_NAME_HEIGHT_PX));
       lv_label_set_long_mode(cards_[i].name, LV_LABEL_LONG_WRAP);
 
-      cards_[i].meta = ui::label(cards_[i].panel, Font::BODY, theme::MUTED);
-      lv_obj_set_pos(cards_[i].meta, 0, ui::px(54));
-      lv_obj_set_size(cards_[i].meta, card_width_ - ui::px(20), ui::px(22));
+      cards_[i].meta = ui::label(cards_[i].panel, st::CARD_META_FONT, st::CARD_META_COLOR);
+      lv_obj_set_pos(cards_[i].meta, 0, ui::px(st::CARD_META_Y_PX));
+      lv_obj_set_size(cards_[i].meta, card_width_ - 2 * ui::px(st::CARD_PADDING_PX), ui::px(st::CARD_META_HEIGHT_PX));
     }
     update_cards();
     plugin_->load_recipes();
@@ -100,11 +102,11 @@ class RecipeBrowserTile : public tessera::Tile {
     update_cards();
   }
   void on_theme() override {
-    ui::set_color(title_, theme::INK);
-    ui::set_color(status_label_, theme::MUTED);
+    ui::set_color(title_, st::LIST_TITLE_COLOR);
+    ui::set_color(status_label_, st::LIST_STATUS_COLOR);
     for (auto &card : cards_) {
-      ui::set_color(card.name, theme::INK);
-      ui::set_color(card.meta, theme::MUTED);
+      ui::set_color(card.name, st::CARD_NAME_COLOR);
+      ui::set_color(card.meta, st::CARD_META_COLOR);
     }
   }
   void on_tap() override {
@@ -186,23 +188,23 @@ class RecipeDetailCard : public tessera::Card {
   ~RecipeDetailCard() override { if(plugin_->open_card_==this) plugin_->open_card_=nullptr; }
   void open(const tessera::CardContext &c) override {
     parent_=c.parent; width_=c.width; height_=c.height; plugin_->open_card_=this;
-    meta_=ui::label(parent_,Font::BODY,theme::MUTED);
+    meta_=ui::label(parent_,st::DETAIL_META_FONT,st::DETAIL_META_COLOR);
     lv_obj_set_pos(meta_,0,0);
-    lv_obj_set_size(meta_,width_,ui::line_height(Font::BODY));
+    lv_obj_set_size(meta_,width_,ui::line_height(st::DETAIL_META_FONT));
     ui::set_text(meta_,plugin_->text("detail_loading"));  // status text until the data arrives
-    const int top=ui::line_height(Font::BODY)+ui::px(20);
-    const int gap=ui::px(24), col=(width_-gap)/2;
-    ingredients_title_=ui::label(parent_,Font::HEADLINE,theme::INK);
-    lv_obj_set_pos(ingredients_title_,0,top); lv_obj_set_size(ingredients_title_,col,ui::line_height(Font::HEADLINE));
+    const int top=ui::line_height(st::DETAIL_META_FONT)+ui::px(st::DETAIL_META_GAP_PX);
+    const int gap=ui::px(st::DETAIL_COLUMN_GAP_PX), col=(width_-gap)/2;
+    ingredients_title_=ui::label(parent_,st::DETAIL_HEADING_FONT,st::DETAIL_HEADING_COLOR);
+    lv_obj_set_pos(ingredients_title_,0,top); lv_obj_set_size(ingredients_title_,col,ui::line_height(st::DETAIL_HEADING_FONT));
     ui::set_text(ingredients_title_,plugin_->text("ingredients"));
-    instructions_title_=ui::label(parent_,Font::HEADLINE,theme::INK);
-    lv_obj_set_pos(instructions_title_,col+gap,top); lv_obj_set_size(instructions_title_,col,ui::line_height(Font::HEADLINE));
+    instructions_title_=ui::label(parent_,st::DETAIL_HEADING_FONT,st::DETAIL_HEADING_COLOR);
+    lv_obj_set_pos(instructions_title_,col+gap,top); lv_obj_set_size(instructions_title_,col,ui::line_height(st::DETAIL_HEADING_FONT));
     ui::set_text(instructions_title_,plugin_->text("instructions"));
-    const int body_y=top+ui::line_height(Font::HEADLINE)+ui::px(8), body_h=height_-body_y;
-    ingredients_=ui::label(parent_,Font::BODY,theme::INK);
+    const int body_y=top+ui::line_height(st::DETAIL_HEADING_FONT)+ui::px(st::DETAIL_HEADING_GAP_PX), body_h=height_-body_y;
+    ingredients_=ui::label(parent_,st::DETAIL_TEXT_FONT,st::DETAIL_TEXT_COLOR);
     lv_obj_set_pos(ingredients_,0,body_y); lv_obj_set_size(ingredients_,col,body_h);
     lv_label_set_long_mode(ingredients_,LV_LABEL_LONG_WRAP);
-    instructions_=ui::label(parent_,Font::BODY,theme::INK);
+    instructions_=ui::label(parent_,st::DETAIL_TEXT_FONT,st::DETAIL_TEXT_COLOR);
     lv_obj_set_pos(instructions_,col+gap,body_y); lv_obj_set_size(instructions_,col,body_h);
     lv_label_set_long_mode(instructions_,LV_LABEL_LONG_WRAP);
     if(!plugin_->load_recipe(plugin_->selected_recipe_id_)) ui::set_text(meta_,plugin_->text("detail_failed"));
@@ -221,25 +223,25 @@ class RecipeDetailCard : public tessera::Card {
     else if(servings>0) snprintf(meta,sizeof(meta),"%.1f %s",servings,plugin_->text("servings"));
     ui::set_text(meta_,meta);
     std::string ing;
-    for(int i=0;i<6;++i){
+    for(int i=0;i<st::DETAIL_INGREDIENT_LINES;++i){
       char key[8]; snprintf(key,sizeof(key),"i%d",i);
       const char *line=r[key]|""; if(!*line) continue;
-      if(!ing.empty()) ing+="\n"; ing+="• "; ing+=printable(line);
+      if(!ing.empty()) ing+=st::INGREDIENT_SEPARATOR; ing+=st::INGREDIENT_BULLET; ing+=printable(line);
     }
     std::string steps; int n=0;
-    for(int i=0;i<3;++i){
+    for(int i=0;i<st::DETAIL_STEPS;++i){
       char key[8]; snprintf(key,sizeof(key),"s%d",i);
       const char *txt=r[key]|""; if(!*txt) continue;
-      if(!steps.empty()) steps+="\n\n";
+      if(!steps.empty()) steps+=st::STEP_SEPARATOR;
       char number[12]; snprintf(number,sizeof(number),"%d. ",++n); steps+=number; steps+=printable(txt);
     }
     ui::set_text(ingredients_,ing.empty()?plugin_->text("no_ingredients"):ing);
     ui::set_text(instructions_,steps.empty()?plugin_->text("no_instructions"):steps);
   }
   void on_theme() override {
-    ui::set_color(meta_,theme::MUTED);
-    ui::set_color(ingredients_title_,theme::INK); ui::set_color(instructions_title_,theme::INK);
-    ui::set_color(ingredients_,theme::INK); ui::set_color(instructions_,theme::INK);
+    ui::set_color(meta_,st::DETAIL_META_COLOR);
+    ui::set_color(ingredients_title_,st::DETAIL_HEADING_COLOR); ui::set_color(instructions_title_,st::DETAIL_HEADING_COLOR);
+    ui::set_color(ingredients_,st::DETAIL_TEXT_COLOR); ui::set_color(instructions_,st::DETAIL_TEXT_COLOR);
   }
  private:
   MealieRecipeBrowser *plugin_;
