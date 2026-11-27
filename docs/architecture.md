@@ -8,7 +8,7 @@ A Tessera recipe browser for the large 10.1-inch kitchen display. It adds a dedi
 
 ```text
         Mealie v3 REST API
-       https://luigi.mahlen.biz
+       the configured public Mealie host
                  |
        HTTPS + bearer API token
                  |
