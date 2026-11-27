@@ -1,82 +1,51 @@
-# Mealie-Datenmodell – beobachtete Antworten
+# Mealie API data model
 
-Diese Datei dokumentiert die in Home Assistant manuell getesteten Antworten. Sie ist keine vollständige Mealie-API-Spezifikation.
+This document records the Mealie v3 REST API fields used by the plugin. The installed Mealie instance was previously identified as v3.31.0; the live response still needs to be verified against the current server.
 
-## Get recipes – Suchtreffer
+## Recipe list
 
-Getesteter Suchbegriff: `sauce`, Limit: 3. Die Einträge unter `recipes.items[]` enthielten unter anderem:
+Endpoint: `GET /api/recipes?page=<page>&perPage=5&orderBy=name&orderDirection=asc`
 
-| Feld | Verwendung |
-|---|---|
-| `recipe_id` | UUID zum späteren Laden des Rezepts |
-| `name` | Anzeigename |
-| `slug` | URL-/Namensslug |
-| `description` | Beschreibung, im Test `None` |
-| `total_time_seconds` | Gesamtzeit in Sekunden |
-| `prep_time_seconds` | Vorbereitungszeit in Sekunden |
-| `perform_time_seconds` | aktive Zubereitungszeit in Sekunden |
-| `image` | Bildreferenz; im Test `null` |
-| `recipe_servings` | Portionen |
-| `recipe_yield`, `recipe_yield_quantity` | Ertrag und Menge |
-| `rating` | Bewertung; im Test `null` |
+Mealie returns a paginated object with an `items[]` array. The plugin maps each item to:
 
-Das Rezept **Pizzasauce** hatte die ID `406fd7ba-2df2-43f7-950f-5e725194fbbb`.
+| Mealie field | Plugin field | Use |
+|---|---|---|
+| `slug` | `id` | Detail endpoint identifier |
+| `name` | `name` | Display name |
+| `totalTimeSeconds` | `seconds` | Total time in seconds |
+| `recipeServings` | `servings` | Number of servings |
 
-## Get Recipe – vollständiges Rezept
+The plugin requests five pages with five results per page and keeps at most 24 recipes.
 
-Die Antwort hat den Wurzelknoten `recipe`.
+## Recipe detail
 
-### Zutaten
+Endpoint: `GET /api/recipes/{slug}`
 
-`recipe.ingredients[]` enthält:
+The detail response is mapped to the 12 fields supported by Tessera:
 
-| Feld | Verwendung |
-|---|---|
-| `display` | Formatierte Zutatenzeile, z. B. `300 Milliliter passierte Tomaten` |
-| `quantity` | Numerische Menge, kann `null` sein |
-| `unit.name` | Einheitenname, kann fehlen |
-| `food.name` | Lebensmittelname |
-| `note` | Zusatzhinweis |
-| `reference_id` | Zutatenreferenz |
+| Mealie field | Plugin field | Use |
+|---|---|---|
+| `name` | `name` | Recipe name |
+| `totalTime` | `time` | Total time display |
+| `recipeServings` | `serv` | Number of servings |
+| `recipeIngredient[0..5].display` | `i0..i5` | Formatted ingredient lines |
+| `recipeInstructions[0..2].text` | `s0..s2` | Preparation steps |
 
-**Für die erste Version ist `display` die primäre Anzeigequelle.** Mealie formatiert Menge, Einheit und Lebensmittel bereits. `quantity` bleibt für eine spätere Portionsanpassung relevant.
+Mealie formats ingredient quantities and units in `display`, so the plugin does not need to reconstruct ingredient lines.
 
-### Zubereitung
+## Authentication
 
-`recipe.instructions[]` enthält:
-- `instruction_id`
-- `text`
-- `title`
-- `ingredient_references[]`
-- `recipe_notes[]`
+The plugin uses a long-lived Mealie API token in the HTTP header:
 
-Die Reihenfolge der Liste entspricht der Reihenfolge der Zubereitungsschritte.
+```http
+Authorization: Bearer <api-token>
+```
 
-### Weitere Felder
+The token is a Tessera input of kind `secret`. It is stored by the Tessera app and is not passed to the ESP32 firmware.
 
-- `recipe.notes[]`: Rezeptnotizen
-- `recipe.nutrition`: Nährwerte; im Test waren alle Werte `null`
-- `recipe.image`: im Test `null`
+## Limitations
 
-## Pizzasauce – Testinhalt
-
-Das Rezept hat 2 Portionen und 40 Minuten Gesamtzeit.
-
-Zutaten:
-- 1 Schalotte
-- 2 Zehe/n Knoblauch
-- 300 Milliliter passierte Tomaten
-- 1 Teelöffel Oregano
-- 1 Prise Zucker
-- 1 Teelöffel gekörnte Brühe
-- Salz
-- Pfeffer
-
-Die drei Zubereitungsschritte werden aus `instructions[].text` übernommen.
-
-## Offene Prüfungen
-
-- Bildreferenz bei Rezepten mit Bild
-- Nachrichtengröße bei Rezepten mit vielen Zutaten und Schritten
-- Verhalten bei langen Anweisungstexten
-- Weitere Filterparameter der Mealie-Aktion
+- The list is currently unfiltered and alphabetically ordered.
+- Only six ingredients and three instructions are included in the detail map.
+- Tessera mapped text fields are limited to 48 bytes, so long text can be shortened.
+- Live API response validation remains pending.
