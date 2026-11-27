@@ -12,7 +12,7 @@ boards: [jc8012p4a1, jc8012p4a1v2, jc8012p4a1v3, reterminald1001, waveshare101, 
 flash_kb: 12
 
 permissions:
-  network: [luigi.mahlen.biz]
+  network: [mealie.example.com]
 attributes: [cloud]
 privacy: https://github.com/mark77-DE/mealie-tessera-plugin#privacy
 
@@ -37,7 +37,7 @@ cards:
 fetch:
   - id: recipes
     asked: [page]
-    url: https://luigi.mahlen.biz/api/recipes?page={page}&perPage=5&orderBy=name&orderDirection=asc
+    url: https://mealie.example.com/api/recipes?page={page}&perPage=5&orderBy=name&orderDirection=asc
     headers: { Authorization: "Bearer {api_token}" }
     every: 30s
     map:
@@ -50,7 +50,7 @@ fetch:
       limit: 5
   - id: recipe
     asked: [slug]
-    url: https://luigi.mahlen.biz/api/recipes/{slug}
+    url: https://mealie.example.com/api/recipes/{slug}
     headers: { Authorization: "Bearer {api_token}" }
     every: 30s
     map:
