@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.6 - 2026-11-27
+- Fetch recipe summaries directly from the Mealie API in five-item pages, combining up to 24 results.
+- Store the Mealie API token as a Tessera secret instead of using the Home Assistant Mealie integration.
+- Load recipe details directly by slug and display the list in a three-column, eight-row full-screen grid.
+
 ## 0.4.5 - 2026-11-27
 - Read the recipe list from Mealie's raw `get_recipes` response instead of unsupported array mappings.
 - Keep the mapped `get_recipe` response for recipe details.
