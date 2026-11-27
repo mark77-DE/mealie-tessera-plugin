@@ -37,7 +37,7 @@ cards:
 fetch:
   - id: recipes
     asked: [page]
-    url: https://luigi.mahlen.eu/api/recipes?page={page}&perPage=5&orderBy=name&orderDirection=asc
+    url: https://luigi.mahlen.biz/api/recipes?page={page}&perPage=5&orderBy=name&orderDirection=asc
     headers: { Authorization: "Bearer {api_token}" }
     every: 30s
     map:
