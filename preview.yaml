@@ -1,73 +1,63 @@
-# Realistic sample answers for Tessera's official plugin preview bench.
-# No live Home Assistant connection or private IDs are used here.
+# Representative Mealie API responses for the Tessera preview bench.
+# The list fixture has five pages of five recipes; the plugin displays the first 24.
 time_zone: Europe/Berlin
 
 tiles:
   - tile: browser
     name: 01-Rezeptbrowser
-    options:
-      query: pasta
     sizes: [full]
 
-commands:
-  "call_service:mealie.get_recipes":
-    recipes:
+answers:
+  recipes:
+    "page=1":
       items:
-        - recipe_id: "406fd7ba-2df2-43f7-950f-5e725194fbbb"
-          name: "Pasta mit Tomatensauce"
-          total_time_seconds: 1800
-          recipe_servings: 4
-        - recipe_id: "bf9ed69c-bef1-4a14-a686-e358924708e6"
-          name: "Cremige Knoblauch-Pasta"
-          total_time_seconds: 1500
-          recipe_servings: 2
-        - recipe_id: "f0ccba41-3b0f-4d7e-bc1e-81e3a5010a2d"
-          name: "Ofengemüse mit Kräutern"
-          total_time_seconds: 2700
-          recipe_servings: 3
-        - recipe_id: "106fd7ba-2df2-43f7-950f-5e725194f001"
-          name: "Mediterraner Nudelsalat mit Tomaten und Rucola"
-          total_time_seconds: 1200
-          recipe_servings: 4
-        - recipe_id: "206fd7ba-2df2-43f7-950f-5e725194f002"
-          name: "Cremige Kürbissuppe"
-          total_time_seconds: 2100
-          recipe_servings: 6
-        - recipe_id: "306fd7ba-2df2-43f7-950f-5e725194f003"
-          name: "Knusprige Ofenkartoffeln mit Rosmarin"
-          total_time_seconds: 2400
-          recipe_servings: 2
-        - recipe_id: "406fd7ba-2df2-43f7-950f-5e725194f004"
-          name: "Bunter Couscous-Salat mit geröstetem Gemüse"
-          total_time_seconds: 1800
-          recipe_servings: 4
-        - recipe_id: "506fd7ba-2df2-43f7-950f-5e725194f005"
-          name: "Schokoladenkuchen mit flüssigem Kern"
-          total_time_seconds: 1500
-          recipe_servings: 6
+        - { slug: "pasta-mit-tomatensauce", name: "Pasta mit Tomatensauce", totalTimeSeconds: 1800, recipeServings: 4 }
+        - { slug: "cremige-knoblauch-pasta", name: "Cremige Knoblauch-Pasta", totalTimeSeconds: 1500, recipeServings: 2 }
+        - { slug: "ofengemuese-mit-kraeutern", name: "Ofengemüse mit Kräutern", totalTimeSeconds: 2700, recipeServings: 3 }
+        - { slug: "mediterraner-nudelsalat", name: "Mediterraner Nudelsalat mit Tomaten und Rucola", totalTimeSeconds: 1200, recipeServings: 4 }
+        - { slug: "cremige-kuerbissuppe", name: "Cremige Kürbissuppe", totalTimeSeconds: 2100, recipeServings: 6 }
+    "page=2":
+      items:
+        - { slug: "ofenkartoffeln-rosmarin", name: "Knusprige Ofenkartoffeln mit Rosmarin", totalTimeSeconds: 2400, recipeServings: 2 }
+        - { slug: "couscous-salat", name: "Bunter Couscous-Salat mit geröstetem Gemüse", totalTimeSeconds: 1800, recipeServings: 4 }
+        - { slug: "schokoladenkuchen", name: "Schokoladenkuchen mit flüssigem Kern", totalTimeSeconds: 1500, recipeServings: 6 }
+        - { slug: "gemuese-lasagne", name: "Gemüse-Lasagne", totalTimeSeconds: 3600, recipeServings: 4 }
+        - { slug: "kartoffelgratin", name: "Kartoffelgratin mit Bergkäse", totalTimeSeconds: 3000, recipeServings: 4 }
+    "page=3":
+      items:
+        - { slug: "tomaten-mozzarella-salat", name: "Tomaten-Mozzarella-Salat", totalTimeSeconds: 600, recipeServings: 2 }
+        - { slug: "linseneintopf", name: "Herzhafter Linseneintopf", totalTimeSeconds: 2700, recipeServings: 4 }
+        - { slug: "apfelpfannkuchen", name: "Apfelpfannkuchen", totalTimeSeconds: 1200, recipeServings: 3 }
+        - { slug: "haehnchen-curry", name: "Hähnchen-Curry mit Reis", totalTimeSeconds: 2400, recipeServings: 4 }
+        - { slug: "kuerbisrisotto", name: "Cremiges Kürbisrisotto", totalTimeSeconds: 2100, recipeServings: 3 }
+    "page=4":
+      items:
+        - { slug: "pizza-margherita", name: "Pizza Margherita", totalTimeSeconds: 1800, recipeServings: 2 }
+        - { slug: "brokkoli-auflauf", name: "Brokkoli-Auflauf", totalTimeSeconds: 2400, recipeServings: 4 }
+        - { slug: "pancakes", name: "Fluffige Pancakes", totalTimeSeconds: 900, recipeServings: 4 }
+        - { slug: "gemuesesuppe", name: "Bunte Gemüsesuppe", totalTimeSeconds: 1800, recipeServings: 4 }
+        - { slug: "wraps", name: "Wraps mit Ofengemüse", totalTimeSeconds: 1500, recipeServings: 2 }
+    "page=5":
+      items:
+        - { slug: "zitronenkuchen", name: "Saftiger Zitronenkuchen", totalTimeSeconds: 3000, recipeServings: 8 }
+        - { slug: "falafel", name: "Falafel mit Joghurtsauce", totalTimeSeconds: 2400, recipeServings: 4 }
+        - { slug: "bratkartoffeln", name: "Bratkartoffeln mit Kräutern", totalTimeSeconds: 1800, recipeServings: 2 }
+        - { slug: "haferkekse", name: "Knusprige Haferkekse", totalTimeSeconds: 1500, recipeServings: 20 }
+        - { slug: "tomatensuppe", name: "Cremige Tomatensuppe", totalTimeSeconds: 1200, recipeServings: 4 }
 
-  "call_service:mealie.get_recipe":
-    recipe:
+  recipe:
+    "slug=pasta-mit-tomatensauce":
       name: "Pasta mit Tomatensauce"
-      description: "Ein einfaches Pastagericht mit aromatischer Tomatensauce."
-      total_time: "30 Minuten"
-      recipe_servings: 4
-      ingredients:
-        - display: "400 g Spaghetti"
-          title: "Spaghetti"
-        - display: "1 Dose gehackte Tomaten"
-          title: "Gehackte Tomaten"
-        - display: "1 Zwiebel"
-          title: "Zwiebel"
-        - display: "2 Knoblauchzehen"
-          title: "Knoblauch"
-        - display: "2 EL Olivenöl"
-          title: "Olivenöl"
-        - display: "Salz und Pfeffer"
-          title: "Salz und Pfeffer"
-      instructions:
-        - text: "Zwiebel und Knoblauch fein würfeln."
-        - text: "Olivenöl erhitzen und Zwiebel sowie Knoblauch glasig dünsten."
-        - text: "Tomaten hinzufügen und die Sauce etwa 15 Minuten köcheln lassen."
-        - text: "Spaghetti in Salzwasser al dente kochen."
-        - text: "Pasta mit der Sauce vermengen und abschmecken."
+      totalTime: "PT30M"
+      recipeServings: 4
+      recipeIngredient:
+        - { display: "400 g Spaghetti" }
+        - { display: "1 Dose gehackte Tomaten" }
+        - { display: "1 Zwiebel" }
+        - { display: "2 Knoblauchzehen" }
+        - { display: "2 EL Olivenöl" }
+        - { display: "Salz und Pfeffer" }
+      recipeInstructions:
+        - { text: "Zwiebel und Knoblauch fein würfeln." }
+        - { text: "Olivenöl erhitzen und Zwiebel sowie Knoblauch glasig dünsten." }
+        - { text: "Tomaten hinzufügen und die Sauce etwa 15 Minuten köcheln lassen." }
