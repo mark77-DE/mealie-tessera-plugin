@@ -23,6 +23,7 @@
     "ingredients": "Zutaten",
     "instructions": "Zubereitung",
     "servings": "Portionen",
+    "minutes": "Min.",
     "no_ingredients": "Keine Zutaten zurückgegeben",
     "no_instructions": "Keine Zubereitungsschritte zurückgegeben"
   },
