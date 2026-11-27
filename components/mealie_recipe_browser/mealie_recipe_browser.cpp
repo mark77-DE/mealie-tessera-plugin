@@ -285,21 +285,32 @@ void MealieRecipeBrowser::on_message(JsonObjectConst message){
     return;
   }
   if(!(message["ok"]|false)){recipes_.clear();status_="service_error";return;}
-  // The manifest maps the large Mealie response to five compact recipe entries.
+  // Without an answers mapping, Tessera forwards the raw Mealie service response.
+  // Mealie currently returns the search results under recipes.items[].
   JsonObjectConst result=message["result"].as<JsonObjectConst>();
-  JsonArrayConst ids=result["ids"].as<JsonArrayConst>();
-  JsonArrayConst names=result["names"].as<JsonArrayConst>();
-  JsonArrayConst secs=result["secs"].as<JsonArrayConst>();
-  JsonArrayConst serv=result["serv"].as<JsonArrayConst>();
+  if(result.isNull()){
+    recipes_.clear();
+    status_="invalid_response";
+    return;
+  }
+  JsonObjectConst recipe_result=result["recipes"].as<JsonObjectConst>();
+  JsonArrayConst items=recipe_result["items"].as<JsonArrayConst>();
+  // Accept a top-level items[] as well, for compatibility with alternate HA response shapes.
+  if(items.isNull()) items=result["items"].as<JsonArrayConst>();
+
   recipes_.clear();
-  const size_t count=ids.isNull() || names.isNull() ? 0 : (ids.size()<names.size()?ids.size():names.size());
-  for(size_t i=0;i<count && i<24;++i){
+  if(items.isNull()){
+    status_="invalid_response";
+    return;
+  }
+  for(JsonObjectConst item : items){
+    if(recipes_.size()>=24) break;
     RecipeSummary recipe;
-    recipe.id=ids[i].as<std::string>();
-    recipe.name=printable(names[i].as<std::string>());
+    recipe.id=item["recipe_id"]|"";
+    recipe.name=printable(std::string(item["name"]|""));
     if(recipe.name.empty() || recipe.id.empty()) continue;
-    if(!secs.isNull() && i<secs.size()) recipe.total_seconds=secs[i]|0u;
-    if(!serv.isNull() && i<serv.size()) recipe.servings=serv[i]|0.0f;
+    recipe.total_seconds=item["total_time_seconds"]|0u;
+    recipe.servings=item["recipe_servings"]|0.0f;
     recipes_.push_back(std::move(recipe));
   }
   status_=recipes_.empty()?"no_results":"loaded";
