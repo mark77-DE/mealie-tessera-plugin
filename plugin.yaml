@@ -1,7 +1,2 @@
 # Tessera adds this package and the component folder to the selected screen's build.
-# CONFIG_ENTRY_ID is supplied by the plugin's per-installation input in Tessera.
-defaults:
-  CONFIG_ENTRY_ID: ""
-
-mealie_recipe_browser:
-  config_entry_id: "${CONFIG_ENTRY_ID}"
+mealie_recipe_browser: {}
