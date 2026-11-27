@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.4.7 - 2026-11-27
+- Mealie-Verbindung auf den produktiven Server `luigi.mahlen.biz` umgestellt.
+
 ## 0.4.6 - 2026-11-27
 - Fetch recipe summaries directly from the Mealie API in five-item pages, combining up to 24 results.
 - Store the Mealie API token as a Tessera secret instead of using the Home Assistant Mealie integration.
