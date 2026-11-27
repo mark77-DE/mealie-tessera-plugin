@@ -53,7 +53,7 @@ tiles:
   - id: browser
     name: tile_browser
     icon: chef-hat
-    sizes: { full: true }
+    sizes: { min: 3x2, max: 3x3, full: true }
     memory: 2600
     example: tile_example
 cards:
