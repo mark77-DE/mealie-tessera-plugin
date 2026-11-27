@@ -23,6 +23,7 @@
     "ingredients": "Ingredients",
     "instructions": "Instructions",
     "servings": "servings",
+    "minutes": "min",
     "no_ingredients": "No ingredients returned",
     "no_instructions": "No instructions returned"
   },
