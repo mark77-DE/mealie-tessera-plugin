@@ -14,7 +14,7 @@ Browse your Mealie recipe collection on a large Tessera touch display. The plugi
 - Loads ingredients and preparation steps only when a recipe is opened.
 - Keeps the Mealie API token in Tessera's secret storage; the token is not sent to the ESP32 firmware.
 
-The plugin is currently configured for the Mealie instance at `https://luigi.mahlen.biz`. Tessera requires every fetch host to be declared explicitly in the manifest. To use another Mealie instance, change the host in `permissions.network` and both fetch URLs before installing the plugin.
+The manifest currently contains the placeholder host `mealie.example.com`. Before installing, replace it with your Mealie server's public HTTPS hostname in `permissions.network` and both fetch URLs. Tessera requires the fetch host to be fixed and explicitly allowlisted.
 
 ## Target screen
 
