@@ -1,5 +1,7 @@
 {
-  "_meta": { "name": "Deutsch" },
+  "_meta": {
+    "name": "Deutsch"
+  },
   "screen": {
     "screen_title": "Mealie-Rezepte",
     "searching_for": "Suche: {n}",
@@ -23,7 +25,12 @@
     "servings": "Portionen",
     "minutes": "Min.",
     "no_ingredients": "Keine Zutaten zurückgegeben",
-    "no_instructions": "Keine Zubereitungsschritte zurückgegeben"
+    "no_instructions": "Keine Zubereitungsschritte zurückgegeben",
+    "search_placeholder": "Suche (bald verfügbar)",
+    "previous_page": "‹ Zurück",
+    "next_page": "Weiter ›",
+    "page_status": "Seite %u von %u",
+    "result_count": "%u Rezepte insgesamt"
   },
   "app": {
     "name": "Mealie-Rezeptbrowser",
