@@ -2,105 +2,73 @@
 
 ## Goal
 
-A Tessera recipe browser for the large 10.1-inch kitchen display. It adds a dedicated recipe view without replacing the existing Tessera dashboard.
+A Tessera recipe browser for the large kitchen display. It adds a dedicated recipe view without replacing the existing Tessera dashboard. The target layout is a header, dynamic category/search navigation and a three-column by eight-row recipe grid (up to 24 recipes).
 
-The target display is 1280 × 800 pixels. The browser has a full-width header, a left navigation sidebar and a three-column by eight-row recipe grid.
-
-## Target data path
+## Data path
 
 ```text
-             Mealie v3 REST API
-                    ▲
-                    │ existing authenticated client
-        Home Assistant Mealie integration
-                    ▲
-                    │
-          Mealie Tessera Bridge
-          - bridge bearer key
-          - categories
-          - filtered recipe pages
-          - recipe details
-                    ▲
-                    │ HTTPS / trusted LAN
-              Tessera app
-          - requests and mapping
-          - buffers five-item pages
-                    ▲
-                    │ compact data
-            Tessera plugin UI
-          - header and category sidebar
-          - search and filter state
-          - 3 × 8 recipe grid
-                    ▲
-                    │
-             GUITION display
+Mealie
+  ↕ authenticated connection
+Official Home Assistant Mealie integration
+  ↕ existing HA client
+Mealie Tessera Bridge (custom integration)
+  - get_recipes response service
+  - get_categories response service
+  - get_recipe response service
+  ↕ native Tessera Home Assistant command channel
+Tessera app / plugin
+  ↕
+GUITION display
 ```
 
-The long Mealie API token remains in Home Assistant. Tessera uses a separate bridge key. The screen firmware receives only mapped display data and never receives either server's credentials.
+Tessera does not connect to Mealie directly. It has no Mealie URL, IP address, API token, bridge URL, bridge key or network permission. All credentials and server configuration remain in Home Assistant.
 
 ## Responsibilities
 
-### Mealie
-- Source of recipes, categories, ingredients and preparation steps.
-- Provides native search, category filtering and pagination.
-- Provides complete recipe details.
-
-### Home Assistant Mealie integration
-- Owns the Mealie server configuration and API token.
-- Provides the authenticated client reused by the bridge.
-
-### Mealie Tessera Bridge
-- Authenticates Tessera with a dedicated bearer key.
-- Exposes a read-only API under `/api/mealie-tessera`.
-- Provides category data.
-- Provides recipe pages of five items with optional search and category filters.
-- Preserves Mealie pagination metadata.
-- Fetches one full recipe by slug on demand.
+### Mealie and Home Assistant
+- The official Mealie integration owns the server connection, authentication and API client.
+- The Mealie Tessera Bridge registers read-only response services and converts Mealie responses into compact display data.
 
 ### Tessera app
-- Stores the bridge base URL and bridge key as plugin configuration, subject to Tessera's supported configuration model.
-- Calls the bridge, maps response fields and buffers list results.
-- Requests categories and recipe details only when needed.
+- Mediates commands between the plugin and Home Assistant.
+- Enforces the plugin's `permissions.ha_commands` allow-list.
+- Bounds command responses; service payloads therefore stay compact.
 
 ### Tessera plugin
-- Renders the header, search/category sidebar and recipe grid.
-- Combines up to five bridge responses to fill 24 recipe tiles.
-- Keeps filters stable across pages.
-- Opens a recipe detail view only after a tile is selected.
+- Requests recipe pages, categories and recipe details through `tessera::send()`.
+- Buffers recipe summaries for the 3 × 8 grid.
+- Keeps search and category state across page requests.
+- Loads detail data only after a recipe is selected.
 
-## API contract
+## Home Assistant command contract
 
-- Categories: `GET /api/mealie-tessera/categories`
-- Recipe page: `GET /api/mealie-tessera/recipes?page=N&search=TEXT&category=CATEGORY_ID`
-- Recipe detail: `GET /api/mealie-tessera/recipe/{slug}`
-- Authentication: `Authorization: Bearer <bridge-key>`
+| Command | Input | Response |
+|---|---|---|
+| `call_service:mealie_tessera_bridge.get_recipes` | `page`, optional `search`, optional `category` | `items[]`, `page`, `per_page`, `total`, `total_pages` |
+| `call_service:mealie_tessera_bridge.get_categories` | none | `items[]` with `id` and `name` |
+| `call_service:mealie_tessera_bridge.get_recipe` | `slug` | `time`, `serv`, `i0..i5`, `s0..s2` |
 
-The list response is Mealie's paginated response, including `items`, `page`, `per_page`, `total` and `total_pages` (exact field casing must be verified against the installed version). The bridge uses a page size of five.
+The recipe list contains at most five summaries per service call. The current detail response is deliberately compact for Tessera's response-size limit; expanded, chunked detail loading is a later task.
 
 ## Filter and pagination model
 
-- Category and search are independent filter values and can be active together.
-- Changing either filter resets the displayed result page to page 1.
-- Moving to the next or previous displayed page retains both filters.
-- The display page contains up to 24 results; the bridge page contains up to five.
-- Tessera must calculate which bridge pages are needed for the requested 24-result window.
-- A response belonging to an older filter state must not be appended to the current buffer.
-
-## Migration status
-
-The repository originally implemented direct Mealie API access from Tessera. That is a legacy implementation and is being replaced by the Home Assistant bridge. Until the plugin fetch definitions and configuration have been migrated, do not assume the target bridge flow is already active on the display.
+- Search and category can be combined.
+- Filter changes reset the displayed result page to page 1 and discard the old buffer.
+- Every page request repeats the active filters.
+- A display page contains up to 24 recipes, collected from multiple five-item Home Assistant responses.
+- Old asynchronous responses must not be appended after the filter state changes.
 
 ## Technical constraints
 
-- Target resolution: 1280 × 800 pixels.
-- The browser tile takes the whole page.
 - Plugin API 0.28.
-- Mapped text fields are limited to 48 bytes; keep list fields compact.
-- Do not reduce structured ingredient data to display strings: later serving adjustment needs quantities, units and food references.
-- Never put credentials in fixtures, source code or firmware.
+- Home Assistant commands are declared under `permissions.ha_commands`.
+- No `permissions.network`, `fetch` entries or secret inputs.
+- Tessera command answers are bounded to about 3 KB; mapped text is limited to 48 bytes.
+- Keep service responses small and preserve structured source data in Home Assistant for later enhancements.
 
 ## Later work
 
-- More than six ingredients and three instructions through segmented detail rendering.
-- Serving adjustment, ingredient checklist and cooking mode.
-- Live Preview Bench and physical-screen verification.
+- Category picker and search UI wired to the native services.
+- True 24-result pagination and stale-response protection.
+- More than six ingredients and three instructions through segmented detail requests.
+- Preview Bench and physical-display verification.
