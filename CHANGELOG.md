@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.4 - 2026-11-28
+- Correct the previous/next chevron directions.
+- Use Tessera's documented tile-relative tap coordinates directly for recipe and navigation hit testing, avoiding screen-coordinate offsets.
+- Add debug logging for valid, missed and matched recipe taps.
+
 ## 0.5.3 - 2026-11-28
 - Replace unsupported arrow characters with clearly outlined square navigation buttons and vector-drawn chevrons.
 - Restrict page changes to the visible square touch targets.
