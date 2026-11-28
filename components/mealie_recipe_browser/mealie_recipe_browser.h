@@ -7,7 +7,7 @@
 namespace esphome::mealie_recipe_browser {
 class RecipeDetailCard;
 struct RecipeSummary {
-  std::string id;  // Mealie recipe slug, used by the detail fetch.
+  std::string id;  // Mealie recipe slug, used by the HA detail service.
   std::string name;
   uint32_t total_seconds = 0;
   float servings = 0;
