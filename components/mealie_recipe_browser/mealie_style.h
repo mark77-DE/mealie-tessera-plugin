@@ -1,5 +1,7 @@
 #pragma once
-// Look of the Mealie recipe browser. Change fonts, colors, spacing and text decoration here only.\n//\n// Layout measurements and spacing are documented in docs/ui-layout.md.\n// All *_PX values are design pixels and must be applied through ui::px().
+// Look of the Mealie recipe browser. Change fonts, colors, spacing and text decoration here only.
+// Layout measurements and spacing are documented in docs/ui-layout.md.
+// All *_PX values are design pixels and must be applied through ui::px().
 //
 // Fonts, from large to small: VALUE (38) > HEADLINE (27) > BODY_LARGE (21) > TITLE (18, bold) > BODY (16).
 //   The numbers are base sizes of Tessera's standard look; the screen scales them.
@@ -17,7 +19,8 @@ constexpr tessera::Font LIST_TITLE_FONT = tessera::Font::TITLE;
 constexpr theme::Role LIST_TITLE_COLOR = theme::INK;
 constexpr tessera::Font LIST_STATUS_FONT = tessera::Font::BODY;
 constexpr theme::Role LIST_STATUS_COLOR = theme::MUTED;
-constexpr int LIST_STATUS_GAP_PX = 6;  // gap from title baseline to the result/status line\nconstexpr int LIST_TOP_GAP_PX = 18;  // breathing room between status line and first recipe row
+constexpr int LIST_STATUS_GAP_PX = 6;  // gap from title baseline to the result/status line
+constexpr int LIST_TOP_GAP_PX = 18;  // breathing room between status line and first recipe row
 
 // 20 recipes: three columns, seven rows (the last row contains two cards).
 // Keep three columns so long German recipe names retain useful width.
