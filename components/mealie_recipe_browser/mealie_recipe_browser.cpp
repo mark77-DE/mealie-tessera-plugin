@@ -121,9 +121,9 @@ class RecipeBrowserTile : public tessera::Tile {
     lv_obj_set_size(previous_, nav_size, nav_size);
     style_nav_button(previous_);
     previous_icon_ = lv_line_create(previous_);
-    lv_obj_center(previous_icon_);
-    lv_point_t left_points[] = {{-7, -10}, {3, 0}, {-7, 10}};
-    lv_line_set_points(previous_icon_, left_points, 3);
+    lv_obj_set_pos(previous_icon_, 0, 0);
+    lv_obj_set_size(previous_icon_, nav_size, nav_size);
+    lv_line_set_points(previous_icon_, previous_points_, 3);
     style_nav_icon(previous_icon_);
 
     page_status_ = ui::label(c.parent, st::LIST_STATUS_FONT, st::LIST_TITLE_COLOR);
@@ -138,9 +138,9 @@ class RecipeBrowserTile : public tessera::Tile {
     lv_obj_set_size(next_, nav_size, nav_size);
     style_nav_button(next_);
     next_icon_ = lv_line_create(next_);
-    lv_obj_center(next_icon_);
-    lv_point_t right_points[] = {{7, -10}, {-3, 0}, {7, 10}};
-    lv_line_set_points(next_icon_, right_points, 3);
+    lv_obj_set_pos(next_icon_, 0, 0);
+    lv_obj_set_size(next_icon_, nav_size, nav_size);
+    lv_line_set_points(next_icon_, next_points_, 3);
     style_nav_icon(next_icon_);
 
     update_cards();
@@ -153,9 +153,11 @@ class RecipeBrowserTile : public tessera::Tile {
     ui::set_color(title_, st::LIST_TITLE_COLOR);
     ui::set_color(status_label_, st::LIST_STATUS_COLOR);
     ui::set_color(search_placeholder_, st::LIST_STATUS_COLOR);
-    ui::set_color(previous_, st::LIST_TITLE_COLOR);
     ui::set_color(page_status_, st::LIST_TITLE_COLOR);
-    ui::set_color(next_, st::LIST_TITLE_COLOR);
+    style_nav_button(previous_);
+    style_nav_button(next_);
+    style_nav_icon(previous_icon_);
+    style_nav_icon(next_icon_);
     for (auto &card : cards_) {
       ui::set_color(card.name, st::CARD_NAME_COLOR);
       ui::set_color(card.meta, st::CARD_META_COLOR);
@@ -293,6 +295,8 @@ class RecipeBrowserTile : public tessera::Tile {
   lv_obj_t *next_icon_ = nullptr;
   int previous_x_ = 0;
   int next_x_ = 0;
+  lv_point_precise_t previous_points_[3] = {{21, 18}, {31, 28}, {21, 38}};
+  lv_point_precise_t next_points_[3] = {{31, 18}, {21, 28}, {31, 38}};
   lv_obj_t *list_ = nullptr;
   lv_obj_t *content_ = nullptr;
   lv_obj_t *parent_ = nullptr;
