@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.3 - 2026-11-28
+- Nicht unterstützte Pfeilzeichen durch klar erkennbare quadratische Navigationstasten mit gezeichneten Pfeilen ersetzen.
+- Seitenwechsel nur noch innerhalb der sichtbaren quadratischen Touchflächen auslösen.
+- Gesamtzahl der Rezepte beim Laden einer anderen Seite beibehalten; temporäre Ladezähler entfernen.
+
 ## 0.5.0 - 2026-11-28
 - Direkten Mealie-HTTP-Zugriff durch native Home-Assistant-Response-Services ersetzt.
 - Mealie-API-Token, Serveradresse und Tessera-Netzwerkberechtigung entfernt.
