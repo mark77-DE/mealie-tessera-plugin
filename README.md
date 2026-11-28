@@ -2,77 +2,64 @@
 
 Browse your Mealie recipe collection on a large Tessera touch display. The plugin adds a dedicated recipe view and leaves the existing Tessera dashboard and its pages untouched.
 
-> **Status: beta / early development.** The plugin loads recipe summaries in five-item pages and can display up to 24 recipes in a three-column, eight-row grid. Live API and hardware verification are still pending.
+> **Status: beta / bridge migration in progress.** The current plugin contains the original direct-Mealie implementation. The target architecture is to access Mealie through the Home Assistant Mealie Tessera Bridge before adding dynamic categories and search.
 
-## What it does
+## Target experience
 
-- Reads recipes directly from the Mealie REST API over HTTPS.
-- Loads five recipes per API request and combines up to five pages.
-- Shows up to 24 recipes on the full-screen tile.
-- Displays each recipe's name, total time and servings.
-- Opens a recipe detail card when a result is tapped.
-- Loads ingredients and preparation steps only when a recipe is opened.
-- Keeps the Mealie API token in Tessera's secret storage; the token is not sent to the ESP32 firmware.
+- Full-screen recipe browser for 1280 × 800 displays, including supported Guition devices.
+- Header: **Mealie Rezepte**.
+- Left navigation: search field and dynamically loaded Mealie categories.
+- Right area: up to 24 recipes in a three-column, eight-row grid.
+- Recipe tiles show name, total time and servings.
+- Search and category filters can be combined.
+- Filters remain active when moving between result pages.
+- Full recipe details are loaded only after a recipe is selected.
 
-The manifest currently contains the placeholder host `mealie.example.com`. Before installing, replace it with your Mealie server's public HTTPS hostname in `permissions.network` and both fetch URLs. Tessera requires the fetch host to be fixed and explicitly allowlisted.
+See [the implementation plan](docs/implementation-plan.md) for the agreed behavior and work sequence.
 
-## Target screen
+## Target architecture
 
-The 24-card layout is designed for 1280 × 800 displays, including Guition JC8012P4A1 V1/V2/V3, reTerminal D1001 and Waveshare 10.1-inch models. The recipe browser uses the whole page so all 24 entries can fit. Smaller 7-inch displays are not enabled because their lower resolution cannot fit this grid. See [supported displays](docs/supported-displays.en.md).
+Tessera communicates with the Home Assistant integration [Mealie Tessera Bridge](https://github.com/mark77-DE/mealie-tessera-bridge). The bridge reuses the already configured Home Assistant Mealie integration. The long Mealie API token stays in Home Assistant; Tessera uses a separate bridge key.
 
-## Set up
+Target endpoints:
 
-1. In Mealie, open **User Profile → API Tokens** (usually `/user/profile/api-tokens`) and create a long-lived API token.
-2. In Tessera, open **Plugins** and choose **Add with a link**.
-3. Add this repository: [mark77-DE/mealie-tessera-plugin](https://github.com/mark77-DE/mealie-tessera-plugin).
-4. Select your large display and install the plugin.
-5. When Tessera asks for **Mealie API token**, paste the token you created in Mealie. Tessera stores it as a secret.
-6. In Layout, add **Recipe browser** from the Plugins group as a full-page tile.
+- `GET /api/mealie-tessera/categories`
+- `GET /api/mealie-tessera/recipes?page=1&search=...&category=...`
+- `GET /api/mealie-tessera/recipe/{slug}`
 
-No Home Assistant Mealie integration or config-entry ID is required for the recipe list or recipe details. Mealie must be reachable at the configured public HTTPS hostname from the Tessera app's fetch service.
+The bridge returns five recipes per list request. Tessera combines responses to fill up to 24 tiles. The search and category parameters must be repeated on every request, including requests for subsequent pages.
 
-## Pagination
+## Current implementation state
 
-The browser makes five requests to `GET /api/recipes?page=<page>&perPage=5`. It combines their results and displays the first 24 recipes. The fifth page may return fewer than five items. Mealie's API provides the pagination; the Home Assistant Mealie actions do not expose a page parameter.
-
-## Privacy
-
-The Tessera app sends the API token in the HTTPS `Authorization: Bearer` header to the hostname declared in the manifest only. It requests recipe summaries from `/api/recipes` and a single recipe's details from `/api/recipes/{slug}`. The token is stored by Tessera as a secret and is not included in the plugin manifest, source code, preview fixtures or screen firmware. Mealie receives the API requests and may record them in its normal server logs.
-
-The plugin does not send recipe data or the API token to any other host.
-
-## Known limitations
-
-- The Mealie hostname is fixed in the manifest because Tessera's network permission model does not allow a user-supplied hostname in a fetch URL.
-- The initial list is unfiltered and alphabetically ordered. Search, category filters and cooking mode are planned for later work.
-- The detail card currently shows up to six ingredients and three preparation steps. Longer recipes need segmented detail loading.
-- The virtual preview does not install plugins or replace a test on the physical display.
-
-## Live development preview
-
-The official Tessera Preview Bench can use the real Mealie API. See [Live Mealie preview](docs/live-preview.md) for setup and security notes.
-
-## Development status
+The original plugin was built against the Mealie API directly. Its direct-token setup and fetch definitions are being migrated to the bridge. Do not treat the legacy setup instructions or direct Mealie endpoints in old examples as the target architecture.
 
 | Feature | Status |
 |---|---|
-| Direct Mealie API connection using a Tessera secret input | Implemented; live verification pending |
-| Five-item pagination and collection of up to 24 recipes | Implemented; live verification pending |
-| Three-column, eight-row full-screen recipe grid | Implemented; layout verification pending |
-| Recipe details loaded on demand | Implemented; live verification pending |
-| Search and category filters | Planned |
-| Cooking mode and ingredient checklist | Planned |
-| Preview Bench and supported-board builds | Pending |
-| Physical display test | Pending |
+| Home Assistant bridge with separate bearer key | Implemented; live endpoint verification pending |
+| Bridge recipe list and on-demand detail endpoint | Implemented and previously tested |
+| Bridge search and category parameters | Added; verify against installed Mealie version |
+| Dynamic category endpoint | Added; verify against installed Mealie version |
+| Bridge pagination metadata passthrough | Added; verify raw response |
+| Tessera bridge configuration and authentication | Planned |
+| Header, sidebar and 3×8 recipe grid | Existing grid foundation; target layout work pending |
+| Dynamic categories and search UI | Planned |
+| Persistent filters across pagination | Planned |
+| Full detail view and structured ingredients | Existing foundation; verify during migration |
+| Serving adjustment and cooking mode | Later phase |
 
 ## Documentation
 
+- [Implementation plan and AI handoff](docs/implementation-plan.md)
 - [Architecture](docs/architecture.md)
 - [Mealie API data model](docs/mealie-data-model.md)
 - [Tessera data contract](docs/shared-data-contract.md)
 - [Development plan](docs/development.md)
 - [Live Mealie preview](docs/live-preview.md)
 
-## Safety
+## Development rules
 
-Never commit Mealie API tokens, private URLs or other credentials. Use the Tessera secret input for the token. The manifest declares the one public Mealie hostname this plugin is allowed to contact.
+- Read the implementation plan before changing the plugin.
+- Do not add a direct Mealie token input to the target architecture.
+- Do not invent Mealie routes or fields; verify them against the installed instance at `/docs`.
+- Never commit Mealie tokens, bridge keys or private credentials.
+- Keep the recipe browser isolated from the existing Tessera dashboard.
