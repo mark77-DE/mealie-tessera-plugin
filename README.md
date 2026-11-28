@@ -18,7 +18,7 @@ Browse recipes from a Mealie instance on a Tessera touch display. The plugin use
 
 ## Data
 
-- Recipe summaries are retrieved in pages of five.
+- Recipe summaries are retrieved in pages of four.
 - Up to 24 recipes can be shown on the overview.
 - Search and category filters are passed to Home Assistant.
 - Categories are loaded dynamically from Mealie.
