@@ -9,7 +9,7 @@ This document describes the compact data returned to Tessera by the Home Assista
 - Tessera talks to Home Assistant through native `call_service` commands, never directly to Mealie.
 - Mealie URL, IP address, token and authenticated client remain in Home Assistant.
 - The Bridge exposes read-only response services.
-- Recipe summaries are requested in pages of five.
+- Recipe summaries are requested in pages of four.
 - The browser can collect up to 24 summaries for one display page.
 - Recipe details are requested only after a recipe is opened.
 - Search and category filters are repeated on every page request.
@@ -33,7 +33,7 @@ Each summary item contains:
 | `seconds` | Total time in seconds |
 | `servings` | Number of servings |
 
-The service returns no more than five summaries per page. Pagination metadata describes the current filtered result set.
+The service returns no more than four summaries per page. Pagination metadata describes the current filtered result set.
 
 ## Filter semantics
 
@@ -56,4 +56,4 @@ This is a transport-sized initial contract, not the final recipe model. A later 
 
 ## Tessera transport limits
 
-Tessera's Home Assistant command response is bounded to about 3 KB and text values are limited to 48 bytes. Keep each response compact. Recipe summaries are intentionally split into five-item pages.
+Tessera's Home Assistant command response is bounded to about 3 KB and text values are limited to 48 bytes. Keep each response compact. Recipe summaries are intentionally split into four-item pages.
