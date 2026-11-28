@@ -40,8 +40,11 @@ constexpr theme::Role CARD_META_COLOR = theme::MUTED;
 constexpr int CARD_META_Y_PX = 46;  // metadata baseline relative to the card top; reduced from 50 px
 constexpr int CARD_META_HEIGHT_PX = 20;
 
-// Footer navigation: large arrows with a generous 20% touch target at each edge.
-constexpr tessera::Font NAV_ARROW_FONT = tessera::Font::HEADLINE;
+// Footer navigation: square, unambiguous touch targets; chevrons are drawn as LVGL lines.
+constexpr int NAV_BUTTON_SIZE_PX = 56;
+constexpr int NAV_BUTTON_INSET_PX = 8;
+constexpr int NAV_BUTTON_RADIUS_PX = 10;
+constexpr int NAV_ICON_WIDTH_PX = 3;
 
 // ---------------------------------------------------------------------------------------------------------------
 // Recipe card (the detail view; its title bar is set by Tessera and cannot be changed here)
