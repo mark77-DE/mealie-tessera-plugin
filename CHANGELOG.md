@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.3 - 2026-11-28
+- Replace unsupported arrow characters with clearly outlined square navigation buttons and vector-drawn chevrons.
+- Restrict page changes to the visible square touch targets.
+- Keep the total recipe count stable while another page loads; remove transient partial-load counters.
+
 ## 0.5.2 - 2026-11-28
 - Display up to 20 recipes per Tessera page and fetch five Mealie pages per view.
 - Tighten recipe card metadata spacing and improve footer pagination arrows.
