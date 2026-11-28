@@ -1,17 +1,34 @@
 # Changelog
 
+## 0.5.0 - 2026-11-28
+- Direkten Mealie-HTTP-Zugriff durch native Home-Assistant-Response-Services ersetzt.
+- Mealie-API-Token, Serveradresse und Tessera-Netzwerkberechtigung entfernt.
+- Bestehende Mealie-Integration in Home Assistant über die Mealie Tessera Bridge verwenden.
+- Native HA-Command-Fixtures für die 24-Rezepte-Vorschau ergänzt.
+
+## 0.4.7 - 2026-11-27
+- Vorbereitende direkte Fetch-Variante; wird in 0.5.0 durch den nativen Home-Assistant-Datenweg ersetzt.
+
+## 0.4.6 - 2026-11-27
+- Rezeptzusammenfassungen in Fünferpaketen laden und bis zu 24 Treffer kombinieren.
+- Rezeptdetails per Slug laden und dreispaltiges Vollbildraster ergänzen.
+
+## 0.4.5 - 2026-11-27
+- Rezeptliste direkt aus der Mealie-Antwort lesen.
+
+## 0.4.4 - 2026-11-26
+- Kompakte Rezeptfelder zur Einhaltung der Tessera-Antwortgrenze verwenden.
+
 ## 0.4.3 - 2026-11-22
-- Alle derzeit im Tessera-Katalog geführten Touchdisplays ab 7 Zoll freigeschaltet, einschließlich Hardware-Revisionen sowie Modellen von Waveshare, Guition, reTerminal, CrowPanel und Sunton.
-- Automatisierten Preview-Build für alle freigeschalteten großen Displays ergänzt.
-- Board-IDs, Auflösungen und Katalogstatus dokumentiert.
+- Große Tessera-Touchdisplays freischalten und automatisierte Preview-Builds ergänzen.
 
 ## 0.4.2 - 2026-11-22
-- Die Board-Kompatibilität auf das 10,1-Zoll-Guition JC8012P4A1 V3 korrigiert.
-- Repräsentative Such- und Rezeptdetaildaten für die offizielle Preview-Bench ergänzt.
+- Unterstütztes 10,1-Zoll-Guition JC8012P4A1 V3 korrigieren.
+- Beispieldaten für Rezeptsuche und Rezeptdetails ergänzen.
 
 ## 0.4.1 - 2026-11-19
-- Rezepte lassen sich aus der Trefferliste öffnen; Zutaten und Zubereitung werden angezeigt.
-- Die Rezeptdetailansicht zeigt Gesamtzeit und Portionen.
+- Rezepte aus der Trefferliste öffnen und Zutaten sowie Zubereitung anzeigen.
+- Gesamtzeit und Portionen in der Detailansicht anzeigen.
 
 ## 0.4.0 - 2026-11-18
 - Erstes installierbares Plugin-Grundgerüst mit Rezeptsuche.
