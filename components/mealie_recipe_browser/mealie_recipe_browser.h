@@ -22,6 +22,7 @@ class MealieRecipeBrowser : public Component, public tessera::Plugin {
   const std::vector<RecipeSummary> &recipes() const { return recipes_; }
   const std::string &status() const { return status_; }
   void on_message(JsonObjectConst message) override;
+  void on_interval(uint32_t now_ms) override;
  private:
   friend class RecipeDetailCard;
   friend class RecipeBrowserTile;
@@ -35,6 +36,10 @@ class MealieRecipeBrowser : public Component, public tessera::Plugin {
   bool recipe_page_received_[MEALIE_PAGES_PER_VIEW]{};
   size_t recipe_pages_received_ = 0;
   size_t recipe_page_failures_ = 0;
+  size_t next_mealie_page_index_ = 0;
+  uint32_t request_started_ms_ = 0;
+  void send_next_recipe_page();
+  void publish_recipe_pages();
   size_t current_page_ = 1;
   size_t total_pages_ = 1;
   size_t total_recipes_ = 0;
