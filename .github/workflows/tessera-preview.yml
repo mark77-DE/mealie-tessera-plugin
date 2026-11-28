@@ -98,3 +98,4 @@ jobs:
             plugin/.preview/
             plugin/store.png
           if-no-files-found: warn
+          include-hidden-files: true
