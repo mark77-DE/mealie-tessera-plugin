@@ -1,5 +1,7 @@
 {
-  "_meta": { "name": "English" },
+  "_meta": {
+    "name": "English"
+  },
   "screen": {
     "screen_title": "Mealie recipes",
     "searching_for": "Search: {n}",
@@ -23,7 +25,12 @@
     "servings": "servings",
     "minutes": "min",
     "no_ingredients": "No ingredients returned",
-    "no_instructions": "No instructions returned"
+    "no_instructions": "No instructions returned",
+    "search_placeholder": "Search (coming soon)",
+    "previous_page": "‹ Previous",
+    "next_page": "Next ›",
+    "page_status": "Page %u of %u",
+    "result_count": "%u recipes total"
   },
   "app": {
     "name": "Mealie Recipe Browser",
