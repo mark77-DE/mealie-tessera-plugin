@@ -2,7 +2,7 @@ name: Tessera plugin validation and store image
 
 on:
   push:
-    branches: [main]
+    branches: [main, native-ha-services]
     paths:
       - "tessera-plugin.yaml"
       - "plugin.yaml"
