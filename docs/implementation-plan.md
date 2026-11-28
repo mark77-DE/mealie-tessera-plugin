@@ -1,179 +1,111 @@
-# Mealie Recipe Browser – Implementierungsplan für Tessera
+# Mealie Recipe Browser – Implementierungsplan
 
-> Dieses Dokument ist die verbindliche Projektübergabe für Entwickler und unterstützende KI-Systeme. Vor Änderungen zuerst dieses Dokument, `docs/architecture.md`, `docs/shared-data-contract.md` und die Bridge-Dokumentation lesen.
+Dieses Dokument beschreibt den verbindlichen Zielzustand und den aktuellen Umbau auf native Home-Assistant-Funktionen.
 
 ## 1. Projektziel
 
 Ein eigenständiger Mealie-Rezeptbrowser als Vollbild-Ansicht in Tessera für das GUITION-Display. Die bestehende Tessera-Startseite und andere Dashboard-Seiten bleiben unverändert.
 
-Zielgerät: GUITION mit 1280 × 800 Pixeln. Die Rezeptübersicht nutzt den gesamten Bildschirm.
+Ziel-Layout: Kopfbereich, linke Navigation mit Suche und Kategorien sowie eine rechte Rezeptfläche mit 3 Spalten × 8 Reihen. Bis zu 24 Rezepte werden gleichzeitig angezeigt.
 
-## 2. Ziel-Layout
+## 2. Verbindliche Architektur
 
-Die Oberfläche ist in einen Kopfbereich, eine linke Navigationsspalte und eine rechte Rezeptfläche aufgeteilt.
+Tessera spricht ausschließlich über den nativen Home-Assistant-Command-Kanal mit der **Mealie Tessera Bridge**.
 
 ```text
-┌──────────────────────────────────────────────────────────────────────┐
-│                           Mealie Rezepte                              │
-├───────────────────┬──────────────────────────────────────────────────┤
-│ Suche             │  Rezept 01 │ Rezept 02 │ Rezept 03                │
-│ [______________]  │────────────┼────────────┼────────────             │
-│                   │  Rezept 04 │ Rezept 05 │ Rezept 06                │
-│ Alle Rezepte      │────────────┼────────────┼────────────             │
-│ Kategorie A       │  Rezept 07 │ Rezept 08 │ Rezept 09                │
-│ Kategorie B       │────────────┼────────────┼────────────             │
-│ Kategorie C       │  ...       │ ...        │ ...                     │
-│ ...               │                                              ...  │
-│                   │  bis zu 24 Rezepte (3 Spalten × 8 Reihen)         │
-│                   │                                                  │
-│                   │  ‹ Zurück          Seite 1 / N          Weiter › │
-└───────────────────┴──────────────────────────────────────────────────┘
+Mealie
+  ↕
+Offizielle Mealie-Integration in Home Assistant
+  ↕ vorhandener authentifizierter Client
+Mealie Tessera Bridge (HA Custom Integration)
+  ↕ native HA Response Services
+Tessera-App / Mealie Recipe Browser
+  ↕
+GUITION Display
 ```
 
-### Kopfbereich
-- Überschrift: **Mealie Rezepte**.
-- Der Kopfbereich erstreckt sich über die gesamte Displaybreite.
+Tessera enthält keine Mealie-URL, IP-Adresse, API-Zugangsdaten oder Bridge-Token. Im Tessera-Manifest gibt es keine `permissions.network`, keine Fetch-URLs und keine Secret-Inputs.
 
-### Linke Navigationsspalte
-- Suchfeld.
-- Dynamisch geladene Kategorien.
-- Eintrag **Alle Rezepte** als Standardauswahl.
-- Kategorien sind Single-Select; die Suche kann zusätzlich zur Kategorie aktiv sein.
-- Lange Kategorienamen müssen lesbar gekürzt oder umgebrochen werden.
+## 3. Native Home-Assistant-Services
 
-### Rechte Rezeptfläche
-- Drei Spalten und acht Reihen.
-- Maximal 24 Rezeptkacheln gleichzeitig.
-- Eine Kachel zeigt mindestens Rezeptname, Gesamtzeit und Portionen.
-- Leere Plätze bei weniger als 24 Treffern bleiben leer und erzeugen keine Dummy-Rezepte.
-
-### Pagination
-- Navigation **Zurück / Weiter** und Anzeige der aktuellen Seite.
-- Die tatsächliche Seitenzahl kommt aus den Mealie-Pagination-Metadaten.
-- Die Tessera-Ansicht fordert fünf Rezepte je Bridge-Anfrage an und sammelt mehrere Antworten bis zu 24 Kacheln gefüllt sind oder keine weiteren Treffer existieren.
-- Beim Wechsel der Displayseite wird die nächste Gruppe von bis zu 24 Treffern geladen.
-
-## 3. Filtersemantik – verbindlich
-
-Die Filter gelten für die gesamte Trefferliste und nicht nur für eine einzelne Mealie-Teilantwort.
-
-| Aktion | Erwartetes Verhalten |
-|---|---|
-| Rezeptbrowser öffnen | Alle Rezepte, Seite 1 |
-| Kategorie auswählen | Kategorie aktivieren, Seite 1 neu laden |
-| Suche ändern | Suche anwenden, Seite 1 neu laden |
-| Suche + Kategorie | Beide Filter gleichzeitig anwenden |
-| Weiter blättern | Nächste 24 Treffer mit unveränderten Filtern |
-| Zurück blättern | Vorherige 24 Treffer mit unveränderten Filtern |
-| Alle Rezepte | Kategorie zurücksetzen; Suchtext bleibt nur dann bestehen, wenn er bewusst nicht gelöscht wird |
-
-**Wichtig:** Seite 2 darf nicht plötzlich ungefilterte Rezepte anzeigen. Suche und Kategorie werden bei jeder Anfrage erneut an die Bridge übergeben.
-
-Ein Wechsel von Kategorie oder Suchtext setzt die Tessera-Seitennummer auf 1 und verwirft den bisherigen Seitenpuffer.
-
-## 4. Datenarchitektur
-
-Tessera spricht ausschließlich mit der Home-Assistant-Bridge, nicht direkt mit Mealie.
-
-- Bridge-Projekt: [mark77-DE/mealie-tessera-bridge](https://github.com/mark77-DE/mealie-tessera-bridge)
-- Basis-URL: `/api/mealie-tessera`
-- Authentifizierung: `Authorization: Bearer <Bridge-Key>`
-
-| Tessera-Anfrage | Bridge-Endpunkt | Zweck |
+| Service | Eingaben | Aufgabe |
 |---|---|---|
-| Rezeptseite | `GET /recipes?page=N&search=...&category=...` | maximal fünf Rezeptzusammenfassungen |
-| Kategorien | `GET /categories` | dynamische Kategorien aus Mealie |
-| Detail | `GET /recipe/{slug}` | vollständige Daten eines ausgewählten Rezepts |
+| `mealie_tessera_bridge.get_recipes` | `page`, optional `search`, optional `category` | Eine Seite mit fünf Rezeptzusammenfassungen |
+| `mealie_tessera_bridge.get_categories` | keine | Dynamische Kategorienliste |
+| `mealie_tessera_bridge.get_recipe` | `slug` | Kompakte Rezeptdetails |
 
-Der lange Mealie-API-Token verbleibt in Home Assistant. Tessera erhält nur den separaten Bridge-Key. Der Key darf nicht in Firmware, Screenshots, Fixtures oder Git eingecheckt werden.
+Das Plugin deklariert die drei Aufrufe in `permissions.ha_commands` und fragt sie mit `tessera::send()` ab.
 
-### Datenverarbeitung und Speicherstrategie
+Tessera begrenzt Antworten auf etwa 3 KB und Textfelder auf 48 Bytes. Deshalb bleiben Listenaufrufe bei fünf Rezepten pro Antwort. Die UI sammelt mehrere Antworten für bis zu 24 Kacheln.
 
-- Für die Kachelübersicht nur Zusammenfassungsdaten laden.
-- Fünf Rezepte je Bridge-Aufruf; Antworten puffern, bis bis zu 24 Kacheln gefüllt sind.
-- Nicht die vollständige Rezeptdatenbank auf einmal laden.
-- Gesamtzahl und Seitenzahl aus der Bridge-/Mealie-Antwort übernehmen.
-- Rezeptdetails erst nach Touch auf eine Kachel laden.
-- Strukturierte Zutatenfelder aus dem Detailobjekt unverändert erhalten. Nicht nur `display` speichern: spätere Portionsanpassung benötigt u. a. `quantity`, `unit` und `food`.
+## 4. Filter und Pagination
 
-## 5. Bedienungs- und Zustandsmodell
+- Suche und Kategorie sind kombinierbar.
+- Jede Seitenanfrage übergibt die aktiven Filter erneut.
+- Ein Filterwechsel setzt die Displayseite auf 1 und leert den bisherigen Puffer.
+- Eine Displayseite umfasst bis zu 24 Rezepte.
+- Die Mealie-Seiten werden in Fünferpaketen geladen.
+- Antworten aus einem vorherigen Filterzustand dürfen nicht in die neue Liste gelangen.
+- Die nächste Displayseite lädt den nächsten Bereich der gefilterten Treffer.
 
-Der Zustand der Rezeptübersicht umfasst mindestens:
+## 5. Aktueller Umsetzungsstand
 
-- `searchText`
-- `selectedCategoryId` (leer = alle Kategorien)
-- `displayPage` (1-basiert; eine Displayseite entspricht bis zu 24 Treffern)
-- `totalRecipes` und `totalPages` für die aktuelle Filterkombination
-- `recipeBuffer` mit maximal 24 Rezeptzusammenfassungen
-- `isLoading` und einen sichtbaren Fehlerstatus
+### Phase A – Home-Assistant-Bridge
 
-Ein Filterwechsel muss alte asynchrone Antworten verwerfen, damit Ergebnisse einer vorherigen Suche nicht in der neuen Liste erscheinen.
+- [x] Vorhandene offizielle Mealie-Integration wiederverwenden.
+- [x] Eigenen HTTP-Endpunkt und separaten Bridge-Key entfernen.
+- [x] Native Response-Services für Rezepte, Kategorien und Details registrieren.
+- [x] Bestehende Bridge-Konfiguration migrieren.
+- [x] Servicebeschreibungen und Dokumentation ergänzen.
+- [ ] Services gegen die installierte Home-Assistant-/Mealie-Version live testen.
+- [ ] Mealie-Kategorien und Filterparameter live verifizieren.
+- [ ] Fehlerfälle und Antwortgrößen testen.
 
-Die Bridge-Seitennummer und die Tessera-Displayseite sind nicht dasselbe: Bei fünf Einträgen pro Bridge-Aufruf werden für eine Displayseite bis zu fünf Bridge-Seiten benötigt. Für die nächste Displayseite wird der entsprechende nächste Bereich angefordert. Die Implementierung muss dabei die Mealie-Seitennummern aus dem aktuellen Filterzustand ableiten.
+### Phase B – Tessera-Transport
 
-## 6. Umsetzungsreihenfolge
+- [x] Direkte Mealie-HTTP-Fetches aus dem Manifest entfernen.
+- [x] Mealie-Token-Input entfernen.
+- [x] Tessera auf native HA-Response-Commands umstellen.
+- [x] Preview-Fixtures auf HA-Commands umstellen.
+- [ ] Preview Bench mit allen Zielboards ausführen.
+- [ ] Echte Antworten aus Home Assistant testen.
 
-### Phase A – Bridge
-- [x] Vorhandene Mealie-Integration in Home Assistant wiederverwenden
-- [x] Separaten Bridge-Key bereitstellen
-- [x] Rezeptdetail-Endpunkt
-- [x] Fünf Rezepte je Listenanfrage
-- [ ] Rohes Pagination-Metadatum vollständig durchreichen und live verifizieren
-- [ ] Kategorien-Endpunkt gegen die installierte Mealie-Version verifizieren
-- [ ] Suchparameter und Kategorie-ID-Filter live verifizieren
-- [ ] Tests für leere Treffer, letzte Seite, ungültige Filter und Authentifizierung
+### Phase C – Rezeptübersicht
 
-### Phase B – Tessera-Rezeptübersicht
-- [ ] Direkte Mealie-Verbindung und Mealie-Token-Eingabe durch Bridge-Verbindung ersetzen
-- [ ] Konfigurierbare Bridge-Basis-URL und Bridge-Key als Plugin-Einstellungen, sofern Tessera dies unterstützt
-- [ ] Kopfbereich und linke Navigationsspalte umsetzen
-- [ ] Kategorien dynamisch laden und anzeigen
-- [ ] Suche implementieren
-- [ ] Suche und Kategorie kombinieren
-- [ ] 3×8-Kachelraster mit bis zu 24 Treffern
-- [ ] Pufferung der fünfteiligen Bridge-Antworten
-- [ ] Pagination mit stabilen Filtern
-- [ ] Lade-, Leer- und Fehlerzustände
+- [ ] Dynamische Kategorienliste in der UI anzeigen.
+- [ ] Suchfeld anbinden.
+- [ ] Kategorie- und Suchfilter kombinieren.
+- [ ] 3×8-Kachelraster mit bis zu 24 Treffern vervollständigen.
+- [ ] Pufferung und Display-Pagination vollständig implementieren.
+- [ ] Veraltete asynchrone Antworten sicher verwerfen.
+- [ ] Lade-, Leer- und Fehlerzustände prüfen.
 
-### Phase C – Rezeptdetails
-- [ ] Vollständige Details bei Auswahl laden
-- [ ] Zutaten und Schritte ohne willkürliche Kürzung darstellen
-- [ ] Strukturierte Zutaten für spätere Portionsanpassung erhalten
+### Phase D – Rezeptdetails und Kochfunktionen
 
-### Phase D – spätere Kochfunktionen
-- [ ] Portionszahl ändern und Mengen skalieren
-- [ ] Zutaten abhaken
-- [ ] Schritt-für-Schritt-Kochansicht
-- [ ] Vorheriger/nächster Schritt
-- [ ] Optionaler Timer
+- [x] Erste kompakte Detailantwort mit Zeit, Portionen, sechs Zutaten und drei Schritten.
+- [ ] Zutaten und Schritte abschnittsweise nachladen.
+- [ ] Strukturierte Mengen und Einheiten für spätere Portionsskalierung erhalten.
+- [ ] Portionszahl ändern und Mengen skalieren.
+- [ ] Zutaten abhaken und Schritt-für-Schritt-Kochansicht ergänzen.
 
 ### Phase E – Tests und Release
-- [ ] Preview Bench
-- [ ] Layout bei 1280×800 prüfen
-- [ ] Touch-Ziele und Lesbarkeit prüfen
-- [ ] Speicherbedarf und Ladezeiten prüfen
-- [ ] Test auf dem realen GUITION-Display
 
-## 7. Regeln für weitere KI-Systeme und Entwickler
+- [ ] Offiziellen Tessera Checker ausführen.
+- [ ] Preview Bench für die unterstützten großen Displays ausführen.
+- [ ] Layout bei 1280×800 prüfen.
+- [ ] Touch-Ziele, Lesbarkeit und Speicherverbrauch prüfen.
+- [ ] Auf dem realen GUITION-Display testen.
 
-1. **Vor jeder Änderung Repository-Dokumentation lesen.** Insbesondere dieses Dokument und den gemeinsamen Datenvertrag.
-2. **Keine erfundenen API-Felder oder Routen.** Mealie-Version und echte Antwort prüfen. Die lokale Mealie-API-Dokumentation unter `/docs` ist maßgeblich.
-3. **Bridge statt direkter Mealie-Zugriff.** Tessera darf keinen Mealie-Token verlangen oder speichern.
-4. **Filterzustand erhalten.** Kategorie und Suche müssen über alle Seiten hinweg aktiv bleiben.
-5. **Kleine, nachvollziehbare Commits.** Änderungen und Gründe dokumentieren.
-6. **Keine bestehenden Tessera-Dashboard-Seiten überschreiben.** Der Browser bleibt eine eigenständige Plugin-Ansicht.
-7. **Keine Secrets committen.** Niemals echte URLs mit privaten Pfaden, Tokens oder Bridge-Keys in Fixtures oder Dokumentation aufnehmen.
-8. **Strukturierte Rezeptdaten bewahren.** Für zukünftige Portionsskalierung dürfen Zutatenmengen und Einheiten nicht auf formatierten Text reduziert werden.
-9. **Unfertige Funktionen ehrlich markieren.** Ein Dokumentations-Häkchen bedeutet erst dann erledigt, wenn Implementierung und passende Tests vorhanden sind.
+## 6. Wichtige technische Hinweise
 
-## 8. Aktuelle wichtige Entscheidungen
+- Die HA-Bridge nutzt den bereits authentifizierten Mealie-Client.
+- Keine privaten URLs, IP-Adressen, Tokens oder Config-Entry-IDs in Git einchecken.
+- Rezeptzusammenfassungen bleiben kompakt.
+- Die aktuelle Detailantwort ist bewusst begrenzt. Für vollständige Rezepte ist eine abschnittsweise Übertragung erforderlich.
+- Mealie-interne API-Routen und Parameter werden ausschließlich in der HA-Bridge verwendet.
+- Keine Hardwaretests behaupten, solange sie nicht tatsächlich durchgeführt wurden.
 
-- Vollbild-Rezeptbrowser auf dem GUITION, kein Lovelace-Dashboard.
-- Layout: Kopfzeile + linke Navigation + rechte 3×8-Rezeptfläche.
-- Bis zu 24 Rezepte pro Displayseite.
-- Mealie liefert dynamische Kategorien.
-- Kategorie und Suche sind kombinierbar.
-- Filter bleiben beim Blättern aktiv.
-- Bridge-Anfragen holen fünf Rezepte auf einmal.
-- Rezeptdetails werden on demand geladen.
-- Portionsanpassung ist spätere Ausbaustufe, deshalb strukturierte Zutaten erhalten.
+## 7. Repositorys
+
+- [Mealie Tessera Bridge](https://github.com/mark77-DE/mealie-tessera-bridge)
+- [Mealie Tessera Plugin](https://github.com/mark77-DE/mealie-tessera-plugin)
