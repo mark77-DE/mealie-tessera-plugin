@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.2 - 2026-11-28
+- Display up to 20 recipes per Tessera page and fetch five Mealie pages per view.
+- Tighten recipe card metadata spacing and improve footer pagination arrows.
+- Document layout measurements and spacing in `docs/ui-layout.md` and `mealie_style.h`.
+
 ## 0.5.1 - 2026-11-28
 - Add diagnostics for Home Assistant recipe-service requests and responses.
 - Keep partial recipe results visible while additional pages load.
