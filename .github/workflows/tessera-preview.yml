@@ -4,6 +4,8 @@ on:
   push:
     branches: [main, native-ha-services]
     paths:
+      - "CHANGELOG.md"
+      - "CHANGELOG.de.md"
       - "tessera-plugin.yaml"
       - "plugin.yaml"
       - "preview.yaml"
