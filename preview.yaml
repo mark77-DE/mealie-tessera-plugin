@@ -8,6 +8,10 @@ tiles:
 
 commands:
   "call_service:mealie_tessera_bridge.get_recipes":
+    # The preview returns 24 sample recipes for every call; total=48 exposes page 2.
+    total: 48
+    total_pages: 12
+    per_page: 4
     items:
       - { id: pasta-mit-tomatensauce, name: "Pasta mit Tomatensauce", seconds: 1800, servings: 4 }
       - { id: cremige-knoblauch-pasta, name: "Cremige Knoblauch-Pasta", seconds: 1500, servings: 2 }
