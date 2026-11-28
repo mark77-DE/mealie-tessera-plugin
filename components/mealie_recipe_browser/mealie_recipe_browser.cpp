@@ -112,19 +112,19 @@ class RecipeBrowserTile : public tessera::Tile {
                       ui::px(st::CARD_META_HEIGHT_PX));
     }
 
-    previous_ = ui::label(c.parent, st::LIST_STATUS_FONT, st::LIST_TITLE_COLOR);
+    previous_ = ui::label(c.parent, st::NAV_ARROW_FONT, st::LIST_TITLE_COLOR);
     lv_obj_set_pos(previous_, 0, footer_y_);
-    lv_obj_set_size(previous_, width_ / 3, footer_height_);
-    ui::set_text(previous_, plugin_->text("previous_page"));
+    lv_obj_set_size(previous_, width_ / 5, footer_height_);
+    ui::set_text(previous_, "←");
 
     page_status_ = ui::label(c.parent, st::LIST_STATUS_FONT, st::LIST_TITLE_COLOR);
-    lv_obj_set_pos(page_status_, width_ / 3, footer_y_);
-    lv_obj_set_size(page_status_, width_ / 3, footer_height_);
+    lv_obj_set_pos(page_status_, width_ / 5, footer_y_);
+    lv_obj_set_size(page_status_, width_ * 3 / 5, footer_height_);
 
-    next_ = ui::label(c.parent, st::LIST_STATUS_FONT, st::LIST_TITLE_COLOR);
-    lv_obj_set_pos(next_, width_ * 2 / 3, footer_y_);
-    lv_obj_set_size(next_, width_ / 3, footer_height_);
-    ui::set_text(next_, plugin_->text("next_page"));
+    next_ = ui::label(c.parent, st::NAV_ARROW_FONT, st::LIST_TITLE_COLOR);
+    lv_obj_set_pos(next_, width_ * 4 / 5, footer_y_);
+    lv_obj_set_size(next_, width_ / 5, footer_height_);
+    ui::set_text(next_, "→");
 
     update_cards();
     plugin_->load_recipes();
@@ -152,9 +152,9 @@ class RecipeBrowserTile : public tessera::Tile {
     const int ax = pa.x1 + p.x;
     const int ay = pa.y1 + p.y;
     if (p.y >= footer_y_ && p.y < height_) {
-      if (p.x < width_ / 3 && plugin_->current_page_ > 1)
+      if (p.x < width_ / 5 && plugin_->current_page_ > 1)
         plugin_->load_page(plugin_->current_page_ - 1);
-      else if (p.x >= width_ * 2 / 3 && plugin_->current_page_ < plugin_->total_pages_)
+      else if (p.x >= width_ * 4 / 5 && plugin_->current_page_ < plugin_->total_pages_)
         plugin_->load_page(plugin_->current_page_ + 1);
       return;
     }
@@ -221,10 +221,20 @@ class RecipeBrowserTile : public tessera::Tile {
     snprintf(page_text, sizeof(page_text), plugin_->text("page_status"),
              static_cast<unsigned>(plugin_->current_page_), static_cast<unsigned>(plugin_->total_pages_));
     ui::set_text(page_status_, page_text);
-    if (plugin_->current_page_ <= 1) lv_obj_add_state(previous_, LV_STATE_DISABLED);
-    else lv_obj_clear_state(previous_, LV_STATE_DISABLED);
-    if (plugin_->current_page_ >= plugin_->total_pages_) lv_obj_add_state(next_, LV_STATE_DISABLED);
-    else lv_obj_clear_state(next_, LV_STATE_DISABLED);
+    if (plugin_->current_page_ <= 1) {
+      lv_obj_add_state(previous_, LV_STATE_DISABLED);
+      ui::set_color(previous_, st::LIST_STATUS_COLOR);
+    } else {
+      lv_obj_clear_state(previous_, LV_STATE_DISABLED);
+      ui::set_color(previous_, st::LIST_TITLE_COLOR);
+    }
+    if (plugin_->current_page_ >= plugin_->total_pages_) {
+      lv_obj_add_state(next_, LV_STATE_DISABLED);
+      ui::set_color(next_, st::LIST_STATUS_COLOR);
+    } else {
+      lv_obj_clear_state(next_, LV_STATE_DISABLED);
+      ui::set_color(next_, st::LIST_TITLE_COLOR);
+    }
 
     const size_t rows = (recipes.size() + st::CARD_COLUMNS - 1) / st::CARD_COLUMNS;
     const int gap = ui::px(st::CARD_GAP_PX);
@@ -234,8 +244,8 @@ class RecipeBrowserTile : public tessera::Tile {
     lv_obj_update_layout(content_);
   }
 
-  static constexpr size_t MAX_VISIBLE_RECIPES = 24;
-  static constexpr int FOOTER_HEIGHT_PX = 44;
+  static constexpr size_t MAX_VISIBLE_RECIPES = 20;
+  static constexpr int FOOTER_HEIGHT_PX = 56;
   MealieRecipeBrowser *plugin_;
   int width_ = 0;
   int height_ = 0;
