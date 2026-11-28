@@ -38,7 +38,10 @@ constexpr int CARD_NAME_HEIGHT_PX = 42;
 constexpr tessera::Font CARD_META_FONT = tessera::Font::BODY;
 constexpr theme::Role CARD_META_COLOR = theme::MUTED;
 constexpr int CARD_META_Y_PX = 46;  // metadata baseline relative to the card top; reduced from 50 px
-constexpr int CARD_META_HEIGHT_PX = 20;\n\n// Footer navigation: large arrows with a generous 20% touch target at each edge.\nconstexpr tessera::Font NAV_ARROW_FONT = tessera::Font::HEADLINE;
+constexpr int CARD_META_HEIGHT_PX = 20;
+
+// Footer navigation: large arrows with a generous 20% touch target at each edge.
+constexpr tessera::Font NAV_ARROW_FONT = tessera::Font::HEADLINE;
 
 // ---------------------------------------------------------------------------------------------------------------
 // Recipe card (the detail view; its title bar is set by Tessera and cannot be changed here)
