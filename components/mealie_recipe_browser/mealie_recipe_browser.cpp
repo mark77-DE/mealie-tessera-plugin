@@ -1,10 +1,12 @@
 #include "mealie_recipe_browser.h"
 #include "mealie_style.h"
+#include "esphome/core/log.h"
 #include <cstdio>
 #include <string>
 #include <utility>
 
 namespace esphome::mealie_recipe_browser {
+static const char *const TAG = "mealie_recipe_browser";
 namespace ui = tessera::ui;
 namespace st = style;
 
@@ -212,9 +214,6 @@ class RecipeBrowserTile : public tessera::Tile {
                static_cast<unsigned>(recipes.size()));
     } else {
       snprintf(count_text, sizeof(count_text), "%s", plugin_->text(plugin_->status().c_str()));
-    }
-    if (plugin_->status() == "loading") {
-      snprintf(count_text, sizeof(count_text), "%s", plugin_->text("loading"));
     }
     ui::set_text(status_label_, count_text);
 
@@ -428,8 +427,12 @@ void MealieRecipeBrowser::send_next_recipe_page() {
     if (id) {
       recipe_request_ids_[index] = id;
       request_started_ms_ = millis();
+      ESP_LOGI(TAG, "Requested Mealie page %u (request %u)",
+               static_cast<unsigned>(first_mealie_page + index), static_cast<unsigned>(id));
       return;
     }
+    ESP_LOGW(TAG, "Could not send request for Mealie page %u",
+             static_cast<unsigned>(first_mealie_page + index));
     recipe_page_received_[index] = true;
     ++recipe_pages_received_;
     ++recipe_page_failures_;
@@ -480,13 +483,19 @@ void MealieRecipeBrowser::on_message(JsonObjectConst message) {
   ++recipe_pages_received_;
   recipe_page_received_[page_index] = true;
   if (!(message["ok"] | false)) {
+    const char *error = message["error"] | "unknown";
+    ESP_LOGW(TAG, "Mealie page request %u failed: %s", static_cast<unsigned>(received_id), error);
     ++recipe_page_failures_;
   } else {
     JsonObjectConst result = message["result"].as<JsonObjectConst>();
     JsonArrayConst items = result["items"].as<JsonArrayConst>();
     if (items.isNull()) {
+      ESP_LOGW(TAG, "Mealie page request %u returned no items array", static_cast<unsigned>(received_id));
       ++recipe_page_failures_;
     } else {
+      ESP_LOGI(TAG, "Mealie page response %u: %u items, total %u",
+               static_cast<unsigned>(received_id), static_cast<unsigned>(items.size()),
+               static_cast<unsigned>(result["total"] | 0u));
       total_recipes_ = result["total"] | total_recipes_;
       for (JsonObjectConst item : items) {
         RecipeSummary recipe;
@@ -519,6 +528,8 @@ void MealieRecipeBrowser::on_interval(uint32_t now_ms) {
 
   for (size_t i = 0; i < MEALIE_PAGES_PER_VIEW; ++i) {
     if (recipe_request_ids_[i] == 0) continue;
+    ESP_LOGW(TAG, "Timed out waiting for Mealie page request %u",
+             static_cast<unsigned>(recipe_request_ids_[i]));
     recipe_request_ids_[i] = 0;
     recipe_page_received_[i] = true;
     ++recipe_pages_received_;
