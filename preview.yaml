@@ -1,5 +1,4 @@
-# Representative Mealie API responses for the Tessera preview bench.
-# The list fixture has five pages of five recipes; the plugin displays the first 24.
+# Home Assistant command responses used by the native Tessera bridge.
 time_zone: Europe/Berlin
 
 tiles:
@@ -7,57 +6,53 @@ tiles:
     name: 01-Rezeptbrowser
     sizes: [full]
 
-answers:
-  recipes:
-    "page=1":
-      items:
-        - { slug: "pasta-mit-tomatensauce", name: "Pasta mit Tomatensauce", totalTimeSeconds: 1800, recipeServings: 4 }
-        - { slug: "cremige-knoblauch-pasta", name: "Cremige Knoblauch-Pasta", totalTimeSeconds: 1500, recipeServings: 2 }
-        - { slug: "ofengemuese-mit-kraeutern", name: "Ofengemüse mit Kräutern", totalTimeSeconds: 2700, recipeServings: 3 }
-        - { slug: "mediterraner-nudelsalat", name: "Mediterraner Nudelsalat mit Tomaten und Rucola", totalTimeSeconds: 1200, recipeServings: 4 }
-        - { slug: "cremige-kuerbissuppe", name: "Cremige Kürbissuppe", totalTimeSeconds: 2100, recipeServings: 6 }
-    "page=2":
-      items:
-        - { slug: "ofenkartoffeln-rosmarin", name: "Knusprige Ofenkartoffeln mit Rosmarin", totalTimeSeconds: 2400, recipeServings: 2 }
-        - { slug: "couscous-salat", name: "Bunter Couscous-Salat mit geröstetem Gemüse", totalTimeSeconds: 1800, recipeServings: 4 }
-        - { slug: "schokoladenkuchen", name: "Schokoladenkuchen mit flüssigem Kern", totalTimeSeconds: 1500, recipeServings: 6 }
-        - { slug: "gemuese-lasagne", name: "Gemüse-Lasagne", totalTimeSeconds: 3600, recipeServings: 4 }
-        - { slug: "kartoffelgratin", name: "Kartoffelgratin mit Bergkäse", totalTimeSeconds: 3000, recipeServings: 4 }
-    "page=3":
-      items:
-        - { slug: "tomaten-mozzarella-salat", name: "Tomaten-Mozzarella-Salat", totalTimeSeconds: 600, recipeServings: 2 }
-        - { slug: "linseneintopf", name: "Herzhafter Linseneintopf", totalTimeSeconds: 2700, recipeServings: 4 }
-        - { slug: "apfelpfannkuchen", name: "Apfelpfannkuchen", totalTimeSeconds: 1200, recipeServings: 3 }
-        - { slug: "haehnchen-curry", name: "Hähnchen-Curry mit Reis", totalTimeSeconds: 2400, recipeServings: 4 }
-        - { slug: "kuerbisrisotto", name: "Cremiges Kürbisrisotto", totalTimeSeconds: 2100, recipeServings: 3 }
-    "page=4":
-      items:
-        - { slug: "pizza-margherita", name: "Pizza Margherita", totalTimeSeconds: 1800, recipeServings: 2 }
-        - { slug: "brokkoli-auflauf", name: "Brokkoli-Auflauf", totalTimeSeconds: 2400, recipeServings: 4 }
-        - { slug: "pancakes", name: "Fluffige Pancakes", totalTimeSeconds: 900, recipeServings: 4 }
-        - { slug: "gemuesesuppe", name: "Bunte Gemüsesuppe", totalTimeSeconds: 1800, recipeServings: 4 }
-        - { slug: "wraps", name: "Wraps mit Ofengemüse", totalTimeSeconds: 1500, recipeServings: 2 }
-    "page=5":
-      items:
-        - { slug: "zitronenkuchen", name: "Saftiger Zitronenkuchen", totalTimeSeconds: 3000, recipeServings: 8 }
-        - { slug: "falafel", name: "Falafel mit Joghurtsauce", totalTimeSeconds: 2400, recipeServings: 4 }
-        - { slug: "bratkartoffeln", name: "Bratkartoffeln mit Kräutern", totalTimeSeconds: 1800, recipeServings: 2 }
-        - { slug: "haferkekse", name: "Knusprige Haferkekse", totalTimeSeconds: 1500, recipeServings: 20 }
-        - { slug: "tomatensuppe", name: "Cremige Tomatensuppe", totalTimeSeconds: 1200, recipeServings: 4 }
+commands:
+  "call_service:mealie_tessera_bridge.get_recipes":
+    # The preview returns 24 sample recipes for every call; total=48 exposes page 2.
+    total: 48
+    total_pages: 12
+    per_page: 4
+    items:
+      - { id: pasta-mit-tomatensauce, name: "Pasta mit Tomatensauce", seconds: 1800, servings: 4 }
+      - { id: cremige-knoblauch-pasta, name: "Cremige Knoblauch-Pasta", seconds: 1500, servings: 2 }
+      - { id: ofengemuese-mit-kraeutern, name: "Ofengemüse mit Kräutern", seconds: 2700, servings: 3 }
+      - { id: mediterraner-nudelsalat, name: "Mediterraner Nudelsalat mit Tomaten und Rucola", seconds: 1200, servings: 4 }
+      - { id: cremige-kuerbissuppe, name: "Cremige Kürbissuppe", seconds: 2100, servings: 6 }
+      - { id: ofenkartoffeln-rosmarin, name: "Knusprige Ofenkartoffeln mit Rosmarin", seconds: 2400, servings: 2 }
+      - { id: couscous-salat, name: "Bunter Couscous-Salat mit geröstetem Gemüse", seconds: 1800, servings: 4 }
+      - { id: schokoladenkuchen, name: "Schokoladenkuchen mit flüssigem Kern", seconds: 1500, servings: 6 }
+      - { id: gemuese-lasagne, name: "Gemüse-Lasagne", seconds: 3600, servings: 4 }
+      - { id: kartoffelgratin, name: "Kartoffelgratin mit Bergkäse", seconds: 3000, servings: 4 }
+      - { id: tomaten-mozzarella-salat, name: "Tomaten-Mozzarella-Salat", seconds: 600, servings: 2 }
+      - { id: linseneintopf, name: "Herzhafter Linseneintopf", seconds: 2700, servings: 4 }
+      - { id: apfelpfannkuchen, name: "Apfelpfannkuchen", seconds: 1200, servings: 3 }
+      - { id: haehnchen-curry, name: "Hähnchen-Curry mit Reis", seconds: 2400, servings: 4 }
+      - { id: kuerbisrisotto, name: "Cremiges Kürbisrisotto", seconds: 2100, servings: 3 }
+      - { id: pizza-margherita, name: "Pizza Margherita", seconds: 1800, servings: 2 }
+      - { id: brokkoli-auflauf, name: "Brokkoli-Auflauf", seconds: 2400, servings: 4 }
+      - { id: pancakes, name: "Fluffige Pancakes", seconds: 900, servings: 4 }
+      - { id: gemuesesuppe, name: "Bunte Gemüsesuppe", seconds: 1800, servings: 4 }
+      - { id: wraps, name: "Wraps mit Ofengemüse", seconds: 1500, servings: 2 }
+      - { id: zitronenkuchen, name: "Saftiger Zitronenkuchen", seconds: 3000, servings: 8 }
+      - { id: falafel, name: "Falafel mit Joghurtsauce", seconds: 2400, servings: 4 }
+      - { id: bratkartoffeln, name: "Bratkartoffeln mit Kräutern", seconds: 1800, servings: 2 }
+      - { id: haferkekse, name: "Knusprige Haferkekse", seconds: 1500, servings: 20 }
 
-  recipe:
-    "slug=pasta-mit-tomatensauce":
-      name: "Pasta mit Tomatensauce"
-      totalTimeSeconds: 1800
-      recipeServings: 4
-      recipeIngredient:
-        - { display: "400 g Spaghetti" }
-        - { display: "1 Dose gehackte Tomaten" }
-        - { display: "1 Zwiebel" }
-        - { display: "2 Knoblauchzehen" }
-        - { display: "2 EL Olivenöl" }
-        - { display: "Salz und Pfeffer" }
-      recipeInstructions:
-        - { text: "Zwiebel und Knoblauch fein würfeln." }
-        - { text: "Olivenöl erhitzen und Zwiebel sowie Knoblauch glasig dünsten." }
-        - { text: "Tomaten hinzufügen und die Sauce etwa 15 Minuten köcheln lassen." }
+  "call_service:mealie_tessera_bridge.get_categories":
+    items:
+      - { id: hauptgerichte, name: "Hauptgerichte" }
+      - { id: backen, name: "Backen" }
+      - { id: suppen, name: "Suppen" }
+
+  "call_service:mealie_tessera_bridge.get_recipe":
+    time: 1800
+    serv: 4
+    i0: "400 g Spaghetti"
+    i1: "1 Dose gehackte Tomaten"
+    i2: "1 Zwiebel"
+    i3: "2 Knoblauchzehen"
+    i4: "2 EL Olivenöl"
+    i5: "Salz und Pfeffer"
+    s0: "Zwiebel und Knoblauch fein würfeln."
+    s1: "Olivenöl erhitzen und Zwiebel sowie Knoblauch glasig dünsten."
+    s2: "Tomaten hinzufügen und 15 Minuten köcheln lassen."

@@ -2,8 +2,10 @@ name: Tessera plugin validation and store image
 
 on:
   push:
-    branches: [main]
+    branches: [main, native-ha-services]
     paths:
+      - "CHANGELOG.md"
+      - "CHANGELOG.de.md"
       - "tessera-plugin.yaml"
       - "plugin.yaml"
       - "preview.yaml"
@@ -96,3 +98,4 @@ jobs:
             plugin/.preview/
             plugin/store.png
           if-no-files-found: warn
+          include-hidden-files: true

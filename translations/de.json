@@ -7,13 +7,11 @@
     "searching_for": "Suche: {n}",
     "not_loaded": "Noch nicht geladen",
     "loading": "Rezepte werden geladen …",
-    "loading_count": "%u / 24 geladen …",
     "loaded": "Rezepte geladen",
     "recipe_count": "%u Rezepte",
-    "partial_count": "%u / 24 Rezepte geladen",
     "partial_results": "Einige Rezeptseiten konnten nicht geladen werden",
     "no_results": "Keine Rezepte gefunden",
-    "missing_config": "Mealie-Verbindung zuerst konfigurieren",
+    "missing_config": "Zuerst Mealie Tessera Bridge in Home Assistant einrichten",
     "request_failed": "Anfrage konnte nicht gesendet werden",
     "service_error": "Rezepte konnten nicht von Mealie geladen werden",
     "unexpected_response": "Unerwartetes Antwortformat von Mealie",
@@ -25,15 +23,16 @@
     "servings": "Portionen",
     "minutes": "Min.",
     "no_ingredients": "Keine Zutaten zurückgegeben",
-    "no_instructions": "Keine Zubereitungsschritte zurückgegeben"
+    "no_instructions": "Keine Zubereitungsschritte zurückgegeben",
+    "search_placeholder": "Suche (bald verfügbar)",
+    "page_status": "Seite %u von %u",
+    "result_count": "%u Rezepte insgesamt"
   },
   "app": {
     "name": "Mealie-Rezeptbrowser",
-    "summary": "Bis zu 24 Mealie-Rezepte auf einem großen Tessera-Display anzeigen.",
+    "summary": "Bis zu 20 Mealie-Rezepte auf einem großen Tessera-Display anzeigen.",
     "tile_browser": "Rezeptbrowser",
     "tile_example": "Dreispaltige Rezeptübersicht aus Mealie.",
-    "api_token": "Mealie-API-Token",
-    "api_token_hint": "Einen langlebigen Mealie-API-Token einfügen. Tessera speichert ihn als Geheimnis und sendet ihn nur an deinen Mealie-Server.",
     "card_recipe": "Rezeptdetails"
   }
 }

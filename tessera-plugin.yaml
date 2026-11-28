@@ -1,5 +1,5 @@
 id: mealie_recipe_browser
-version: 0.4.7
+version: 0.5.4
 api: "0.28"
 icon: chef-hat
 maintainer: mark77-DE
@@ -12,17 +12,10 @@ boards: [jc8012p4a1, jc8012p4a1v2, jc8012p4a1v3, reterminald1001, waveshare101, 
 flash_kb: 12
 
 permissions:
-  network:
-    - luigi.mahlen.biz
-attributes: [cloud]
-privacy: https://github.com/mark77-DE/mealie-tessera-plugin#privacy
-
-inputs:
-  - id: api_token
-    kind: secret
-    scope: all
-    label: api_token
-    hint: api_token_hint
+  ha_commands:
+    - call_service:mealie_tessera_bridge.get_recipes
+    - call_service:mealie_tessera_bridge.get_categories
+    - call_service:mealie_tessera_bridge.get_recipe
 
 tiles:
   - id: browser
@@ -34,37 +27,3 @@ tiles:
 
 cards:
   - { id: recipe, name: card_recipe }
-
-fetch:
-  - id: recipes
-    asked: [page]
-    url: https://luigi.mahlen.biz/api/recipes?page={page}&perPage=5&orderBy=name&orderDirection=asc
-    headers: { Authorization: "Bearer {api_token}" }
-    every: 30s
-    map:
-      items: "$.items[*]"
-      fields:
-        id: slug
-        name: name
-        seconds: { path: totalTimeSeconds, as: number }
-        servings: { path: recipeServings, as: number }
-      limit: 5
-  - id: recipe
-    asked: [slug]
-    url: https://luigi.mahlen.biz/api/recipes/{slug}
-    headers: { Authorization: "Bearer {api_token}" }
-    every: 30s
-    map:
-      fields:
-        name: name
-        time: { path: totalTimeSeconds, as: number }
-        serv: { path: recipeServings, as: number }
-        i0: recipeIngredient[0].display
-        i1: recipeIngredient[1].display
-        i2: recipeIngredient[2].display
-        i3: recipeIngredient[3].display
-        i4: recipeIngredient[4].display
-        i5: recipeIngredient[5].display
-        s0: recipeInstructions[0].text
-        s1: recipeInstructions[1].text
-        s2: recipeInstructions[2].text

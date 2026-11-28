@@ -1,13 +1,13 @@
 # Home Assistant integration
 
-The recipe browser no longer uses Home Assistant's Mealie integration actions. Recipe summaries and recipe details are read directly from the Mealie REST API by Tessera's app-side fetch service.
+The Tessera plugin uses the native Home Assistant command channel. It does not call the Mealie API or any HTTP endpoint directly.
 
-No Mealie config-entry ID, Home Assistant long-lived token or Home Assistant service permission is required by the installed plugin.
+Install the **Mealie Tessera Bridge** custom integration and link it to the existing official Mealie integration. The bridge registers three read-only response services:
 
-See:
+- `mealie_tessera_bridge.get_recipes`
+- `mealie_tessera_bridge.get_categories`
+- `mealie_tessera_bridge.get_recipe`
 
-- [README setup and privacy](../README.md#setup)
-- [Mealie API data model](mealie-data-model.md)
-- [Live Mealie preview](live-preview.md)
+The Tessera manifest allows these commands through `permissions.ha_commands`. The Mealie URL, IP address, API token and authentication session remain inside Home Assistant. The Tessera plugin has no network permission or credential input.
 
-Home Assistant may still host the Mealie container or provide network access to it, but it is not part of the plugin's recipe data path.
+See the [Bridge repository](https://github.com/mark77-DE/mealie-tessera-bridge) for installation and service response details.
