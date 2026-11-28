@@ -166,10 +166,11 @@ class RecipeBrowserTile : public tessera::Tile {
 
   void on_tap() override {
     const tessera::Point p = tessera::tap_point();
-    lv_area_t pa;
-    lv_obj_get_coords(parent_, &pa);
-    const int ax = pa.x1 + p.x;
-    const int ay = pa.y1 + p.y;
+    if (p.x < 0 || p.y < 0) {
+      ESP_LOGW(TAG, "Tap without valid tile coordinates");
+      return;
+    }
+    // tap_point() is already relative to TileContext::parent (0,0), not screen coordinates.
     const int nav_size = ui::px(st::NAV_BUTTON_SIZE_PX);
     const int nav_y = footer_y_ + (footer_height_ - nav_size) / 2;
     if (p.y >= nav_y && p.y < nav_y + nav_size) {
@@ -186,15 +187,20 @@ class RecipeBrowserTile : public tessera::Tile {
 
     const auto &recipes = plugin_->recipes();
 
+    const int gap = ui::px(st::CARD_GAP_PX);
     for (size_t i = 0; i < recipes.size() && i < MAX_VISIBLE_RECIPES; ++i) {
-      lv_area_t a;
-      lv_obj_get_coords(cards_[i].panel, &a);
-      if (ax < a.x1 || ax > a.x2 || ay < a.y1 || ay > a.y2) continue;
+      const int card_x = (static_cast<int>(i) % st::CARD_COLUMNS) * (card_width_ + gap);
+      const int card_y = list_top_ + (static_cast<int>(i) / st::CARD_COLUMNS) * (card_height_ + gap);
+      if (p.x < card_x || p.x >= card_x + card_width_ ||
+          p.y < card_y || p.y >= card_y + card_height_) continue;
+      ESP_LOGD(TAG, "Recipe tap hit index %u at (%d,%d), card (%d,%d %dx%d)",
+               static_cast<unsigned>(i), p.x, p.y, card_x, card_y, card_width_, card_height_);
       if (recipes[i].id.empty()) return;
       plugin_->selected_recipe_id_ = recipes[i].id;
       tessera::open_card(plugin_->plugin_id(), "recipe", "", tile_, recipes[i].name);
       return;
     }
+    ESP_LOGD(TAG, "Tap missed recipe cards at tile position (%d,%d)", p.x, p.y);
   }
 
  private:
@@ -295,8 +301,8 @@ class RecipeBrowserTile : public tessera::Tile {
   lv_obj_t *next_icon_ = nullptr;
   int previous_x_ = 0;
   int next_x_ = 0;
-  lv_point_precise_t previous_points_[3] = {{21, 18}, {31, 28}, {21, 38}};
-  lv_point_precise_t next_points_[3] = {{31, 18}, {21, 28}, {31, 38}};
+  lv_point_precise_t previous_points_[3] = {{31, 18}, {21, 28}, {31, 38}};
+  lv_point_precise_t next_points_[3] = {{21, 18}, {31, 28}, {21, 38}};
   lv_obj_t *list_ = nullptr;
   lv_obj_t *content_ = nullptr;
   lv_obj_t *parent_ = nullptr;
