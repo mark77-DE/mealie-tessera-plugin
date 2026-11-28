@@ -1,65 +1,47 @@
 # Mealie-Rezeptbrowser für Tessera
 
-Rezepte aus einer Mealie-Instanz auf einem Tessera-Touchdisplay suchen und anzeigen. Das Plugin ergänzt das vorhandene Tessera-Dashboard um eine eigene Rezeptansicht. Das bestehende Dashboard und seine Seiten bleiben unverändert.
+Rezepte aus einer Mealie-Instanz auf einem Tessera-Touchdisplay suchen und anzeigen. Das Plugin nutzt ausschließlich die native Home-Assistant-Verbindung der Tessera-App. Es greift nicht direkt auf Mealie zu.
 
-> **Status: Beta / frühe Entwicklung.** Rezeptsuche und eine erste Rezeptdetailansicht sind implementiert. Bildschirmtastatur, Kategorienfilter, Seitennavigation und Kochmodus sind noch geplant. Das Plugin wurde bisher nicht auf echter Hardware gebaut oder getestet.
+> **Status: Beta / frühe Entwicklung.** Die native Anbindung an die Home-Assistant-Response-Services ist in Arbeit. Rezeptübersicht und Detailansicht werden schrittweise auf den neuen Datenweg umgestellt.
 
-## Funktionen
+## Architektur
 
-- Rezepte über die Mealie-Integration von Home Assistant suchen.
-- Rezeptnamen, Gesamtzeit und Portionen anzeigen.
-- Einen Treffer per Touch öffnen.
-- Zutaten und Zubereitung nebeneinander darstellen.
-- Die Mealie-Verbindung und Zugangsdaten in Home Assistant belassen.
+```text
+Mealie
+  ↕
+Offizielle Mealie-Integration in Home Assistant
+  ↕
+Mealie Tessera Bridge (HA Custom Integration)
+  ↕ native HA-Commands
+Tessera-App / Mealie Recipe Browser
+  ↕
+GUITION Display
+```
 
-Aktuell verwendet das Plugin die Home-Assistant-Aktionen `mealie.get_recipes` und `mealie.get_recipe`.
-
-## Zielgerät
-
-Das Plugin gibt alle derzeit im Tessera-Katalog geführten Touchdisplays ab 7 Zoll frei: unter anderem Guition JC8012P4A1 V1/V2/V3, Guition 7 Zoll, reTerminal D1001, CrowPanel, Sunton sowie Waveshare 7 Zoll und 10,1 Zoll. Die vollständige Liste mit Board-IDs und Auflösungen steht in der [Display-Kompatibilitätsliste](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/supported-displays.md). Kleinere Displays bleiben bewusst ausgeschlossen.
+Das Plugin enthält keine Mealie-IP-Adresse, URL, API-Zugangsdaten oder Bridge-Token. Es benötigt keine `permissions.network`-Freigabe. Die Mealie-Verbindung und Authentifizierung bleiben vollständig in Home Assistant.
 
 ## Einrichtung
 
-1. In Tessera **Plugins** öffnen und **Add with a link** wählen.
-2. Dieses Repository hinzufügen: [mark77-DE/mealie-tessera-plugin](https://github.com/mark77-DE/mealie-tessera-plugin).
-3. Eines der unterstützten großen Displays auswählen und das Plugin installieren.
-4. In Home Assistant **Einstellungen → Geräte & Dienste** öffnen.
-5. Beim Integrationseintrag **Mealie** das Drei-Punkte-Menü öffnen und **Eintrag-ID kopieren** auswählen.
-6. Die kopierte ID in den Plugin-Einstellungen des Displays in das Feld `config_entry_id` eintragen.
-7. Im Layout unter der Gruppe **Plugins** die Kachel **Rezeptbrowser** hinzufügen. Den anfänglichen Suchbegriff kannst du im Kachel-Inspektor ändern.
+1. Die offizielle Mealie-Integration in Home Assistant einrichten.
+2. Die [Mealie Tessera Bridge](https://github.com/mark77-DE/mealie-tessera-bridge) installieren und mit dem vorhandenen Mealie-Eintrag verknüpfen.
+3. Home Assistant neu starten bzw. die Bridge laden.
+4. Dieses Tessera-Plugin installieren.
+5. Die Rezeptbrowser-Kachel dem Tessera-Layout hinzufügen.
 
-Bei mehreren Mealie-Instanzen muss die Eintrag-ID des gewünschten Integrationseintrags kopiert werden. Die ID ist installationsspezifisch und wird nur lokal in Tessera eingetragen. Sie gehört nicht in dieses Repository.
+Es sind keine Serveradresse, kein API-Token und keine Eintrag-ID im Tessera-Plugin einzutragen.
 
-## Bekannte Einschränkungen
+## Datenabruf
 
-- Die installierte Mealie-Integration kann derzeit nicht automatisch im Plugin ausgewählt werden. Die Config-Entry-ID muss einmalig über **Eintrag-ID kopieren** manuell übernommen werden.
-- Kategorienliste und Kategorienfilter sind noch nicht angebunden.
-- Die Detailantwort wird bewusst klein gehalten. Sehr lange Rezepte können gekürzt werden, bis die abschnittsweise Übertragung umgesetzt ist.
-- Die virtuelle Vorschau in der Tessera-App kann keine Plugins installieren. Für die Darstellung gibt es eine separate Entwickler-Vorschau (Bench), die keinen physischen Bildschirm benötigt.
+- Rezepte werden in Seiten zu jeweils fünf Einträgen abgerufen.
+- Die Oberfläche kann bis zu 24 Rezepte gleichzeitig anzeigen.
+- Suche und Kategorie werden als Home-Assistant-Serviceparameter übergeben.
+- Kategorien werden dynamisch aus Mealie geladen.
+- Vollständige Rezeptdaten werden erst beim Öffnen eines Rezepts angefordert.
 
 ## Entwicklungsstand
 
-| Funktion | Stand |
-|---|---|
-| Plugin-Manifest mit großen Display-Varianten | Implementiert; Preview-Builds laufen noch |
-| Rezeptsuche über Home Assistant | Implementiert; Hardwaretest offen |
-| Rezepttrefferliste | Erste Implementierung |
-| Rezeptdetailansicht | Erste Implementierung |
-| Bildschirmtastatur | Geplant |
-| Kategorien und Filter | Geeigneter Datenweg in Home Assistant noch offen |
-| Seitennavigation | Geplant |
-| Kochmodus und Zutaten-Checkliste | Geplant |
-| Automatische Auswahl der Mealie-Integration | Derzeit nicht über die Tessera-Plugin-API verfügbar |
-
-## Dokumentation
-
-- [Architektur](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/architecture.md)
-- [Bedienkonzept](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/ui-concept.md)
-- [Home-Assistant-Aktionen und Eintrag-ID](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/home-assistant.md)
-- [Beobachtetes Mealie-Datenmodell](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/mealie-data-model.md)
-- [Tessera-Datenvertrag](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/shared-data-contract.md)
-- [Entwicklungsplan](https://github.com/mark77-DE/mealie-tessera-plugin/blob/main/docs/development.md)
+Die bisherige HTTP-/Fetch-Variante wird durch native Home-Assistant-Response-Services ersetzt. Die virtuelle Vorschau und die Serviceantworten müssen vor einem Release gemeinsam geprüft werden.
 
 ## Sicherheit
 
-Keine Home-Assistant-Tokens, Mealie-Zugangsdaten, privaten URLs, Config-Entry-IDs oder sonstigen Geheimnisse einchecken. Das Plugin ruft Mealie über Home Assistant auf und speichert keine Mealie-Zugangsdaten selbst.
+Keine Tokens, Zugangsdaten, privaten URLs, IP-Adressen oder Home-Assistant-Config-Entry-IDs in das Plugin oder Repository eintragen.
