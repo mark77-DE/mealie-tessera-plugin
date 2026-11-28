@@ -349,7 +349,7 @@ bool MealieRecipeBrowser::load_recipes() {
   bool sent_any = false;
   for (size_t i = 0; i < RECIPE_PAGE_COUNT; ++i) {
     JsonDocument request;
-    request["ask"] = "fetch:recipes";
+    request["ask"] = "call_service:mealie_tessera_bridge.get_recipes";
     request["data"]["page"] = static_cast<unsigned>(i + 1);
     recipe_request_ids_[i] = tessera::send(this, request.as<JsonObjectConst>());
     if (recipe_request_ids_[i]) {
@@ -370,7 +370,7 @@ bool MealieRecipeBrowser::load_recipes() {
 bool MealieRecipeBrowser::load_recipe(const std::string &slug) {
   if (slug.empty()) return false;
   JsonDocument request;
-  request["ask"] = "fetch:recipe";
+  request["ask"] = "call_service:mealie_tessera_bridge.get_recipe";
   request["data"]["slug"] = slug;
   detail_request_id_ = tessera::send(this, request.as<JsonObjectConst>());
   return detail_request_id_ != 0;
