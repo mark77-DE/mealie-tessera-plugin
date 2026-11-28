@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.4 - 2026-11-28
+- Richtung der Zurück-/Weiter-Pfeile korrigiert.
+- Für die Trefferprüfung die von Tessera dokumentierten Tile-relativen Touchkoordinaten direkt verwenden, ohne Bildschirmkoordinaten-Offset.
+- Debug-Protokollierung für erkannte und nicht zugeordnete Rezeptberührungen ergänzt.
+
 ## 0.5.3 - 2026-11-28
 - Nicht unterstützte Pfeilzeichen durch klar erkennbare quadratische Navigationstasten mit gezeichneten Pfeilen ersetzen.
 - Seitenwechsel nur noch innerhalb der sichtbaren quadratischen Touchflächen auslösen.
