@@ -2,6 +2,8 @@
 
 The goal is an installable Tessera recipe browser for large 1280 × 800 touch displays. A separate Lovelace card is not part of the project.
 
+The agreed target behavior and handoff rules are in [implementation-plan.md](implementation-plan.md).
+
 ## Phase 0 – Foundations
 - [x] GitHub repository created
 - [x] Mealie data model reviewed
@@ -11,36 +13,52 @@ The goal is an installable Tessera recipe browser for large 1280 × 800 touch di
 - [x] Plugin API 0.28 and official manifest schema reviewed
 - [x] Plugin skeleton and full-screen tile created
 
-## Phase 1 – Data path
-- [x] Direct Mealie API access selected
-- [x] Tessera secret input for the Mealie API token
-- [x] Paginated recipe summary fetch (five pages of five)
-- [x] Compact recipe summary mapping
-- [x] On-demand recipe detail fetch by slug
-- [x] Representative list and detail fixtures added
-- [ ] Live Mealie fetch verified from the Preview Bench
-- [ ] Actual list and detail response shapes verified against the installed Mealie version
-- [ ] Long ingredient and instruction text handled through segmented loading
-- [ ] Categories and search strategy implemented
+## Phase 1 – Home Assistant bridge
+- [x] Existing Home Assistant Mealie integration reused
+- [x] Separate short bridge bearer key
+- [x] Paginated recipe list endpoint (five recipes per request)
+- [x] On-demand recipe detail endpoint
+- [x] Bridge category endpoint added (live verification pending)
+- [x] Bridge search and category parameters added (live verification pending)
+- [x] Preserve pagination metadata in bridge response (live verification pending)
+- [ ] Verify category endpoint against installed Mealie version
+- [ ] Verify search and category filters against installed Mealie version
+- [ ] Verify exact pagination response and last-page behavior
+- [ ] Test invalid key, missing Mealie entry and Mealie errors
 
-## Phase 2 – Recipe browser
-- [x] Full-screen recipe tile
-- [x] Three-column grid for up to 24 recipes
-- [x] Recipe name, time and servings
-- [x] Tap a recipe to open details
-- [x] Initial detail view with ingredients and preparation
+## Phase 2 – Tessera data path
+- [ ] Replace direct Mealie requests with bridge requests
+- [ ] Remove Mealie API token input from the target plugin setup
+- [ ] Add bridge URL and bridge key configuration using supported Tessera mechanisms
+- [ ] Map recipe summary and pagination metadata
+- [ ] Load categories dynamically
+- [ ] Load full recipe details on demand
+- [ ] Preserve structured ingredient data in detail responses
+
+## Phase 3 – Recipe browser UI
+- [x] Initial full-screen recipe tile
+- [x] Initial three-column grid foundation
+- [ ] Header across full display width
+- [ ] Left navigation sidebar
 - [ ] Search field and on-screen keyboard
-- [ ] Category filter
-- [ ] Recipe images and paging controls
+- [ ] Dynamic category list and “Alle Rezepte”
+- [ ] Search and category can be combined
+- [ ] 3×8 recipe grid for up to 24 results
+- [ ] Collect five-item bridge responses into a 24-item buffer
+- [ ] Pagination controls and total-page indicator
+- [ ] Keep active filters when moving between displayed pages
+- [ ] Reset to first page when a filter changes
+- [ ] Loading, empty and error states
+- [ ] Prevent stale responses from an older filter state
 
-## Phase 3 – Cooking features
-- [ ] Adjust serving count
+## Phase 4 – Cooking features
+- [ ] Adjust serving count using structured ingredient quantities
 - [ ] Check off ingredients
 - [ ] Step-by-step cooking view
 - [ ] Previous/next step
 - [ ] Optional timer
 
-## Phase 4 – Preview, testing and release
+## Phase 5 – Preview, testing and release
 - [x] Official Tessera plugin checker workflow configured
 - [ ] Official Preview Bench succeeds for enabled large displays
 - [ ] Check layout and readability at target resolutions
@@ -52,7 +70,8 @@ The goal is an installable Tessera recipe browser for large 1280 × 800 touch di
 ## Development rules
 
 - Keep commits small and reviewable.
-- Do not assume unverified Mealie response fields.
-- Follow the official Tessera plugin structure and checks.
+- Verify API paths, parameters and response fields against the installed Mealie instance.
+- Read [implementation-plan.md](implementation-plan.md) before beginning work.
+- Use the Home Assistant bridge; do not reintroduce a Mealie API token in Tessera.
 - Never commit secrets, API tokens or other credentials.
 - Do not overwrite existing Home Assistant or Tessera configuration without explicit instruction.
