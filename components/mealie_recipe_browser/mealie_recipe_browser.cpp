@@ -400,6 +400,8 @@ bool MealieRecipeBrowser::load_page(size_t page) {
   recipes_.clear();
   recipe_pages_received_ = 0;
   recipe_page_failures_ = 0;
+  next_mealie_page_index_ = 0;
+  request_started_ms_ = 0;
   total_recipes_ = 0;
   for (size_t i = 0; i < MEALIE_PAGES_PER_VIEW; ++i) {
     recipe_request_ids_[i] = 0;
@@ -408,25 +410,48 @@ bool MealieRecipeBrowser::load_page(size_t page) {
   }
 
   status_ = "loading";
-  bool sent_any = false;
+  send_next_recipe_page();
+  return true;
+}
+
+void MealieRecipeBrowser::send_next_recipe_page() {
+  for (size_t i = 0; i < MEALIE_PAGES_PER_VIEW; ++i)
+    if (recipe_request_ids_[i] != 0) return;
+
   const size_t first_mealie_page = (current_page_ - 1) * MEALIE_PAGES_PER_VIEW + 1;
-  for (size_t i = 0; i < MEALIE_PAGES_PER_VIEW; ++i) {
+  while (next_mealie_page_index_ < MEALIE_PAGES_PER_VIEW) {
+    const size_t index = next_mealie_page_index_++;
     JsonDocument request;
     request["ask"] = "call_service:mealie_tessera_bridge.get_recipes";
-    request["data"]["page"] = static_cast<unsigned>(first_mealie_page + i);
-    recipe_request_ids_[i] = tessera::send(this, request.as<JsonObjectConst>());
-    if (recipe_request_ids_[i]) {
-      sent_any = true;
-    } else {
-      recipe_page_received_[i] = true;
-      ++recipe_pages_received_;
-      ++recipe_page_failures_;
+    request["data"]["page"] = static_cast<unsigned>(first_mealie_page + index);
+    const uint32_t id = tessera::send(this, request.as<JsonObjectConst>());
+    if (id) {
+      recipe_request_ids_[index] = id;
+      request_started_ms_ = millis();
+      return;
     }
+    recipe_page_received_[index] = true;
+    ++recipe_pages_received_;
+    ++recipe_page_failures_;
   }
 
-  if (recipe_pages_received_ == MEALIE_PAGES_PER_VIEW)
-    status_ = sent_any ? "service_error" : "request_failed";
-  return sent_any;
+  if (recipe_pages_received_ == MEALIE_PAGES_PER_VIEW) {
+    total_pages_ = total_recipes_ == 0 ? 1 : (total_recipes_ + MAX_RECIPES - 1) / MAX_RECIPES;
+    status_ = recipes_.empty() ? "request_failed" :
+              (recipe_page_failures_ ? "partial_results" : "loaded");
+  }
+}
+
+void MealieRecipeBrowser::publish_recipe_pages() {
+  recipes_.clear();
+  for (size_t i = 0; i < MEALIE_PAGES_PER_VIEW; ++i) {
+    for (const auto &recipe : recipe_page_items_[i]) {
+      if (recipes_.size() >= MAX_RECIPES) break;
+      recipes_.push_back(recipe);
+    }
+  }
+  if (total_recipes_ > 0)
+    total_pages_ = (total_recipes_ + MAX_RECIPES - 1) / MAX_RECIPES;
 }
 
 bool MealieRecipeBrowser::load_recipe(const std::string &slug) {
@@ -442,48 +467,71 @@ void MealieRecipeBrowser::on_message(JsonObjectConst message) {
   const uint32_t received_id = message["re"] | 0u;
   if (open_card_) open_card_->answer(message);
 
-  for (size_t page = 0; page < MEALIE_PAGES_PER_VIEW; ++page) {
-    if (recipe_request_ids_[page] != received_id || recipe_page_received_[page]) continue;
+  size_t page_index = MEALIE_PAGES_PER_VIEW;
+  for (size_t i = 0; i < MEALIE_PAGES_PER_VIEW; ++i) {
+    if (recipe_request_ids_[i] == received_id && received_id != 0) {
+      page_index = i;
+      recipe_request_ids_[i] = 0;
+      break;
+    }
+  }
+  if (page_index == MEALIE_PAGES_PER_VIEW) return;
 
-    recipe_page_received_[page] = true;
-    ++recipe_pages_received_;
-    if (!(message["ok"] | false)) {
+  ++recipe_pages_received_;
+  recipe_page_received_[page_index] = true;
+  if (!(message["ok"] | false)) {
+    ++recipe_page_failures_;
+  } else {
+    JsonObjectConst result = message["result"].as<JsonObjectConst>();
+    JsonArrayConst items = result["items"].as<JsonArrayConst>();
+    if (items.isNull()) {
       ++recipe_page_failures_;
     } else {
-      JsonObjectConst result = message["result"].as<JsonObjectConst>();
-      JsonArrayConst items = result["items"].as<JsonArrayConst>();
-      if (items.isNull()) {
-        ++recipe_page_failures_;
-      } else {
-        total_recipes_ = result["total"] | total_recipes_;
-        for (JsonObjectConst item : items) {
-          RecipeSummary recipe;
-          recipe.id = item["id"] | "";
-          recipe.name = printable(std::string(item["name"] | ""));
-          if (recipe.name.empty() || recipe.id.empty()) continue;
-          recipe.total_seconds = item["seconds"] | 0u;
-          recipe.servings = item["servings"] | 0.0f;
-          recipe_page_items_[page].push_back(std::move(recipe));
-        }
+      total_recipes_ = result["total"] | total_recipes_;
+      for (JsonObjectConst item : items) {
+        RecipeSummary recipe;
+        recipe.id = item["id"] | "";
+        recipe.name = printable(std::string(item["name"] | ""));
+        if (recipe.name.empty() || recipe.id.empty()) continue;
+        recipe.total_seconds = item["seconds"] | 0u;
+        recipe.servings = item["servings"] | 0.0f;
+        recipe_page_items_[page_index].push_back(std::move(recipe));
       }
+      publish_recipe_pages();
     }
+  }
 
-    if (recipe_pages_received_ == MEALIE_PAGES_PER_VIEW) {
-      recipes_.clear();
-      for (size_t i = 0; i < MEALIE_PAGES_PER_VIEW; ++i) {
-        for (auto &recipe : recipe_page_items_[i]) {
-          if (recipes_.size() >= MAX_RECIPES) break;
-          recipes_.push_back(std::move(recipe));
-        }
-      }
-      total_pages_ = total_recipes_ == 0 ? 1 : (total_recipes_ + MAX_RECIPES - 1) / MAX_RECIPES;
-      if (current_page_ > total_pages_) current_page_ = total_pages_;
-      if (recipes_.empty())
-        status_ = recipe_page_failures_ ? "service_error" : "no_results";
-      else
-        status_ = recipe_page_failures_ ? "partial_results" : "loaded";
-    }
-    return;
+  request_started_ms_ = 0;
+  if (recipe_pages_received_ < MEALIE_PAGES_PER_VIEW) {
+    send_next_recipe_page();
+  } else {
+    publish_recipe_pages();
+    total_pages_ = total_recipes_ == 0 ? 1 : (total_recipes_ + MAX_RECIPES - 1) / MAX_RECIPES;
+    if (recipes_.empty())
+      status_ = recipe_page_failures_ ? "service_error" : "no_results";
+    else
+      status_ = recipe_page_failures_ ? "partial_results" : "loaded";
+  }
+}
+
+void MealieRecipeBrowser::on_interval(uint32_t now_ms) {
+  if (!request_started_ms_ || now_ms - request_started_ms_ < 15000) return;
+
+  for (size_t i = 0; i < MEALIE_PAGES_PER_VIEW; ++i) {
+    if (recipe_request_ids_[i] == 0) continue;
+    recipe_request_ids_[i] = 0;
+    recipe_page_received_[i] = true;
+    ++recipe_pages_received_;
+    ++recipe_page_failures_;
+    break;
+  }
+  request_started_ms_ = 0;
+  if (recipe_pages_received_ < MEALIE_PAGES_PER_VIEW) {
+    send_next_recipe_page();
+  } else {
+    publish_recipe_pages();
+    total_pages_ = total_recipes_ == 0 ? 1 : (total_recipes_ + MAX_RECIPES - 1) / MAX_RECIPES;
+    status_ = recipes_.empty() ? "service_error" : "partial_results";
   }
 }
 }  // namespace esphome::mealie_recipe_browser
