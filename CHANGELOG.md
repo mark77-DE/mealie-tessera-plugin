@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.1 - 2026-11-28
+- Add diagnostics for Home Assistant recipe-service requests and responses.
+- Keep partial recipe results visible while additional pages load.
+- Include hidden preview diagnostics in CI artifacts.
+
+
 ## 0.5.0 - 2026-11-28
 - Replace direct Mealie HTTP access with native Home Assistant response services.
 - Remove the Mealie API token input, server URL and Tessera network permission.
