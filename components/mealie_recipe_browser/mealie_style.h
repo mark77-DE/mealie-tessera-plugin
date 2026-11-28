@@ -1,5 +1,5 @@
 #pragma once
-// Look of the Mealie recipe browser. Change fonts, colors, spacing and text decoration here only.
+// Look of the Mealie recipe browser. Change fonts, colors, spacing and text decoration here only.\n//\n// Layout measurements and spacing are documented in docs/ui-layout.md.\n// All *_PX values are design pixels and must be applied through ui::px().
 //
 // Fonts, from large to small: VALUE (38) > HEADLINE (27) > BODY_LARGE (21) > TITLE (18, bold) > BODY (16).
 //   The numbers are base sizes of Tessera's standard look; the screen scales them.
@@ -17,15 +17,15 @@ constexpr tessera::Font LIST_TITLE_FONT = tessera::Font::TITLE;
 constexpr theme::Role LIST_TITLE_COLOR = theme::INK;
 constexpr tessera::Font LIST_STATUS_FONT = tessera::Font::BODY;
 constexpr theme::Role LIST_STATUS_COLOR = theme::MUTED;
-constexpr int LIST_STATUS_GAP_PX = 6;
-constexpr int LIST_TOP_GAP_PX = 18;
+constexpr int LIST_STATUS_GAP_PX = 6;  // gap from title baseline to the result/status line\nconstexpr int LIST_TOP_GAP_PX = 18;  // breathing room between status line and first recipe row
 
-// 24 recipes: three columns by eight rows on the 10.1-inch display.
+// 20 recipes: three columns, seven rows (the last row contains two cards).
+// Keep three columns so long German recipe names retain useful width.
 constexpr int CARD_COLUMNS = 3;
-constexpr int CARD_GAP_PX = 8;
+constexpr int CARD_GAP_PX = 8;  // horizontal and vertical gap between neighboring cards
 constexpr int CARD_HEIGHT_PX = 76;
 constexpr int CARD_RADIUS_PX = 12;
-constexpr int CARD_PADDING_PX = 10;
+constexpr int CARD_PADDING_PX = 10;  // inset from card border to name and metadata
 constexpr int CARD_BORDER_WIDTH = 1;
 constexpr theme::Role CARD_BG_COLOR = theme::CARD;
 constexpr theme::Role CARD_BORDER_COLOR = theme::LINE;
@@ -34,8 +34,8 @@ constexpr theme::Role CARD_NAME_COLOR = theme::INK;
 constexpr int CARD_NAME_HEIGHT_PX = 42;
 constexpr tessera::Font CARD_META_FONT = tessera::Font::BODY;
 constexpr theme::Role CARD_META_COLOR = theme::MUTED;
-constexpr int CARD_META_Y_PX = 50;
-constexpr int CARD_META_HEIGHT_PX = 20;
+constexpr int CARD_META_Y_PX = 46;  // metadata baseline relative to the card top; reduced from 50 px
+constexpr int CARD_META_HEIGHT_PX = 20;\n\n// Footer navigation: large arrows with a generous 20% touch target at each edge.\nconstexpr tessera::Font NAV_ARROW_FONT = tessera::Font::HEADLINE;
 
 // ---------------------------------------------------------------------------------------------------------------
 // Recipe card (the detail view; its title bar is set by Tessera and cannot be changed here)
