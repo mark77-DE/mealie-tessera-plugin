@@ -202,8 +202,8 @@ class RecipeBrowserTile : public tessera::Tile {
 
     char count_text[80];
     if (plugin_->status() == "loaded") {
-      snprintf(count_text, sizeof(count_text), plugin_->text("recipe_count"),
-               static_cast<unsigned>(recipes.size()));
+      snprintf(count_text, sizeof(count_text), plugin_->text("result_count"),
+               static_cast<unsigned>(plugin_->total_recipes_));
     } else if (plugin_->status() == "partial_results") {
       snprintf(count_text, sizeof(count_text), plugin_->text("partial_count"),
                static_cast<unsigned>(recipes.size()));
