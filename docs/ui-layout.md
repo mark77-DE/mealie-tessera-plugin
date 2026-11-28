@@ -37,10 +37,12 @@ card edges; it does not change the width of the grid columns.
 The footer is reserved at the bottom of the tile.
 
 - `FOOTER_HEIGHT_PX` in the C++ tile controls the footer's total height.
-- The leftmost 20% is the touch target for the previous-page arrow.
-- The middle 60% contains the centered page indicator.
-- The rightmost 20% is the touch target for the next-page arrow.
-- The arrows use `NAV_ARROW_FONT` and are larger than the status text.
+- `NAV_BUTTON_SIZE_PX` sets the square buttons' width and height.
+- `NAV_BUTTON_INSET_PX` sets their distance from the left and right edge.
+- `NAV_BUTTON_RADIUS_PX` controls the corner radius; the border and background reuse the recipe-card theme.
+- The chevrons are drawn from LVGL line segments, not font characters, so they do not depend on glyph coverage.
+- Only taps inside the visible square button bounds change pages; the middle footer area is not a navigation target.
+- The page indicator occupies the remaining center area.
 - On page 1, the previous arrow is disabled and muted. On the last page, the next arrow is disabled
   and muted. Disabled arrows do not trigger page changes.
 
