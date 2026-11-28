@@ -113,17 +113,22 @@ class RecipeBrowserTile : public tessera::Tile {
     }
 
     previous_ = ui::label(c.parent, st::NAV_ARROW_FONT, st::LIST_TITLE_COLOR);
-    lv_obj_set_pos(previous_, 0, footer_y_);
-    lv_obj_set_size(previous_, width_ / 5, footer_height_);
+    lv_obj_set_pos(previous_, 0, footer_y_ + (footer_height_ - ui::line_height(st::NAV_ARROW_FONT)) / 2);
+    lv_obj_set_size(previous_, width_ / 5, ui::line_height(st::NAV_ARROW_FONT));
+    lv_obj_set_style_text_align(previous_, LV_TEXT_ALIGN_CENTER, 0);
     ui::set_text(previous_, "←");
 
     page_status_ = ui::label(c.parent, st::LIST_STATUS_FONT, st::LIST_TITLE_COLOR);
-    lv_obj_set_pos(page_status_, width_ / 5, footer_y_);
-    lv_obj_set_size(page_status_, width_ * 3 / 5, footer_height_);
+    lv_obj_set_pos(page_status_, width_ / 5,
+                   footer_y_ + (footer_height_ - ui::line_height(st::LIST_STATUS_FONT)) / 2);
+    lv_obj_set_size(page_status_, width_ * 3 / 5, ui::line_height(st::LIST_STATUS_FONT));
+    lv_obj_set_style_text_align(page_status_, LV_TEXT_ALIGN_CENTER, 0);
 
     next_ = ui::label(c.parent, st::NAV_ARROW_FONT, st::LIST_TITLE_COLOR);
-    lv_obj_set_pos(next_, width_ * 4 / 5, footer_y_);
-    lv_obj_set_size(next_, width_ / 5, footer_height_);
+    lv_obj_set_pos(next_, width_ * 4 / 5,
+                   footer_y_ + (footer_height_ - ui::line_height(st::NAV_ARROW_FONT)) / 2);
+    lv_obj_set_size(next_, width_ / 5, ui::line_height(st::NAV_ARROW_FONT));
+    lv_obj_set_style_text_align(next_, LV_TEXT_ALIGN_CENTER, 0);
     ui::set_text(next_, "→");
 
     update_cards();
