@@ -44,17 +44,24 @@ class RecipeBrowserTile : public tessera::Tile {
     title_ = ui::label(c.parent, st::LIST_TITLE_FONT, st::LIST_TITLE_COLOR);
     ui::set_text(title_, plugin_->text("screen_title"));
     lv_obj_set_pos(title_, 0, 0);
-    lv_obj_set_size(title_, width_, ui::line_height(st::LIST_TITLE_FONT));
+    lv_obj_set_size(title_, width_ * 55 / 100, ui::line_height(st::LIST_TITLE_FONT));
+
+    search_placeholder_ = ui::label(c.parent, st::LIST_STATUS_FONT, st::LIST_STATUS_COLOR);
+    lv_obj_set_pos(search_placeholder_, width_ * 58 / 100, 0);
+    lv_obj_set_size(search_placeholder_, width_ * 42 / 100, ui::line_height(st::LIST_TITLE_FONT));
+    ui::set_text(search_placeholder_, plugin_->text("search_placeholder"));
 
     status_label_ = ui::label(c.parent, st::LIST_STATUS_FONT, st::LIST_STATUS_COLOR);
     lv_obj_set_pos(status_label_, 0, ui::line_height(st::LIST_TITLE_FONT) + ui::px(st::LIST_STATUS_GAP_PX));
     lv_obj_set_size(status_label_, width_, ui::line_height(st::LIST_STATUS_FONT));
 
+    footer_height_ = ui::px(FOOTER_HEIGHT_PX);
+    footer_y_ = height_ - footer_height_;
     list_top_ = ui::line_height(st::LIST_TITLE_FONT) + ui::line_height(st::LIST_STATUS_FONT) +
                 ui::px(st::LIST_STATUS_GAP_PX + st::LIST_TOP_GAP_PX);
     list_ = lv_obj_create(c.parent);
     lv_obj_set_pos(list_, 0, list_top_);
-    lv_obj_set_size(list_, width_, height_ - list_top_);
+    lv_obj_set_size(list_, width_, footer_y_ - list_top_);
     lv_obj_set_style_bg_opa(list_, LV_OPA_TRANSP, 0);
     lv_obj_set_style_border_width(list_, 0, 0);
     lv_obj_set_style_pad_all(list_, 0, 0);
@@ -66,7 +73,7 @@ class RecipeBrowserTile : public tessera::Tile {
 
     content_ = lv_obj_create(list_);
     lv_obj_set_pos(content_, 0, 0);
-    lv_obj_set_size(content_, width_, height_ - list_top_);
+    lv_obj_set_size(content_, width_, footer_y_ - list_top_);
     lv_obj_set_style_bg_opa(content_, LV_OPA_TRANSP, 0);
     lv_obj_set_style_border_width(content_, 0, 0);
     lv_obj_set_style_pad_all(content_, 0, 0);
@@ -103,6 +110,20 @@ class RecipeBrowserTile : public tessera::Tile {
                       ui::px(st::CARD_META_HEIGHT_PX));
     }
 
+    previous_ = ui::label(c.parent, st::LIST_STATUS_FONT, st::LIST_TITLE_COLOR);
+    lv_obj_set_pos(previous_, 0, footer_y_);
+    lv_obj_set_size(previous_, width_ / 3, footer_height_);
+    ui::set_text(previous_, plugin_->text("previous_page"));
+
+    page_status_ = ui::label(c.parent, st::LIST_STATUS_FONT, st::LIST_TITLE_COLOR);
+    lv_obj_set_pos(page_status_, width_ / 3, footer_y_);
+    lv_obj_set_size(page_status_, width_ / 3, footer_height_);
+
+    next_ = ui::label(c.parent, st::LIST_STATUS_FONT, st::LIST_TITLE_COLOR);
+    lv_obj_set_pos(next_, width_ * 2 / 3, footer_y_);
+    lv_obj_set_size(next_, width_ / 3, footer_height_);
+    ui::set_text(next_, plugin_->text("next_page"));
+
     update_cards();
     plugin_->load_recipes();
   }
@@ -112,6 +133,10 @@ class RecipeBrowserTile : public tessera::Tile {
   void on_theme() override {
     ui::set_color(title_, st::LIST_TITLE_COLOR);
     ui::set_color(status_label_, st::LIST_STATUS_COLOR);
+    ui::set_color(search_placeholder_, st::LIST_STATUS_COLOR);
+    ui::set_color(previous_, st::LIST_TITLE_COLOR);
+    ui::set_color(page_status_, st::LIST_TITLE_COLOR);
+    ui::set_color(next_, st::LIST_TITLE_COLOR);
     for (auto &card : cards_) {
       ui::set_color(card.name, st::CARD_NAME_COLOR);
       ui::set_color(card.meta, st::CARD_META_COLOR);
@@ -124,6 +149,14 @@ class RecipeBrowserTile : public tessera::Tile {
     lv_obj_get_coords(parent_, &pa);
     const int ax = pa.x1 + p.x;
     const int ay = pa.y1 + p.y;
+    if (p.y >= footer_y_ && p.y < height_) {
+      if (p.x < width_ / 3 && plugin_->current_page_ > 1)
+        plugin_->load_page(plugin_->current_page_ - 1);
+      else if (p.x >= width_ * 2 / 3 && plugin_->current_page_ < plugin_->total_pages_)
+        plugin_->load_page(plugin_->current_page_ + 1);
+      return;
+    }
+
     const auto &recipes = plugin_->recipes();
 
     for (size_t i = 0; i < recipes.size() && i < MAX_VISIBLE_RECIPES; ++i) {
@@ -180,7 +213,19 @@ class RecipeBrowserTile : public tessera::Tile {
     } else {
       snprintf(count_text, sizeof(count_text), "%s", plugin_->text(plugin_->status().c_str()));
     }
+    if (plugin_->status() == "loading") {
+      snprintf(count_text, sizeof(count_text), "%s", plugin_->text("loading"));
+    }
     ui::set_text(status_label_, count_text);
+
+    char page_text[64];
+    snprintf(page_text, sizeof(page_text), plugin_->text("page_status"),
+             static_cast<unsigned>(plugin_->current_page_), static_cast<unsigned>(plugin_->total_pages_));
+    ui::set_text(page_status_, page_text);
+    if (plugin_->current_page_ <= 1) lv_obj_add_state(previous_, LV_STATE_DISABLED);
+    else lv_obj_clear_state(previous_, LV_STATE_DISABLED);
+    if (plugin_->current_page_ >= plugin_->total_pages_) lv_obj_add_state(next_, LV_STATE_DISABLED);
+    else lv_obj_clear_state(next_, LV_STATE_DISABLED);
 
     const size_t rows = (recipes.size() + st::CARD_COLUMNS - 1) / st::CARD_COLUMNS;
     const int gap = ui::px(st::CARD_GAP_PX);
@@ -191,6 +236,7 @@ class RecipeBrowserTile : public tessera::Tile {
   }
 
   static constexpr size_t MAX_VISIBLE_RECIPES = 24;
+  static constexpr int FOOTER_HEIGHT_PX = 44;
   MealieRecipeBrowser *plugin_;
   int width_ = 0;
   int height_ = 0;
@@ -198,8 +244,14 @@ class RecipeBrowserTile : public tessera::Tile {
   int list_top_ = 0;
   int card_width_ = 0;
   int card_height_ = 0;
+  int footer_y_ = 0;
+  int footer_height_ = 0;
   lv_obj_t *title_ = nullptr;
+  lv_obj_t *search_placeholder_ = nullptr;
   lv_obj_t *status_label_ = nullptr;
+  lv_obj_t *previous_ = nullptr;
+  lv_obj_t *page_status_ = nullptr;
+  lv_obj_t *next_ = nullptr;
   lv_obj_t *list_ = nullptr;
   lv_obj_t *content_ = nullptr;
   lv_obj_t *parent_ = nullptr;
@@ -337,20 +389,31 @@ void MealieRecipeBrowser::setup() {
 }
 
 bool MealieRecipeBrowser::load_recipes() {
+  current_page_ = 1;
+  return load_page(1);
+}
+
+bool MealieRecipeBrowser::load_page(size_t page) {
+  if (page < 1) page = 1;
+  if (total_pages_ > 0 && page > total_pages_) page = total_pages_;
+  current_page_ = page;
   recipes_.clear();
   recipe_pages_received_ = 0;
   recipe_page_failures_ = 0;
-  for (size_t i = 0; i < RECIPE_PAGE_COUNT; ++i) {
+  total_recipes_ = 0;
+  for (size_t i = 0; i < MEALIE_PAGES_PER_VIEW; ++i) {
     recipe_request_ids_[i] = 0;
     recipe_page_received_[i] = false;
+    recipe_page_items_[i].clear();
   }
 
   status_ = "loading";
   bool sent_any = false;
-  for (size_t i = 0; i < RECIPE_PAGE_COUNT; ++i) {
+  const size_t first_mealie_page = (current_page_ - 1) * MEALIE_PAGES_PER_VIEW + 1;
+  for (size_t i = 0; i < MEALIE_PAGES_PER_VIEW; ++i) {
     JsonDocument request;
     request["ask"] = "call_service:mealie_tessera_bridge.get_recipes";
-    request["data"]["page"] = static_cast<unsigned>(i + 1);
+    request["data"]["page"] = static_cast<unsigned>(first_mealie_page + i);
     recipe_request_ids_[i] = tessera::send(this, request.as<JsonObjectConst>());
     if (recipe_request_ids_[i]) {
       sent_any = true;
@@ -361,9 +424,8 @@ bool MealieRecipeBrowser::load_recipes() {
     }
   }
 
-  if (recipe_pages_received_ == RECIPE_PAGE_COUNT) {
+  if (recipe_pages_received_ == MEALIE_PAGES_PER_VIEW)
     status_ = sent_any ? "service_error" : "request_failed";
-  }
   return sent_any;
 }
 
@@ -380,7 +442,7 @@ void MealieRecipeBrowser::on_message(JsonObjectConst message) {
   const uint32_t received_id = message["re"] | 0u;
   if (open_card_) open_card_->answer(message);
 
-  for (size_t page = 0; page < RECIPE_PAGE_COUNT; ++page) {
+  for (size_t page = 0; page < MEALIE_PAGES_PER_VIEW; ++page) {
     if (recipe_request_ids_[page] != received_id || recipe_page_received_[page]) continue;
 
     recipe_page_received_[page] = true;
@@ -393,20 +455,29 @@ void MealieRecipeBrowser::on_message(JsonObjectConst message) {
       if (items.isNull()) {
         ++recipe_page_failures_;
       } else {
+        total_recipes_ = result["total"] | total_recipes_;
         for (JsonObjectConst item : items) {
-          if (recipes_.size() >= MAX_RECIPES) break;
           RecipeSummary recipe;
           recipe.id = item["id"] | "";
           recipe.name = printable(std::string(item["name"] | ""));
           if (recipe.name.empty() || recipe.id.empty()) continue;
           recipe.total_seconds = item["seconds"] | 0u;
           recipe.servings = item["servings"] | 0.0f;
-          recipes_.push_back(std::move(recipe));
+          recipe_page_items_[page].push_back(std::move(recipe));
         }
       }
     }
 
-    if (recipe_pages_received_ == RECIPE_PAGE_COUNT) {
+    if (recipe_pages_received_ == MEALIE_PAGES_PER_VIEW) {
+      recipes_.clear();
+      for (size_t i = 0; i < MEALIE_PAGES_PER_VIEW; ++i) {
+        for (auto &recipe : recipe_page_items_[i]) {
+          if (recipes_.size() >= MAX_RECIPES) break;
+          recipes_.push_back(std::move(recipe));
+        }
+      }
+      total_pages_ = total_recipes_ == 0 ? 1 : (total_recipes_ + MAX_RECIPES - 1) / MAX_RECIPES;
+      if (current_page_ > total_pages_) current_page_ = total_pages_;
       if (recipes_.empty())
         status_ = recipe_page_failures_ ? "service_error" : "no_results";
       else
