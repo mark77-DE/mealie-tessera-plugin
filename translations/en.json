@@ -1,7 +1,5 @@
 {
-  "_meta": {
-    "name": "English"
-  },
+  "_meta": { "name": "English" },
   "screen": {
     "screen_title": "Mealie recipes",
     "searching_for": "Search: {n}",
@@ -13,7 +11,7 @@
     "partial_count": "%u / 24 recipes loaded",
     "partial_results": "Some recipe pages could not be loaded",
     "no_results": "No recipes found",
-    "missing_config": "Configure the Mealie connection first",
+    "missing_config": "Set up the Mealie Tessera Bridge in Home Assistant first",
     "request_failed": "Could not send request",
     "service_error": "Could not load recipes from Mealie",
     "unexpected_response": "Unexpected response format from Mealie",
@@ -32,8 +30,6 @@
     "summary": "Browse up to 24 recipes from Mealie on a large Tessera display.",
     "tile_browser": "Recipe browser",
     "tile_example": "A three-column overview of recipes from Mealie.",
-    "api_token": "Mealie API token",
-    "api_token_hint": "Paste a long-lived Mealie API token. Tessera stores it as a secret and sends it only to your Mealie server.",
     "card_recipe": "Recipe details"
   }
 }
