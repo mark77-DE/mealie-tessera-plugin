@@ -7,10 +7,8 @@
     "searching_for": "Search: {n}",
     "not_loaded": "Not loaded",
     "loading": "Loading recipes…",
-    "loading_count": "%u / 24 loaded…",
     "loaded": "Recipes loaded",
     "recipe_count": "%u recipes",
-    "partial_count": "%u / 24 recipes loaded",
     "partial_results": "Some recipe pages could not be loaded",
     "no_results": "No recipes found",
     "missing_config": "Set up the Mealie Tessera Bridge in Home Assistant first",
@@ -27,14 +25,12 @@
     "no_ingredients": "No ingredients returned",
     "no_instructions": "No instructions returned",
     "search_placeholder": "Search (coming soon)",
-    "previous_page": "‹ Previous",
-    "next_page": "Next ›",
     "page_status": "Page %u of %u",
     "result_count": "%u recipes total"
   },
   "app": {
     "name": "Mealie Recipe Browser",
-    "summary": "Browse up to 24 recipes from Mealie on a large Tessera display.",
+    "summary": "Browse up to 20 recipes from Mealie on a large Tessera display.",
     "tile_browser": "Recipe browser",
     "tile_example": "A three-column overview of recipes from Mealie.",
     "card_recipe": "Recipe details"
